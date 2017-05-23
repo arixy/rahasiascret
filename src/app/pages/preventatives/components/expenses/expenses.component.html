@@ -1,0 +1,33 @@
+<div class="row">
+  <header class="header">
+   <div class="col-md-5">
+        <label>Description</label>
+        <input class="expense-description" placeholder="Expenses" 
+            [(ngModel)]="newExpenseDescription"
+        autofocus>
+    </div>
+    <div class="col-md-5">
+        <label>Cost (Rp)</label>
+        <input class="expense-cost" placeholder="Cost"
+            [(ngModel)]="newExpenseCost"
+        >
+    </div>
+    <div class="col-md-2">
+        <button (click)="addNewExpense()">Add</button>    
+    </div>
+</header>
+</div>
+<div class="row">
+<ul class="expense-list">
+      <!-- These are here just to show the structure of the list items -->
+      <!-- List items should get the class `editing` when editing and `completed` when marked as completed -->
+      <li *ngFor="let expense of expenses">
+        <div class="view">
+              <label>{{ expense.description }}</label>
+         
+              <label>Rp {{ expense.cost }}</label>
+         
+        </div>
+      </li>
+</ul>
+</div>

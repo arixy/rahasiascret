@@ -1,0 +1,25 @@
+.all-list__card{
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 0;
+    border-radius: 7px;
+    position: relative;
+    margin-bottom: 24px;
+    box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.15);
+}
+.all-list__card h3{
+	border-bottom: 1px solid #fff;
+    /* padding-top: 12px; */
+    padding: 10px 10px;
+    color:#fff;
+}
+.all-list__card p{
+	padding: 10px 0px 35px 10px;
+    color: #fff;
+}
+.all-list__card h3:hover {
+    color: #efefef;
+}
+.all-list__card p:hover {
+    color: #efefef;
+}

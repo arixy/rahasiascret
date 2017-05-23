@@ -1,0 +1,166 @@
+<div class="widgets">
+<div class="row">
+    <ba-card title="WO Categories" baCardClass="with-scroll">
+      <p-dataTable #dt [value]="work_orders">
+          <p-header>
+            <div class="ui-helper-clearfix">
+                <button (click)="addWOCategory()" class="btn btn-primary" style="float:right">Add New WO Category</button>
+            </div>
+        </p-header>
+           <p-column field="woCategoryId" header="ID"></p-column>
+            <p-column field="name" header="Name"></p-column>
+            <p-column field="description" header="Description"></p-column>
+			<p-column field="prefix" header="Prefix"></p-column>
+			<p-column field="kpiBaseline" header="KPI Baseline"></p-column>
+			<p-column styleClass="col-button">
+                    <template pTemplate="header">
+                        Action
+                    </template>
+                    <template let-wocategory="rowData" pTemplate="body">
+                            <div class="btn-group" dropdown>
+                              <button id="single-button" type="button" class="btn btn-primary" dropdownToggle>
+                                Action <span class="caret"></span>
+                              </button>
+                              <ul dropdownMenu role="menu" aria-labelledby="single-button">
+                                <li role="menuitem"><a  class="dropdown-item" (click)="editWOCategory(wocategory)">Edit</a></li>
+                                <li role="menuitem"><a class="dropdown-item" (click)="deleteWOCategory(wocategory)">Delete</a></li>
+                                <!-- <li role="menuitem"><a class="dropdown-item" (click)="roles(users)">Roles</a></li> -->
+                              </ul>
+                            </div>
+                    </template>
+            </p-column>
+        </p-dataTable>
+    </ba-card>
+</div>
+
+<!-- <div class="row">
+    <div class="col-md-12">
+      <ba-card title="WO Categories" baCardClass="with-scroll">
+        <div *ngFor="let work_order of work_orders" class="location-container">
+            {{work_order.id}} <br />
+            {{work_order.name}} <br /> 
+            {{work_order.description}} <br />
+            {{work_order.prefix}} <br />
+            {{work_order.kpi_baseline}}
+            <hr />
+        </div>
+      </ba-card>
+    </div>
+  </div> -->
+
+</div>
+<!-- control modal from parent component -->
+<div bsModal #childModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button class="close" aria-label="Close" (click)="hideChildModal()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">Child modal</h4>
+      </div>
+      <div class="modal-body">
+        <div>
+            <ba-card title="Add New WO Category" baCardClass="with-scroll">
+              <form [formGroup]="form" (ngSubmit)="onSubmit(form.value)" class="form-horizontal">
+                  <div class="form-group row" [ngClass]="{'has-error': (!name.valid && name.touched), 'has-success': (name.valid && name.touched)}">
+                    <label for="inputEmail3" class="col-sm-2 control-label">Name</label>
+
+                    <div class="col-sm-10">
+                      <input [formControl]="name" type="text" class="form-control" id="inputEmail3" placeholder="Name">
+                    </div>
+                  </div>
+                  <div class="form-group row" [ngClass]="{'has-error': (!description.valid && description.touched), 'has-success': (description.valid && description.touched)}">
+                    <label for="inputPassword3" class="col-sm-2 control-label">Description</label>
+
+                    <div class="col-sm-10">
+                      <input [formControl]="description" type="text" class="form-control" id="inputPassword3" placeholder="Description">
+                    </div>
+                  </div>
+                  <div class="form-group row" [ngClass]="{'has-error': (!prefix.valid && prefix.touched), 'has-success': (prefix.valid && prefix.touched)}">
+                    <label for="inputPassword3" class="col-sm-2 control-label">Prefix</label>
+
+                    <div class="col-sm-10">
+                      <input [formControl]="prefix" type="text" class="form-control" id="inputPassword3" placeholder="Description">
+                    </div>
+                  </div>
+                  <div class="form-group row" [ngClass]="{'has-error': (!kpi_baseline.valid && kpi_baseline.touched), 'has-success': (kpi_baseline.valid && kpi_baseline.touched)}">
+                    <label for="inputPassword3" class="col-sm-2 control-label">KPI Baseline</label>
+
+                    <div class="col-sm-10">
+                      <input [formControl]="kpi_baseline" type="text" class="form-control" id="inputPassword3" placeholder="Description"> 
+                      &nbsp; <ng-select #addSelectBox
+                                 [allowClear]="true"
+                                  [items]="items_kpi_baseline"
+                                  (selected)="selectedKPIBaseline($event)"
+                                  placeholder="No Duration selected">
+                          </ng-select>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <div class="offset-sm-2 col-sm-10">
+                      <button [disabled]="!form.valid" type="submit" class="btn btn-default btn-auth">Submit</button>
+                    </div>
+                  </div>
+                </form>
+            </ba-card>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div bsModal #childModalEdit="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button class="close" aria-label="Close" (click)="hideChildModalEdit()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">Child modal</h4>
+      </div>
+      <div class="modal-body">
+        <div>
+               <ba-card title="Edit New WO Category" baCardClass="with-scroll">
+              <form [formGroup]="editForm" (ngSubmit)="onSubmitEdit(editForm.value, $event)" class="form-horizontal">
+                   <div class="form-group row" [ngClass]="{'has-error': (!name.valid && name.touched), 'has-success': name.valid}">
+                    <label for="inputEmail3" class="col-sm-2 control-label">Name</label>
+
+                    <div class="col-sm-10">
+                      <input [formControl]="edit_name" type="text" class="form-control" id="inputEmail3" placeholder="Name" value="{{location_editwo.name}}">
+                    </div>
+                  </div>
+                  <div class="form-group row" [ngClass]="{'has-error': (!description.valid && description.touched), 'has-success': (description.valid && description.touched)}">
+                    <label for="inputPassword3" class="col-sm-2 control-label">Description</label>
+
+                    <div class="col-sm-10">
+                      <input [formControl]="edit_description" type="text" value="{{location_editwo.description}}" class="form-control" id="inputPassword3" placeholder="Description">
+                    </div>
+                  </div>
+                  <div class="form-group row" [ngClass]="{'has-error': (!prefix.valid && prefix.touched), 'has-success': (prefix.valid && prefix.touched)}">
+                    <label for="inputPassword3" class="col-sm-2 control-label">Prefix</label>
+
+                    <div class="col-sm-10">
+                      <input [formControl]="edit_prefix" type="text" value="location_editwo.prefix" class="form-control" id="inputPassword3" placeholder="Description">
+                    </div>
+                  </div>
+                  <div class="form-group row" [ngClass]="{'has-error': (!kpi_baseline.valid && kpi_baseline.touched), 'has-success': (kpi_baseline.valid && kpi_baseline.touched)}">
+                    <label for="inputPassword3" class="col-sm-2 control-label">KPI Baseline</label>
+
+                    <div class="col-sm-10">
+                      <input [formControl]="edit_kpi_baseline" type="text" value="location_editwo.kpi_baseline" class="form-control" id="inputPassword3" placeholder="Description">
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <div class="offset-sm-2 col-sm-10">
+                      <button type="submit" class="btn btn-default btn-auth">Submit</button>
+                    </div>
+                  </div>
+                </form>
+            </ba-card>
+         </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,110 @@
+.modal-header h4{
+	font-size: 14px;
+}
+
+.modal-header hr{
+	background: #fff;
+    width: 28px;
+    height: 2px;
+    margin: 0;
+    margin-top: 4px;	
+}
+.modal-body{
+	padding: 0;
+}
+.custom-card{
+	background: transparent !important;
+	margin-bottom: 0;
+}
+input.form-control, textarea.form-control{
+    background: transparent !important;
+    border-radius: 0;
+    border: 1px solid #6b6b6b;
+}
+
+button.btn-custom{
+	color: #fff !important;
+    border: 0;
+    border-radius: 5px;
+    margin-top: 24px;
+    background: #00ABFF !IMPORTANT;
+    opacity: 10 !important;
+    padding: 11px 40px;
+}
+button.btn-custom:hover{
+	opacity: 0.6;
+    transform: none !important;
+}
+button.btn-custom:focus{
+	-webkit-box-shadow: 0 0 20px 5px #00ABFF;
+	box-shadow: 0 0 20px 5px #00ABFF;
+}
+.padding-form-horizontal{
+	margin-top: 1em;
+}
+
+.modal-content{
+	width: 550px;
+    margin: 0 auto;
+}
+
+.form-group.row label{
+	color: #6b6b6b;
+}
+
+.custom-card .card-header{
+	background: #00ABFF;
+	padding: 11px 16px !important;
+	height: 40px;
+    margin-top: 10px;
+}
+.btn-submit-center{
+	text-align: center;
+}
+.modal {
+    padding-top: 50px !important;
+}
+.all-list__card a{
+	color: #fff !important;
+}
+body .ui-widget-header{
+	background: transparent !important;
+    border: none !important;
+	margin-bottom: 1em;
+}
+.btn-export__csv{
+   	border: none;
+    background: transparent;
+    font-size: 36px !important;
+    color: #fff;
+}
+.content_confirm h3{
+	text-align: center;
+	margin-bottom: 2em;
+	font-weight: 400;
+}
+.delete-btn_confirm{
+	text-align: center;
+	margin-bottom: 2em;
+}
+button.btn-yes{
+	background: #00ABFF;
+    padding: 8px 30px;
+    border-radius: 5px;
+    border: none;
+	color: #fff;
+}
+
+button.btn-no{
+	background: #00ABFF;
+    padding: 8px 30px;
+    border-radius: 5px;
+    border: none;
+	color: #fff;
+	margin-left: 2em;
+}
+
+button.btn-no:hover,button.btn-yes:hover{
+	-webkit-box-shadow: 0 0 20px 5px #00ABFF;
+	box-shadow: 0 0 20px 5px #00ABFF;
+}

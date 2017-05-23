@@ -1,0 +1,139 @@
+<div class="page-top clearfix" baScrollPosition maxHeight="50" (scrollChange)="scrolledChanged($event)"
+     [ngClass]="{scrolled: isScrolled}">
+  <a routerLink="/pages/dashboard" class="al-logo clearfix"><img src="assets/img/company2.png"><span>EMS</span></a>
+  <a href (click)="toggleMenu()" class="collapse-menu-link ion-navicon"></a>
+<!--
+  <div class="search">
+    <i class="ion-ios-search-strong" ng-click="startSearch()"></i>
+    <input id="searchInput" type="text" placeholder="Search for...">
+  </div>-->
+    <ul class="top-main-menu nav">
+        <li class="dropdown-full">
+            <a (click)="toggleDropdownNew()" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> <i class="fa fa-plus-circle"></i> New <span class="fa fa-caret-down"></span></a>
+          
+        </li>
+        <li class="dropdown-full">
+            <a (click)="toggleDropdownConfig()" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> <i class="fa fa-gears"></i> Configuration <span class="fa fa-caret-down"></span></a>
+          
+        </li>
+     
+        <li class="dropdown"></li>
+    </ul>
+  <div class="user-profile clearfix">
+    <div class="dropdown al-user-profile">
+      <a class="profile-toggle-link dropdown-toggle" (click)="toggleDropdownProfile()" id="user-profile-dd" data-toggle="dropdown" aria-expanded="false">
+        {{ loggedUser }}
+      </a>
+      <ul *ngIf="isDropdownProfile" class="dropdown-menu user-dropdown top-dropdown-menu profile-dropdown" aria-labelledby="user-profile-dd">
+        <li class="dropdown-item"><i class="dropdown-arr"></i></li>
+        
+        <li class="dropdown-item"><a href><i class="fa fa-cog"></i>Settings</a></li>
+        <hr class="user-divider" />
+        <li class="dropdown-item"><a (click)="changePassword()"><i class="fa fa-cog"></i>Change Password</a></li>
+        <li class="dropdown-item"><a (click)="logout()" class="signout"><i class="fa fa-power-off"></i>Sign out</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+<div *ngIf="isDropdownNewmenu" class="top-dropdown dropdown-configuration">
+    <div class="row dropdown-row">
+        <div class="col-md-3">
+         <ul class="dropdown-menu__">
+        <h5>Building Management</h5>
+        <li><i class="fa fa-angle-right"></i><a routerLink="/pages/preventatives">Single Time Request</a></li>
+        <li><i class="fa fa-angle-right"></i><a routerLink="/pages/preventatives">Recurring Request</a></li>
+    </ul>
+        </div>
+        <div class="col-md-3">
+            <ul class="dropdown-menu__">
+        <h5>Assets</h5>
+        <li><i class="fa fa-angle-right"></i><a routerLink="/pages/preventatives">Preventive Maintenance</a></li>
+    </ul>
+        </div>
+        <div class="col-md-3">
+         <ul class="dropdown-menu__">
+        <h5>Owners &amp; Tenants    </h5>
+        <li><i class="fa fa-angle-right"></i><a routerLink="/pages/entities">Owner Request</a></li>
+        <li><i class="fa fa-angle-right"></i><a routerLink="/pages/entities">Tenant Request</a></li>
+        <li><i class="fa fa-angle-right"></i><a routerLink="/pages/entities">Guest Request</a></li>
+    </ul>
+        </div>
+        <div class="col-md-3">
+          <ul class="dropdown-menu__">
+        <h5>Utilities</h5>
+        <li><i class="fa fa-angle-right"></i><a routerLink="/pages/utility-consumptions">Consumptions</a></li>
+    </ul>
+        </div>
+    </div>
+   
+ 
+</div>
+<div *ngIf="isDropdownConfiguration" class="top-dropdown dropdown-configuration">
+    <div class="row dropdown-row">
+        <div class="col-md-3">
+         <ul class="dropdown-menu__">
+        <h5>Configurations</h5>
+        <li><i class="fa fa-angle-right"></i><a routerLink="/pages/setups/locations">Units/Locations</a></li>
+        <li><i class="fa fa-angle-right"></i><a routerLink="/pages/setups/work-orders">WO Categories</a></li>
+        <li><i class="fa fa-angle-right"></i><a routerLink="/pages/weekends">Weekends &amp; Holidays</a></li>
+    </ul>
+        </div>
+        <div class="col-md-3">
+            <ul class="dropdown-menu__">
+                <h5>List</h5>
+                <li><i class="fa fa-angle-right"></i><a routerLink="/pages/all-list">All Lists</a></li>
+            </ul>
+        </div>
+        <div class="col-md-3">
+         <ul class="dropdown-menu__">
+            <h5>Administrations    </h5>
+            <li><i class="fa fa-angle-right"></i><a routerLink="/pages/users">Manage Users</a></li>
+            <li><i class="fa fa-angle-right"></i><a routerLink="/pages/role">Manage Roles</a></li>
+            <li><i class="fa fa-angle-right"></i><a href="#">Access Rights</a></li>
+            <!-- <li><i class="fa fa-angle-right"></i><a href="#">Redirect Tasks(Reassign)</a></li> -->
+        </ul>
+        </div>
+        <div class="col-md-3">
+          &nbsp;
+        </div>
+    </div>
+   
+ 
+</div>
+<div bsModal #changeModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button class="close" aria-label="Close" (click)="hideChangeModal()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">Change Password</h4>
+      </div>
+      <div class="modal-body">
+        <div>
+            <ba-card title="Change Password" baCardClass="with-scroll">
+              <div class="form-group row">
+                <label for="inputPassword3" class="col-sm-2 control-label">Old Password</label>
+
+                <div class="col-sm-10">
+                  <input [(ngModel)]="oldpassword" type="password" class="form-control" id="inputPassword3" placeholder="Old Password">
+                </div>
+              </div>
+			  <div class="form-group row">
+                <label for="inputPassword3" class="col-sm-2 control-label">New Password</label>
+
+                <div class="col-sm-10">
+                  <input [(ngModel)]="newpassword" type="password" class="form-control" id="inputPassword3" placeholder="New Password">
+                </div>
+              </div>
+              <div class="form-group row">
+                <div class="offset-sm-2 col-sm-10">
+                  <button (click)="submitPassword()" class="btn btn-default btn-auth">Submit</button>
+                </div>
+              </div>
+            </ba-card>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>

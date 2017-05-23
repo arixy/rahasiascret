@@ -1,0 +1,133 @@
+<div class="widgets">
+    <ba-card title="WO Utility" baCardClass="with-scroll">
+        <p-dataTable #dt [value]="utilities">
+          <p-header>
+            <div class="ui-helper-clearfix">
+                <button type="button" iconPos="left" (click)="dt.exportCSV()" style="float:left" class="btn-export__csv">
+                    <i class="icon ion-ios-download-outline"></i>
+                </button>
+                <button (click)="addUtilityType()" class="btn btn-primary" style="float:right">Add New Utility Types</button>
+            </div>
+        </p-header>
+           <p-column field="utilityTypeId" header="Utility Type ID"></p-column>
+            <p-column field="name" header="Name"></p-column>
+            <p-column field="description" header="Description"></p-column>
+            <p-column styleClass="col-button">
+                    <template pTemplate="header">
+                        Action
+                    </template>
+                    <template let-utilities="rowData" pTemplate="body">
+                            <div class="btn-group" dropdown>
+                              <button id="single-button" type="button" class="btn btn-primary" dropdownToggle>
+                                Action <span class="caret"></span>
+                              </button>
+                              <ul dropdownMenu role="menu" aria-labelledby="single-button">
+                                <li role="menuitem"><a  class="dropdown-item" (click)="editUtilityType(utilities)">Edit</a></li>
+                                <li role="menuitem"><a class="dropdown-item" (click)="deleteUtilityType(utilities)">Delete</a></li>
+                              </ul>
+                            </div>
+                    </template>
+            </p-column>
+        </p-dataTable>
+    </ba-card>
+</div>
+<div bsModal #addNewModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button class="close" aria-label="Close" (click)="hideChildModal()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">Add New</h4>
+		<hr/>
+      </div>
+      <div class="modal-body">
+        <div>
+            <ba-card title="Add New Priority" baCardClass="with-scroll custom-card">
+              <form [formGroup]="form" (ngSubmit)="onSubmit(form.value)" class="form-horizontal padding-form-horizontal">
+              <div class="form-group row">
+				  <div class="col-sm-12">
+					  <label>Name</label>
+					  <input [formControl]="name" type="text" class="form-control" id="inputEmail3" placeholder="Name">
+				  </div>  
+              </div>
+              <div class="form-group row" [ngClass]="{'has-error': (!description.valid && description.touched), 'has-success': (description.valid && description.touched)}">
+				<div class="col-sm-12">  
+					<label>Description</label>
+					<textarea [formControl]="description" type="text" class="form-control" id="inputPassword3" rows="2" cols="2" placeholder="Description"></textarea>
+				</div>	
+              </div>
+              <div class="form-group row">
+                <div class="col-sm-12 btn-submit-center">
+                  <button [disabled]="!form.valid" type="submit" class="btn btn-default btn-auth btn-custom">Submit</button>
+                </div>
+              </div>
+            </form>
+            </ba-card>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div bsModal #editModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button class="close" aria-label="Close" (click)="hideChildModalEdit()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">Edit Utilities</h4>
+		 <hr/> 
+      </div>
+      <div class="modal-body">
+        <div>
+            <ba-card title="Edit Utilities" baCardClass="with-scroll custom-card">
+              <form [formGroup]="edit_form" (ngSubmit)="onSubmitEdit(edit_form.value, $event)" class="form-horizontal">
+              <div class="form-group row">
+                <div class="col-sm-12">
+					<label>Name</label>
+                  <input [formControl]="edit_name" type="text" class="form-control" id="inputEmail3" placeholder="Name">
+                </div>
+              </div>
+              <div class="form-group row" [ngClass]="{'has-error': (!description.valid && description.touched), 'has-success': (description.valid && description.touched)}">
+                <div class="col-sm-12">
+					<label>Description</label>	
+					<textarea [formControl]="edit_description" type="text" class="form-control" id="inputPassword3" placeholder="Description" rows="2" cols="2"></textarea>
+                </div>
+              </div>
+              <div class="form-group row">
+                <div class="col-sm-12 btn-submit-center">
+                  <button [disabled]="!edit_form.valid" type="submit" class="btn btn-default btn-auth btn-custom">Submit</button>
+                </div>
+              </div>
+            </form>
+            </ba-card>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div bsModal #deleteModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+     
+      </div>
+      <div class="modal-body">
+		  <div class="content_confirm">
+				<h3>Delete {{delete_name}}?</h3>
+		  </div>
+		  <div class="delete-btn_confirm">
+			  <button (click)="saveDelete()" class="btn-yes">
+				  Yes
+			  </button>
+			  <button (click)="deleteClose()" class="btn-no">
+				  No
+			  </button>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>

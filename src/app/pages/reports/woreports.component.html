@@ -1,0 +1,37 @@
+<div class="widgets">
+    <ba-card title="WO Reports" baCardClass="with-scroll">
+        <p-dataTable #dt [rowStyleClass]="lookupRowStyleClass" [value]="processed_work_orders">
+          <p-header>
+            <div class="ui-helper-clearfix">
+                <button type="button" iconPos="left" label="CSV" (click)="dt.exportCSV()" style="float:left" class="btn-export__csv">
+                    <i class="icon ion-ios-download-outline"></i>
+                </button>
+            </div>
+        </p-header>
+           <p-column field="wo_number" header="WO Number"></p-column>
+            <p-column field="task" header="Task"></p-column>
+            <p-column field="description" header="Description"></p-column>
+            <p-column field="due_after" header="Due After"></p-column>
+            <p-column field="status" header="Status"></p-column>
+            <p-column field="duration" header="Duration"></p-column>
+            <p-column styleClass="col-button">
+                    <template pTemplate="header">
+                        Assignee
+                    </template>
+                    <template pTemplate="body">
+                        User B
+                    </template>
+            </p-column>
+            <!-- <p-column styleClass="col-button">
+                    <template pTemplate="header">
+                        Action
+                    </template>
+                    <template let-invoice="rowData" pTemplate="body">
+                        <button type="button" pButton [routerLink]="['/invoicer/invoice-detail', invoice.uuid]" icon="fa fa-search">
+                            <i class="fa fa-pencil"></i>EDIT
+                        </button>
+                    </template>
+            </p-column> -->
+        </p-dataTable>
+    </ba-card>
+</div>

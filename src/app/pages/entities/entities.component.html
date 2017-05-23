@@ -1,0 +1,204 @@
+<div class="widgets">
+    <ba-card title="Entities" baCardClass="with-scroll">
+        <p-dataTable #dt [value]="entities" [lazy]="false" [rows]="10" [paginator]="true">
+          <p-header>
+            <div class="ui-helper-clearfix">
+                <button type="button" iconPos="left" label="CSV" (click)="dt.exportCSV()" style="float:left" class="btn-export__csv">
+                    <i class="icon ion-ios-download-outline"></i>
+                </button>
+                <button (click)="addEntity()" class="btn btn-primary" style="float:right">Add New Entity</button>
+            </div>
+        </p-header>
+           <p-column field="entityId" header="ID" [sortable]="true"></p-column>
+            <p-column field="name" header="Name" 
+            [sortable]="true"
+            [filter]="true" filterPlaceholder="Search"></p-column>
+            <p-column field="description" header="Description"></p-column>
+            <p-column field="address1" header="Address"></p-column>
+            <p-column field="contactPerson" header="Contact"></p-column>
+            <p-column field="phone1" header="Phone"></p-column>
+            <p-column styleClass="col-button">
+                    <template pTemplate="header">
+                        Action
+                    </template>
+                    <template let-entities="rowData" pTemplate="body">
+                            <div class="btn-group" dropdown>
+                              <button id="single-button" type="button" class="btn btn-primary" dropdownToggle>
+                                Action <span class="caret"></span>
+                              </button>
+                              <ul dropdownMenu role="menu" aria-labelledby="single-button">
+                                <li role="menuitem"><a  class="dropdown-item" (click)="editEntity(entities)">Edit</a></li>
+                                <li role="menuitem"><a class="dropdown-item" (click)="deleteEntity(entities)">Delete</a></li>
+                              </ul>
+                            </div>
+                    </template>
+            </p-column>
+        </p-dataTable>
+    </ba-card>
+</div>
+<div bsModal #addNewModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button class="close" aria-label="Close" (click)="hideChildModal()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">Add New</h4>
+      </div>
+      <div class="modal-body">
+        <div>
+            <ba-card title="Add New Priority" baCardClass="with-scroll">
+              <form [formGroup]="form" (ngSubmit)="onSubmit(form.value)" class="form-horizontal">
+              <div class="form-group row">
+                <label for="inputEmail3" class="col-sm-2 control-label">Name</label>
+
+                <div class="col-sm-10">
+                  <input [formControl]="name" type="text" class="form-control" id="inputEmail3" placeholder="Name">
+                </div>
+              </div>
+              <div class="form-group row" [ngClass]="{'has-error': (!description.valid && description.touched), 'has-success': (description.valid && description.touched)}">
+                <label for="inputPassword3" class="col-sm-2 control-label">Description</label>
+
+                <div class="col-sm-10">
+                  <input [formControl]="description" type="text" class="form-control" id="inputPassword3" placeholder="Description">
+                </div>
+              </div>
+              <div class="form-group row">
+                  <label for="inputPassword3" class="col-sm-2 control-label">address 1</label>
+
+                <div class="col-sm-10">
+                  <input [formControl]="address1" type="text" class="form-control" id="inputPassword3" placeholder="address 1">
+                </div>
+              </div>
+			 <div class="form-group row">
+                  <label for="inputPassword3" class="col-sm-2 control-label">contact</label>
+
+                <div class="col-sm-10">
+                  <input [formControl]="contact_person" type="text" class="form-control" id="inputPassword3" placeholder="contact person">
+                </div>
+              </div>	
+			 <div class="form-group row">
+                  <label for="inputPassword3" class="col-sm-2 control-label">phone</label>
+
+                <div class="col-sm-10">
+                  <input [formControl]="phone1" type="text" class="form-control" id="inputPassword3" placeholder="phone">
+                </div>
+              </div>
+              <div *ngIf="items_entity_type" class="form-group row select-container">
+                 <label for="selectlocation" class="col-sm-2 control-label">Entity Type</label>
+                 <div class="col-sm-10">
+                      <ng-select #addEntityTypeSelectBox
+                                 [items]="items_entity_type"
+                                  [disabled]="disabled"
+                                  (selected)="selectedEntityType($event)"
+                                  placeholder="No Entity Type selected">
+                      </ng-select>
+                  </div>
+              </div>		  
+              <div class="form-group row">
+                <div class="offset-sm-2 col-sm-10">
+                  <button [disabled]="!form.valid" type="submit" class="btn btn-default btn-auth">Submit</button>
+                </div>
+              </div>
+            </form>
+            </ba-card>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div bsModal #editModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button class="close" aria-label="Close" (click)="hideEditModal()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">Edit Entities</h4>
+      </div>
+      <div class="modal-body">
+        <div>
+            <ba-card title="Edit Entity" baCardClass="with-scroll">
+              <form [formGroup]="edit_form" (ngSubmit)="onSubmitEdit(edit_form.value, $event)" class="form-horizontal">
+              <div class="form-group row">
+                <label for="inputEmail3" class="col-sm-2 control-label">Name</label>
+
+                <div class="col-sm-10">
+                  <input [formControl]="edit_name" type="text" class="form-control" id="inputEmail3" placeholder="Name">
+                </div>
+              </div>
+			<div class="form-group row">  
+               <label for="inputPassword3" class="col-sm-2 control-label">Description</label>
+
+                <div class="col-sm-10">
+                  <input [formControl]="edit_description" type="text" class="form-control" id="inputPassword3" placeholder="Description">
+                </div>
+			</div>	
+              <div class="form-group row">
+                  <label for="inputPassword3" class="col-sm-2 control-label">address 1</label>
+
+                <div class="col-sm-10">
+                  <input [formControl]="edit_address1" type="text" class="form-control" id="inputPassword3" placeholder="address 1">
+                </div>
+              </div>
+			 <div class="form-group row">
+                  <label for="inputPassword3" class="col-sm-2 control-label">contact</label>
+
+                <div class="col-sm-10">
+                  <input [formControl]="edit_contact_person" type="text" class="form-control" id="inputPassword3" placeholder="contact person">
+                </div>
+              </div>	
+			 <div class="form-group row">
+                  <label for="inputPassword3" class="col-sm-2 control-label">phone</label>
+
+                <div class="col-sm-10">
+                  <input [formControl]="edit_phone1" type="text" class="form-control" id="inputPassword3" placeholder="phone">
+                </div>
+              </div>
+              <div *ngIf="items_entity_type" class="form-group row select-container">
+                 <label for="selectlocation" class="col-sm-2 control-label">Entity Type</label>
+                 <div class="col-sm-10">
+                      <ng-select #editEntityTypeSelectBox
+                                 [items]="items_entity_type"
+                                  [disabled]="disabled"
+                                  (selected)="selectedEditEntityType($event)"
+                                  placeholder="No Entity Type selected">
+                      </ng-select>
+                  </div>
+              </div>		  
+              <div class="form-group row">
+                <div class="offset-sm-2 col-sm-10">
+                  <button [disabled]="!edit_form.valid" type="submit" class="btn btn-default btn-auth">Submit</button>
+                </div>
+              </div>
+            </form>
+            </ba-card>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div bsModal #deleteModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+     
+      </div>
+      <div class="modal-body">
+		  <div class="content_confirm">
+				<h3>Delete {{delete_name}}?</h3>
+		  </div>
+		  <div class="delete-btn_confirm">
+			  <button (click)="saveDelete()" class="btn-yes">
+				  Yes
+			  </button>
+			  <button (click)="deleteClose()" class="btn-no">
+				  No
+			  </button>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>

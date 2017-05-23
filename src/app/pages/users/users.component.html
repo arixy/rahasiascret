@@ -1,0 +1,244 @@
+<div class="widgets">
+    <ba-card title="Users" baCardClass="with-scroll">
+        <p-dataTable #dt [value]="users">
+          <p-header>
+            <div class="ui-helper-clearfix">
+                <button (click)="addUsers()" class="btn btn-primary" style="float:right">Add New User</button>
+            </div>
+        </p-header>
+           <p-column field="userId" header="User ID"></p-column>
+            <p-column field="username" header="Username"></p-column>
+            <p-column field="fullname" header="Fullname"></p-column>
+            <p-column field="email" header="Email"></p-column>
+			<p-column field="mobilePhoneNumber" header="mobile phone number"></p-column>
+			<p-column styleClass="col-button">
+                    <template pTemplate="header">
+                        Action
+                    </template>
+                    <template let-users="rowData" pTemplate="body">
+                            <div class="btn-group" dropdown>
+                              <button id="single-button" type="button" class="btn btn-primary" dropdownToggle>
+                                Action <span class="caret"></span>
+                              </button>
+                              <ul dropdownMenu role="menu" aria-labelledby="single-button">
+                                <li role="menuitem"><a  class="dropdown-item" (click)="editUsers(users)">Edit</a></li>
+                                <li role="menuitem"><a class="dropdown-item" (click)="deleteUsers(users)">Delete</a></li>
+                                <!-- <li role="menuitem"><a class="dropdown-item" (click)="roles(users)">Roles</a></li> -->
+                              </ul>
+                            </div>
+                    </template>
+            </p-column>
+        </p-dataTable>
+    </ba-card>
+</div>
+<div bsModal #addNewModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button class="close" aria-label="Close" (click)="hideChildModal()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        	<h4 class="modal-title">Add New</h4>
+		  <hr/>
+      </div>
+      <div class="modal-body">
+        <div>
+            <ba-card title="Add New User" baCardClass="with-scroll custom-card">
+              <form [formGroup]="form" (ngSubmit)="onSubmit(form.value)" class="form-horizontal">
+              <div class="form-group row" [ngClass]="{'has-error': (!username.valid && username.touched), 'has-success': (username.valid && username.touched)}">
+                <div class="col-sm-12">
+					<label>Username</label>
+					<input [formControl]="username" type="text" class="form-control" id="inputEmail3" placeholder="Username">
+                </div>
+              </div>
+			  <div class="form-group row" [ngClass]="{'has-error': (!fullname.valid && fullname.touched), 'has-success': (fullname.valid && fullname.touched)}">
+                <div class="col-sm-12">
+					<label>Fullname</label>
+					<input [formControl]="fullname" type="text" class="form-control" id="inputEmail3" placeholder="fullname">
+                </div>
+              </div>
+              <div class="form-group row" [ngClass]="{'has-error': (!email.valid && email.touched), 'has-success': (email.valid && email.touched)}">
+                <div class="col-sm-12">
+					<label>Email</label>
+					<input [formControl]="email" type="email" class="form-control" id="inputPassword3" placeholder="Email">
+                </div>
+              </div>
+			  <div class="form-group row">
+                <div class="col-sm-12">
+					<label>Mobile Phone</label>
+					<input [formControl]="mobilePhoneNumber" type="text" class="form-control" id="inputPassword3" placeholder="Mobile Phone">
+                </div>
+              </div>
+			  <div class="form-group row" [ngClass]="{'has-error': (!password.valid && password.touched), 'has-success': (password.valid && password.touched)}">
+                <div class="col-sm-12">
+					<label>Password Salt</label>
+					<input [formControl]="password" type="password" class="form-control" id="inputPassword3" placeholder="Password Salt">
+                </div>
+              </div>
+			  <div class="form-group row" [ngClass]="{'has-error': (!password.valid && password.touched), 'has-success': (password.valid && password.touched)}">
+                <div class="col-sm-12">
+					<label>Hash password</label>
+					<input [formControl]="password" type="password" class="form-control" id="inputPassword3" placeholder="Hash password">
+                </div>
+              </div>	  
+              <div class="form-group row">
+                <div class="col-sm-12 btn-submit-center">
+                  <button [disabled]="!form.valid" type="submit" class="btn btn-default btn-auth btn-custom">Submit</button>
+                </div>
+              </div>
+            </form>
+            <ba-card title="Users Role" baCardClass="with-scroll">
+                  <div *ngFor="let role of loaded_roles">
+                        <div class="form-group">
+                          <div class="checkbox">
+                            <label>
+                              <input type="checkbox" name="role"
+                               [(ngModel)]="role.is_selected" (ngModelChange)="onRoleChange(selected_user,role)">
+                              {{role.name}}
+                            </label>
+                          </div>
+                        </div>
+                    </div>  
+                </ba-card>
+            </ba-card>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div bsModal #editModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button class="close" aria-label="Close" (click)="hideChildModal()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">Edit Users</h4>
+		  <hr/>
+      </div>
+      <div class="modal-body">
+        <div>
+            <ba-card title="Edit Users" baCardClass="with-scroll custom-card">
+             <form [formGroup]="edit_form" (ngSubmit)="onSubmitEdit(edit_form.value , $event)" class="form-horizontal">
+              <div class="form-group row" [ngClass]="{'has-error': (!edit_username.valid && edit_username.touched), 'has-success': (edit_username.valid && edit_username.touched)}">
+                <div class="col-sm-12">
+					<label>Username</label>
+                  	<input [formControl]="edit_username" type="text" class="form-control" id="inputEmail3" placeholder="Username">
+                </div>
+              </div>
+				 <div class="form-group row">
+				  <div class="col-sm-12">
+					 <label>Fullname</label>
+					  <input [formControl]="edit_fullname" type="text" class="form-control" id="inputPassword3" placeholder="Fullname">
+                </div>
+              </div>
+              <div class="form-group row">
+				  <div class="col-sm-12">
+					 <label>Email</label>
+					  <input [formControl]="edit_email" type="email" class="form-control" id="inputPassword3" placeholder="Email">
+                </div>
+              </div>
+			  <div class="form-group row">
+                <div class="col-sm-12">
+					<label>Mobile Phone</label>
+					<input [formControl]="edit_mobilePhoneNumber" type="text" class="form-control" id="inputPassword3" placeholder="Mobile Phone">
+                </div>
+              </div>
+			  <div class="form-group row">
+                <div class="col-sm-12">
+					<label>Password</label>
+                  	<input [formControl]="edit_password" type="text" class="form-control" id="inputPassword3" placeholder="Password Salt">
+                </div>
+              </div>
+<!--
+			  <div class="form-group row">
+                <div class="col-sm-12">
+					  <label>Confirm password</label>
+					<input [formControl]="edit_password" type="password" class="form-control" id="inputPassword3" placeholder="Hash password">
+                </div>
+              </div>
+-->
+              	  
+              <div class="form-group row">
+                <div class="col-sm-12 btn-submit-center">
+                  <button [disabled]="!edit_form.valid" type="submit" class="btn btn-default btn-auth btn-custom">Submit</button>
+                </div>
+              </div>
+            </form>
+                <ba-card title="Users Role" baCardClass="with-scroll">
+                  <div *ngFor="let role of loaded_roles">
+                        <div class="form-group">
+                          <div class="checkbox">
+                            <label>
+                              <input type="checkbox" name="role"
+                               [(ngModel)]="role.is_selected" (ngModelChange)="onRoleChange(selected_user,role)">
+                              {{role.name}}
+                            </label>
+                          </div>
+                        </div>
+                    </div>  
+                </ba-card>
+            </ba-card>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div bsModal #rolesModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button class="close" aria-label="Close" (click)="hideRolesModal()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">Users Roles</h4>
+      </div>
+      <div class="modal-body">
+        <div>
+            <ba-card title="Users Role" baCardClass="with-scroll">
+              <div *ngFor="let role of loaded_roles">
+                    <div class="form-group">
+                      <div class="checkbox">
+                        <label>
+                          <input type="checkbox" name="role"
+                           [(ngModel)]="role.is_selected" (ngModelChange)="onRoleChange(selected_user,role)">
+                          {{role.name}}
+                        </label>
+                      </div>
+                    </div>
+                </div>  
+              <div class="form-group row">
+                <div class="offset-sm-2 col-sm-10">
+                  <button (click)="hideRolesModal()" class="btn btn-default btn-auth">Close</button>
+                </div>
+              </div>
+            </ba-card>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div bsModal #deleteModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+     
+      </div>
+      <div class="modal-body">
+		  <div class="content_confirm">
+				<h3>Delete {{delete_name}}?</h3>
+		  </div>
+		  <div class="delete-btn_confirm">
+			  <button (click)="saveDelete()" class="btn-yes">
+				  Yes
+			  </button>
+			  <button (click)="deleteClose()" class="btn-no">
+				  No
+			  </button>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>

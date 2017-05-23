@@ -1,0 +1,20 @@
+<div class="widgets">
+	<ba-card title="Schedule" baCardClass="with-scroll">
+		<div class="row">
+			<div class="col-xlg-9 col-xl-6 col-lg-6  col-md-12 col-sm-12 col-xs-12">
+					<ba-full-calendar [baFullCalendarConfiguration]="calendarConfiguration" baFullCalendarClass="blurCalendar" (onCalendarReady)="onCalendarReady($event)"></ba-full-calendar>
+			</div>
+			<div class="col-xlg-9 col-xl-6 col-lg-6  col-md-12 col-sm-12 col-xs-12">
+				<div class="title-list-schedule">
+					<h2>List Schedule</h2>
+				</div>
+				<div class="content-list-schedule">
+					<div class="date-calendar__">Sunday, 14 May 2017</div>
+					<div class="content-date-calendar">
+						wekeends
+					</div>
+				</div>
+			</div>
+		</div>
+	</ba-card>
+</div>

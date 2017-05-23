@@ -1,0 +1,198 @@
+<div class="widgets">
+<div class="row">
+    <div class="col-md-12">
+      <ba-card title="Assets" baCardClass="with-scroll">
+           <div class="add-new-button__container">
+               <button (click)="addRootNode()" class="btn btn-primary" style="float:right">Add New Asset</button>
+           </div>
+            <Tree #assets_tree [nodes]="treeAssets" class="tree-location-temp">
+                <template #treeNodeTemplate let-node="node" let-index="index">
+                    <span>{{ node.data.name }}</span>
+                    <button (click)="addChildNode(node.data)"><i class="ion-ios-plus-outline"></i></button>
+                    <button (click)="editThisNode(node.data)"><i class="ion-edit"></i> </button>
+                    <button (click)="deleteThisNode(node.data)"><i class="ion-trash-a"></i></button>
+                </template>
+            </Tree>
+      </ba-card>
+    </div>
+  </div>
+</div>
+<div bsModal #childModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button class="close" aria-label="Close" (click)="hideChildModal()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">Add New Child Asset</h4>
+		  <hr/>
+      </div>
+      <div class="modal-body">
+        <div>
+            <ba-card title="Add New Asset" baCardClass="with-scroll custom-card">
+              <form [formGroup]="form" (ngSubmit)="onSubmit(form.value)" class="form-horizontal">
+              <div class="form-group row" [ngClass]="{'has-error': (!name.valid && name.touched), 'has-success': (name.valid && name.touched)}">
+                <div class="col-sm-12">
+					<label>Name</label>
+					<input [formControl]="name" type="text" class="form-control" id="inputEmail3" placeholder="Name">
+                </div>
+              </div>
+              <div class="form-group row" [ngClass]="{'has-error': (!description.valid && description.touched), 'has-success': (description.valid && description.touched)}">
+               <div class="col-sm-12">
+					<label>Description</label>
+					<input [formControl]="description" type="text" class="form-control" id="inputPassword3" placeholder="Description">
+                </div>
+              </div>
+              <div class="form-group row" [ngClass]="{'has-error': (!photo.valid && photo.touched), 'has-success': (photo.valid && photo.touched)}">
+                <div class="col-sm-12">
+					<label>Photo</label>
+					<input type="file" (change)="addPhotoSelected($event)" placeholder="Upload file" accept=".jpg,.jpeg,.png">
+                  <!-- <input [formControl]="photo" type="text" class="form-control" id="inputPassword3" placeholder="Photo"> -->
+                </div>
+              </div>
+              <div class="form-group row" [ngClass]="{'has-error': (!specification.valid && specification.touched), 'has-success': (specification.valid && specification.touched)}">
+                <div class="col-sm-12">
+					<label>Specification</label>
+                    <textarea [formControl]="specification" class="form-control" id="inputPassword3" placeholder="Specification"></textarea>
+                </div>
+              </div>
+              <div class="form-group row select-container">
+                 <div class="col-sm-12">
+					 <label>WO Category</label>
+                      <ng-select [allowClear]="true"
+                                  [items]="items_wocategory"
+                                  [disabled]="disabled"
+                                  (selected)="selectedWO($event)"
+                                  (removed)="removed($event)"
+                                  (typed)="typed($event)"
+                                  placeholder="No WO Category selected">
+                      </ng-select>
+                  </div>
+              </div>
+              <div class="form-group row select-container">
+                 <div class="col-sm-12">
+					 <label>Location</label>
+                      <ng-select [allowClear]="true"
+                                  [items]="items_location"
+                                  [disabled]="disabled"
+                                    (selected)="selectedLocation($event)"
+                                  (removed)="removed($event)"
+                                  (typed)="typed($event)"
+                                  placeholder="No Location selected">
+                      </ng-select>
+                  </div>
+              </div>
+              <div class="form-group row select-container">
+                 <div class="col-sm-12">
+					 <label>Parent Asset</label>
+                      <ng-select #addSelectBox
+                                 [allowClear]="true"
+                                  [items]="items_asset"
+                                  [disabled]="disabled"
+                                  (selected)="selectedAsset($event)"
+                                  placeholder="No Location selected">
+                      </ng-select>
+                  </div>
+              </div>
+              <div class="form-group row">
+                <div class="col-sm-12 btn-submit-center">
+                  <button [disabled]="!form.valid" type="submit" class="btn btn-default btn-auth btn-custom">Submit</button>
+                </div>
+              </div>
+            </form>
+            </ba-card>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div bsModal #editChildModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button class="close" aria-label="Close" (click)="hideChildModal()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">Edit Asset</h4>
+		  <hr/>
+      </div>
+      <div class="modal-body">
+        <div>
+            <ba-card title="Edit Asset" baCardClass="with-scroll custom-card">
+              <form [formGroup]="editForm" (ngSubmit)="onSubmitEdit(editForm.value, $event)" class="form-horizontal">
+              <div class="form-group row" [ngClass]="{'has-error': (!name.valid && name.touched), 'has-success': (name.valid && name.touched)}">
+               <div class="col-sm-12">
+				   	<label>Name</label>
+					<input [formControl]="edit_name" type="text" class="form-control" id="inputEmail3" placeholder="Name">
+                </div>
+              </div>
+              <div class="form-group row" [ngClass]="{'has-error': (!description.valid && description.touched), 'has-success': (description.valid && description.touched)}">
+               <div class="col-sm-12">
+				   <label>Description</label>
+				   <input [formControl]="edit_description" type="text" class="form-control" id="inputPassword3" placeholder="Description">
+                </div>
+              </div>
+              <div class="form-group row" [ngClass]="{'has-error': (!photo.valid && photo.touched), 'has-success': (photo.valid && photo.touched)}">
+             	<div class="col-sm-12">
+					<label>Photo</label>
+					<input [formControl]="edit_photo" type="text" class="form-control" id="inputPassword3" placeholder="Photo">
+                </div>
+              </div>
+              <div class="form-group row" [ngClass]="{'has-error': (!specification.valid && specification.touched), 'has-success': (specification.valid && specification.touched)}">
+				  
+				  <div class="col-sm-12">
+					  <label>Specifications</label>
+                    <textarea [formControl]="edit_specification" class="form-control" id="inputPassword3" placeholder="Description"></textarea>
+                </div>
+              </div>
+              <div class="form-group row select-container">
+               
+                 <div class="col-sm-12">
+					  <label>WO Category</label>
+                      <ng-select #editWOSelectBox
+                                 [allowClear]="true"
+                                  [items]="items_wocategory"
+                                  [disabled]="disabled"
+                                  (selected)="selectedWOEdit($event)"
+                                  placeholder="No WO Category selected">
+                      </ng-select>
+                  </div>
+              </div>
+              <div class="form-group row select-container">
+            
+                 <div class="col-sm-12">
+					  <label>Location</label>
+                      <ng-select #editLocationSelectBox
+                                 [allowClear]="true"
+                                  [items]="items_location"
+                                  [disabled]="disabled"
+                                  (selected)="selectedLocationEdit($event)"
+                                  placeholder="No Location selected">
+                      </ng-select>
+                  </div>
+              </div>
+              <div class="form-group row select-container">
+          
+                 <div class="col-sm-12">
+					  <label>Parent Asset</label>
+                      <ng-select #editSelectBox
+                                 [allowClear]="true"
+                                  [items]="items_asset"
+                                  [disabled]="disabled"
+                                  (selected)="selectedAssetEdit($event)"
+                                  placeholder="No Asset selected">
+                      </ng-select>
+                  </div>
+              </div>
+              <div class="form-group row">
+                <div class="col-sm-12 btn-submit-center">
+                  <button [disabled]="!editForm.valid" type="submit" class="btn btn-default btn-auth btn-custom">Submit</button>
+                </div>
+              </div>
+            </form>
+            </ba-card>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>

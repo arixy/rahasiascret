@@ -1,0 +1,110 @@
+import { Injectable } from '@angular/core';
+import { Http, Response, Headers, RequestOptions, URLSearchParams } from '@angular/http';
+import { UUID } from 'angular2-uuid';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/map';
+
+@Injectable()
+export class UtilityUomService{
+	private utility_uom_data: any;
+	redirectUrl: string;
+	private appUrl = 'http://ec2-52-40-147-30.us-west-2.compute.amazonaws.com/api/v1/master/';
+
+	  constructor(private http: Http){
+
+	  }
+
+  	getUtilities(): Observable<any> {
+	  	var headers = new Headers();
+		headers.append('Content-Type', 'application/json');
+		var bearer = "Bearer " + localStorage.getItem('bearer_token');
+
+		headers.append('Authorization', bearer);
+		headers.append('Access-Control-Allow-Origin', '*');
+		headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
+
+		var options = new RequestOptions({headers: headers});
+		var load_url = this.appUrl + 'utility-uom/all';
+		console.log('Options ', options);
+
+		return this.http.get(load_url, options).map(this.extractData);
+	}
+    
+  addUtilityUom(new_utility): Observable<any> {
+      var headers = new Headers();
+      headers.append('Content-Type', 'application/x-www-form-urlencoded');
+      headers.append('Authorization', 'Bearer ' + localStorage.getItem('bearer_token'));
+      headers.append('Access-Control-Allow-Origin', '*');
+      headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
+      
+      var options = new RequestOptions({
+          headers: headers
+      });
+      
+      var add_url = this.appUrl + 'utility-uom/add';
+      
+      // To Change the JSON object to urlencoded
+      let url_search_params = new URLSearchParams();
+      
+      url_search_params.append('name', new_utility.name);
+      url_search_params.append('description', new_utility.description);
+	  
+      let utility_body = url_search_params.toString();
+      console.log('utility Body URL encode', utility_body);
+      return this.http.post(add_url, utility_body, options).map(this.extractData);
+  }
+  
+  updateUtilityUom(update_utility){
+	  var headers = new Headers();
+      headers.append('Content-Type', 'application/x-www-form-urlencoded');
+      headers.append('Authorization', 'Bearer ' + localStorage.getItem('bearer_token'));
+      headers.append('Access-Control-Allow-Origin', '*');
+      headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
+      
+      var options = new RequestOptions({
+          headers: headers
+      });
+      
+      
+      var update_url = this.appUrl + 'utility-uom/update';
+      
+      // To Change the JSON object to urlencoded
+      let url_search_params = new URLSearchParams();
+      
+      url_search_params.append('utilityUomId', update_utility.id);
+      url_search_params.append('name', update_utility.name);
+      url_search_params.append('description', update_utility.description);
+      
+      let utility_body = url_search_params.toString();
+      
+      console.log('expense_body URL encode', utility_body);
+      
+      return this.http.post(update_url, utility_body, options).map(this.extractData);
+    }
+
+    deleteUtilityUom(utilityuomid): Observable<any> {
+		var headers = new Headers();
+      
+      headers.append('Content-Type', 'application/x-www-form-urlencoded');
+      headers.append('Authorization', 'Bearer ' + localStorage.getItem('bearer_token'));
+      headers.append('Access-Control-Allow-Origin', '*');
+      headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
+      
+      var options = new RequestOptions({
+          headers: headers
+      });
+      
+      var delete_url = this.appUrl + 'utility-uom/delete';
+      
+      var delete_body = "utilityUomId=" + utilityuomid;
+      console.log('service delete', delete_body);
+      return this.http.post(delete_url, delete_body, options).map(this.extractData);
+    }
+    
+ 
+	private extractData(res: Response){
+		let body = res.json();
+		console.debug(body);
+		return body || { };
+	}
+}

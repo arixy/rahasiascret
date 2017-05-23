@@ -1,0 +1,48 @@
+.node-content-wrapper {
+    background: #00abff !important;
+}
+
+.modal {
+  padding-top: 170px;
+
+  .modal-content {
+    background-color: #202020;
+    .modal-header {
+      border: none;
+    }
+
+    .modal-footer {
+      border: none;
+    }
+
+    .close {
+      outline: none;
+    }
+    
+  }
+}
+
+.modal-buttons .btn {
+  margin-right: 20px;
+}
+
+.widgets{
+	.tree-location-temp{
+		button{
+			border-style: none;
+			background: transparent;
+			padding-left: 15px;
+			i{
+				font-size: 18px;
+				color: #fff;
+			}
+		}
+		
+	}
+}
+.tree-node-active.tree-node-focused > .node-wrapper > .node-content-wrapper{
+	background: red !important;
+}
+.tree-node-focused > .node-wrapper > .node-content-wrapper{
+	background: red !important;
+}
