@@ -76,7 +76,7 @@ body .ui-widget-header{
    	border: none;
     background: transparent;
     font-size: 36px !important;
-    color: #fff;
+    color: #01ABFF;
 }
 .content_confirm h3{
 	text-align: center;
@@ -106,6 +106,9 @@ button.btn-no{
 
 .top-main-menu {
     color: #fff;
+}
+.add-btn-group {
+    float: right;
 }
 button.btn-no:hover,button.btn-yes:hover{
 	-webkit-box-shadow: 0 0 20px 5px #00ABFF;

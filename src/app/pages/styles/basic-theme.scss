@@ -15,7 +15,8 @@ body .ui-widget input, body .ui-widget select, body .ui-widget textarea, body .u
 }
 body .ui-widget-content {
     /* background-color: #ffffff; */
-    border: 1px solid #fff;
+    border: 1px solid #d7d7d7;
+    color: #2d3439;
 }
 body .ui-widget-header {
     background: #ffffff;
@@ -1135,8 +1136,8 @@ body .ui-datatable .ui-paginator {
 }
 body .ui-datatable .ui-datatable-thead > tr > th {
     padding: .75em;
-    border-color: #fff;
-    color: #fff;
+    border-color: #d7d7d7;
+    color: #2d3439;
 }
 body .ui-datatable thead th.ui-sortable-column:not(.ui-state-active):hover {
     background-color: #e3e3e3;
@@ -2123,4 +2124,7 @@ Custom YOSIA Style
 -------------------------- */
 .card.with-scroll .card-body {
     overflow-y: visible !important;
+}
+#user-profile-dd {
+    color: #fff;
 }
