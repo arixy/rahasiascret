@@ -104,7 +104,32 @@ button.btn-no{
 	margin-left: 2em;
 }
 
+.top-main-menu {
+    color: #fff;
+}
 button.btn-no:hover,button.btn-yes:hover{
 	-webkit-box-shadow: 0 0 20px 5px #00ABFF;
 	box-shadow: 0 0 20px 5px #00ABFF;
+}
+@media only screen and (max-width: 589px) {
+	.modal.in .modal-dialog{
+		max-width: 360px;
+		margin: 0 auto;
+	}
+	.modal-content{
+		width: 100%;
+	}
+}
+@media only screen and (max-width: 777px) {
+	.top-main-menu.nav{
+		display: none;
+	}
+}
+@media only screen and (max-width: 1024px) {
+	.ui-datatable-tablewrapper table{
+		min-width: 1024px;
+	}
+	.ui-datatable-tablewrapper{
+		overflow-x: auto;
+	}
 }

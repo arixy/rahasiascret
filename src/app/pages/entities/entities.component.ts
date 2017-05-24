@@ -15,6 +15,7 @@ import * as moment from 'moment';
 })
 export class Entities {
 
+    public error_from_server = null;
     public entities;
     public entity_types;
 	public submitted;
@@ -89,6 +90,7 @@ export class Entities {
             data => {
                 this.entities = data.data;
 				console.log('test ent',this.entities);
+                console.log('Full Data', data);
                 //this.processed_work_orders = this.injectDuration(JSON.parse(JSON.stringify(this.work_orders)));
             }
         ); 
@@ -144,14 +146,22 @@ export class Entities {
 				// your code goes here
 				this.entityService.addEntity(values).subscribe(
 				(data) => {
+                    if(data.resultCode.code == 0){
+                        console.log('Success!');
+                        this.addNewModal.hide();
+                        // Refresh Data
+                        this.ngOnInit();
+                        
+                    } else {
+                        // Fail
+                        this.error_from_server = data.resultCode.message;
+                        // No Need to Close the Modal or Refresh Data
+                    }
 					console.log('Return Data test', data);
 				}
 			);
 
-			this.addNewModal.hide();
-
-			// Refresh Data
-			this.ngOnInit();
+			
 		}
     }
 	public hideEditModal(){

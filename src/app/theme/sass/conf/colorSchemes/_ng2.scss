@@ -1,4 +1,4 @@
-$default: #ffffff; // default colors for layout
+$default: #58666E; // default colors for layout
 $body-bg: #F0F3F4; // default bg color
 
 $default-text: $default; // default text color layout (usually is the same as $default)
@@ -16,7 +16,7 @@ $dropdown-text: #7d7d7d; // dropdown text color
 $ckeditor-text: #333;
 
 // sidebar colors
-$sidebar: #282828;
+$sidebar: #3A3F51;
 $sidebar-text: #ffffff;
 
 // specific components colors
@@ -75,7 +75,8 @@ $hoverlink: darken($activelink, 20%);
     height: 100%;
     top: 0;
     left: 0;
-    background: url($mainBgUrl) no-repeat center center;
+    background: $body-bg;
+    //background: url($mainBgUrl) no-repeat center center;
     background-size: cover;
     will-change: transform;
     z-index: 0;

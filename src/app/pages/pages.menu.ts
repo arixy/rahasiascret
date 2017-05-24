@@ -14,18 +14,6 @@ export const PAGES_MENU = [
           }
         }
       },
-        {
-          path: 'preventatives',
-          data: {
-              menu: {
-                  title: 'Preventive',
-                  icon: 'ion-alert',
-                  selected: false,
-                  expanded: false,
-                  order: 175
-              }
-          }
-      },
     {
         path: 'schedules',
         data: {

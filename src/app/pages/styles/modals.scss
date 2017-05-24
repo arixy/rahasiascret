@@ -6,7 +6,7 @@
   padding-top: 170px;
 
   .modal-content {
-    background-color: #202020;
+    background-color: #fff;
     .modal-header {
       border: none;
     }
@@ -18,7 +18,44 @@
     .close {
       outline: none;
     }
-    
+      .btn-cancel {
+          background: #d80b52;
+          color: #fff;
+          width: 100%;
+      }
+      .btn-cancel:hover {
+          color: #202020;
+      }
+      .btn-save {
+          background: #00abff;
+          color: #fff;
+          width: 100%;
+      }
+      .btn-save[disabled]{
+          background: #00abff;
+          width: 100%;
+      }
+      .btn-save[disabled]:hover {
+          color: #202020;
+      }
+      .btn-save:hover {
+          color: #202020;
+      }
+      .ui-select-toggle {
+          border: solid 1px #6b6b6b;
+      }
+      .error-message {
+          color: #d80b52;
+      }
+      .form-group {
+          margin-bottom: 5px;
+      }
+      .error-row {
+          margin-bottom: 10px;
+      }
+      .line-height-zero {
+          line-height: 0;
+      }
   }
 }
 

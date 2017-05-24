@@ -185,18 +185,22 @@ export class UsersComponent {
 				roles: this.loaded_roles
               });
 			
-			 let response = this.usersService.addUsers(formatted_object).subscribe(
+			 this.usersService.addUsers(formatted_object).subscribe(
 				(data) => {
 					console.log('Return Data test', data);
-					
-					// Refresh Data
-					this.ngOnInit();
+					if(data.resultCode.code == 0){
+                        console.log('Success!');
+                        this.addNewModal.hide();
+                        // Refresh Data
+                        this.ngOnInit();
+                        
+                    } else {
+                        // Fail
+                        this.error_from_server = data.resultCode.message;
+                        // No Need to Close the Modal or Refresh Data
+                    }
 				}
-			);
-
-            //console.log(response);
-            this.addNewModal.hide();
-			
+			);	
 			
 		}
 	}
