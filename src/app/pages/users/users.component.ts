@@ -44,6 +44,7 @@ export class UsersComponent {
 	deleteConfirm;
 	delete_name;
 
+    private error_from_server;
     @ViewChild('addNewModal') addNewModal: ModalDirective;
     @ViewChild('editModal') editModal: ModalDirective;
     @ViewChild('rolesModal') rolesModal: ModalDirective;

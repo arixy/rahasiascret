@@ -104,7 +104,8 @@ export function httpFactory(backend: XHRBackend, options: RequestOptions) {
         useFactory: httpFactory,
         deps: [XHRBackend, RequestOptions]
     },
-    TaskService
+    TaskService,
+    LocationService,
   ]
 })
 

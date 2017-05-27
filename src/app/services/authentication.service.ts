@@ -6,9 +6,9 @@ import 'rxjs/add/operator/map';
 
 @Injectable()
 export class AuthenticationService{
-  //private authUrl = 'http://ec2-52-40-147-30.us-west-2.compute.amazonaws.com/api/v1/auth/login';
-    //private authUrl = 'http://ems.kurisutaru.net/api/v1/auth/login';
-    private authUrl = 'http://192.168.1.252/api/v1/auth/login';
+    private authUrl = 'http://ec2-52-40-147-30.us-west-2.compute.amazonaws.com/api/v1/auth/login';
+    //private authUrl = 'http://192.168.1.252/api/v1/auth/login';
+    //private authUrl = 'http://10.17.50.178/api/v1/auth/login';
   private data: any;
   private users = [
       {

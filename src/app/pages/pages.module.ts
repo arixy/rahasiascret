@@ -39,6 +39,9 @@ import { UtilityConsumptions } from './utility-consumptions/utility-consumptions
 import { TaskComponent } from './task/task.component';
 import { ScheduleComponent } from './schedule/schedule.component';
 
+import { AddNewWorkOrderComponent } from './task/add-wo.component';
+// add primeng
+import { TabViewModule, FileUploadModule, PanelModule } from 'primeng/primeng';
 @NgModule({
   imports: [CommonModule, NgaModule, routing, SelectModule, Ng2SmartTableModule, ModalModule.forRoot(), ReactiveFormsModule,
            DatePickerModule,
@@ -49,7 +52,10 @@ import { ScheduleComponent } from './schedule/schedule.component';
            DataTableModule,
            SharedModule,
            TreeModule,
-           DropdownModule.forRoot()
+           DropdownModule.forRoot(),
+           TabViewModule,
+      FileUploadModule,
+      PanelModule,
            ],
   declarations: [
       Pages, 
@@ -66,8 +72,9 @@ import { ScheduleComponent } from './schedule/schedule.component';
       Weekends,
       UtilityConsumptions,
 	  TaskComponent,
-	  ScheduleComponent
-    ]
+	  ScheduleComponent,
+      AddNewWorkOrderComponent
+    ],
 })
 export class PagesModule {
 }
