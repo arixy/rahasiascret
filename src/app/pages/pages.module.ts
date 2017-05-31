@@ -39,7 +39,14 @@ import { UtilityConsumptions } from './utility-consumptions/utility-consumptions
 import { TaskComponent } from './task/task.component';
 import { ScheduleComponent } from './schedule/schedule.component';
 
-import { AddNewWorkOrderComponent } from './task/add-wo.component';
+import { SingleRequestComponent } from './task/forms/singlerequest.component';
+import { TenantRequestComponent } from './task/forms/tenantrequest.component';
+import { OwnerRequestComponent } from './task/forms/ownerrequest.component';
+import { GuestRequestComponent } from './task/forms/guestrequest.component';
+import { RecurringRequestComponent } from './task/forms/recurringrequest.component';
+import { PreventiveRequestComponent } from './task/forms/preventiverequest.component';
+//import { AddNewWorkOrderComponent } from './task/add-wo.component';
+//import { TabContentRecurringComponent } from './task/tabs/recurring.component';
 // add primeng
 import { TabViewModule, FileUploadModule, PanelModule } from 'primeng/primeng';
 @NgModule({
@@ -73,7 +80,14 @@ import { TabViewModule, FileUploadModule, PanelModule } from 'primeng/primeng';
       UtilityConsumptions,
 	  TaskComponent,
 	  ScheduleComponent,
-      AddNewWorkOrderComponent
+      SingleRequestComponent,
+      TenantRequestComponent,
+      OwnerRequestComponent,
+      GuestRequestComponent,
+      RecurringRequestComponent,
+      PreventiveRequestComponent,
+      //AddNewWorkOrderComponent,
+      //TabContentRecurringComponent
     ],
 })
 export class PagesModule {

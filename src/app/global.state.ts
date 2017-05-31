@@ -41,3 +41,29 @@ export class GlobalState {
     });
   }
 }
+export class GlobalConfigs {
+    //public static readonly APP_BASE_URL = "http://10.17.50.178/api/v1";
+    public static readonly APP_BASE_URL = "http://ec2-52-40-147-30.us-west-2.compute.amazonaws.com/api/v1";
+}
+export class WorkflowActions {
+    public static readonly VIEW = 0;
+    public static readonly EDIT = 2;
+    public static readonly DELETE = 3;
+    public static readonly ASSIGN_REASSIGN = 4;
+    public static readonly CANCEL = 5;
+    public static readonly PENDING = 6;
+    public static readonly IN_PROGRESS = 7;
+    public static readonly CLOSE_FOR_CONFIRMATION = 8;
+    public static readonly COMPLETE = 9;
+    public static readonly RETURN = 10;
+}
+export class WorkOrderStatuses {
+    public static readonly SCHEDULED = 0;
+    public static readonly BACKLOG = 1;
+    public static readonly NEW = 2;
+    public static readonly IN_PROGRESS = 3;
+    public static readonly CLOSE_FOR_CONFIRMATION = 4;
+    public static readonly COMPLETE = 5;
+    public static readonly CANCEL = 6;
+    public static readonly PENDING = 7;
+}

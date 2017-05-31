@@ -4,13 +4,15 @@ import { UUID } from 'angular2-uuid';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 
+import { GlobalConfigs } from '../global.state';
 @Injectable()
 export class AssetService{
   private asset_data: any;
 
   redirectUrl: string;
 
-    private appUrl = 'http://ec2-52-40-147-30.us-west-2.compute.amazonaws.com/api/v1/master/';
+  //private appUrl = 'http://ec2-52-40-147-30.us-west-2.compute.amazonaws.com/api/v1/master/';
+  private appUrl = GlobalConfigs.APP_BASE_URL + "/master/";
 
   constructor(private http: Http){
       var first_elevator_id = UUID.UUID();

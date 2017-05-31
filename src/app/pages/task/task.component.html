@@ -31,7 +31,7 @@
             </div>
         </div>
         <div style="width: 100%; overflow-x: auto; overflow-y: auto;">
-            <p-dataTable #dt [value]="myTasks" [lazy]="true" (onLazyLoad)="refresh($event, dt)" [rows]="2" [paginator]="true" [totalRecords]="totalRecords" sortField="dateUpdated" sortOrder="-1">
+            <p-dataTable #dt [value]="myTasks" [lazy]="true" (onLazyLoad)="refresh($event, dt)" [rows]="10" [paginator]="true" [totalRecords]="totalRecords" sortField="dateUpdated" sortOrder="-1">
                 <p-header>
                     <div class="ui-helper-clearfix">
                         <div class="btn-group" dropdown style="float: right">
@@ -56,7 +56,7 @@
                                   </button>
                                   <ul dropdownMenu role="menu" aria-labelledby="single-button">
                                     <li role="menuitem" *ngFor="let action of mytask.actions">
-                                        <a  class="dropdown-item" (click)="doAction(mytask, action)">{{action.label}}</a>
+                                        <a  class="dropdown-item" (click)="doAction(mytask, action)">{{action.name}}</a>
                                     </li>
                                   </ul>
                                 </div>
@@ -66,8 +66,8 @@
                 <p-column field="woCategoryName" header="Category" [sortable]="true" [filter]="true"></p-column>
                 <p-column field="woPriorityName" header="Priority" [sortable]="true" [filter]="true"></p-column>
                 <p-column field="taskName" header="Task" [sortable]="true" [filter]="true" filterPlaceholder="Search"></p-column>
-                <p-column field="assetName" header="Asset" [sortable]="true" [filter]="true"></p-column>
-                <p-column field="locationName" header="Location" [sortable]="true" [filter]="true" filterPlaceholder="Search"></p-column>
+                <p-column field="woAssetName" header="Asset" [sortable]="true" [filter]="true"></p-column>
+                <p-column field="woLocationName" header="Location" [sortable]="true" [filter]="true" filterPlaceholder="Search"></p-column>
                 <p-column field="start" header="Start" [sortable]="true"></p-column>
                 <p-column field="dueDate" header="Due" [sortable]="true"></p-column>
                 <p-column field="currentStatusName" header="Status" [sortable]="true" [filter]="true"></p-column>

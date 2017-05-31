@@ -6,7 +6,7 @@
         <li class="nav-item disabled">
           <a class="nav-link" data-toggle="tab" href="#schedule">Schedule</a>
         </li>
-        <li class="nav-item disabled">
+        <li class="nav-item disabled" *ngIf="getFieldPermissionByField('recurring', false) == 'show'">
             <a class="nav-link" data-toggle="tab" href="#recurring">Recurring</a>
         </li>
         <li class="nav-item">
@@ -299,7 +299,7 @@
           </div>
         </div>
 
-        <div class="tab-pane" id="recurring" role="tabpanel">
+        <div class="tab-pane" id="recurring" role="tabpanel" *ngIf="getFieldPermissionByField('recurring', false) == 'show'">
           <!-- Recurring Tab View -->
           <!-- Repeat -->
           <div class="form-group row">
