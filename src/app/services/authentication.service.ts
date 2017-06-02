@@ -4,11 +4,11 @@ import { Http, Response, Headers, RequestOptions } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 
+import { GlobalConfigs } from '../global.state';
 @Injectable()
 export class AuthenticationService{
-    private authUrl = 'http://ec2-52-40-147-30.us-west-2.compute.amazonaws.com/api/v1/auth/login';
-    //private authUrl = 'http://192.168.1.252/api/v1/auth/login';
-    //private authUrl = 'http://10.17.50.178/api/v1/auth/login';
+    private authUrl = GlobalConfigs.APP_BASE_URL + '/auth/login'; //'http://ec2-52-40-147-30.us-west-2.compute.amazonaws.com/api/v1/auth/login';
+    
   private data: any;
   private users = [
       {

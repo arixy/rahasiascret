@@ -5,12 +5,11 @@ import { Observable } from 'rxjs/Observable';
 import { Subject }    from 'rxjs/Subject';
 import 'rxjs/add/operator/map';
 
+import { GlobalConfigs } from '../../global.state';
+
 @Injectable()
 export class TaskService{
-    private appUrl = 'http://ec2-52-40-147-30.us-west-2.compute.amazonaws.com/api/v1/';
-    //private appUrl = 'http://ems.kurisutaru.net/api/v1/';
-    //private appUrl = 'http://192.168.1.252/api/v1/';
-	//private appUrl = 'http://10.17.50.178/api/v1/';
+    private appUrl = GlobalConfigs.APP_BASE_URL;
 
     // Observable sources
     private eventEmitted = new Subject<string>();
@@ -31,7 +30,7 @@ export class TaskService{
         headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
 
         var options = new RequestOptions({headers: headers});
-        var load_url = this.appUrl + 'work-order/all-my-task';
+        var load_url = this.appUrl + '/work-order/all-my-task';
         
         if(filters == null){
             filters= {
@@ -46,6 +45,21 @@ export class TaskService{
         }
 
         return this.http.post(load_url, filters, options).map(this.extractData);
+    }
+
+    public getMyTaskById(workOrderId: number) {
+        var headers = new Headers();
+        headers.append('Content-Type', 'application/json');
+        var bearer = "Bearer " + localStorage.getItem('bearer_token');
+
+        headers.append('Authorization', bearer);
+        headers.append('Access-Control-Allow-Origin', '*');
+        headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
+
+        var options = new RequestOptions({ headers: headers });
+        var load_url = this.appUrl + '/work-order/get/' + workOrderId;
+
+        return this.http.get(load_url, options).map(this.extractData);
     }
 
     private extractData(res: Response){

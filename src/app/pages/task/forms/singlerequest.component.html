@@ -1,0 +1,295 @@
+﻿<form [formGroup]="formGroupAdd" (ngSubmit)="onSubmit(formGroupAdd.value)" class="form-horizontal">
+  <ul class="nav nav-pills nav-justified" role="tablist">
+    <li class="nav-item">
+      <a class="nav-link active" data-toggle="tab" href="#general">General</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-toggle="tab" href="#files">Files</a>
+    </li>
+  </ul>
+
+  <div class="tab-content">
+    <div class="tab-pane active" id="general" role="tabpanel">
+      <!-- WO Number -->
+      <div class="form-group row" *ngIf="actionType != null && actionType.id != -1">
+        <label for="inputEmail3" class="control-label">WO Number</label><br />
+        <input [formControl]="wo_number" type="text" class="form-control" id="inputEmail3" placeholder="WO Number">
+      </div>
+
+      <!-- Task Name -->
+      <div class="form-group row" [ngClass]="{'has-error': (!task_name.valid && task_name.touched), 'has-success': (task_name.valid && task_name.touched)}">
+        <label for="inputEmail3" class="control-label">Task</label><br />
+        <input [formControl]="task_name" type="text" class="form-control" id="inputEmail3" placeholder="Task">
+      </div>
+      <div class="row error-row">
+        <div class="col-xg-2 line-height-zero">&nbsp;</div>
+        <div class="error-message col-xg-10"
+             *ngIf="formGroupAdd.get('task_name').hasError('required') && formGroupAdd.get('task_name').touched">
+          Task is required
+        </div>
+        <div class="error-message col-xg-10"
+             *ngIf="formGroupAdd.get('task_name').hasError('minlength') && formGroupAdd.get('task_name').touched">
+          Minimum of 2 characters
+        </div>
+      </div>
+
+      <!-- Task Desc -->
+      <div class="form-group row" [ngClass]="{'has-error': (!task_desc.valid && task_desc.touched), 'has-success': (task_desc.valid && task_desc.touched)}">
+        <label for="inputEmail3" class="col-xg-2 control-label">Description</label><br />
+        <textarea [formControl]="task_desc" class="form-control" id="inputEmail3" placeholder="Description" pInputTextArea></textarea>
+
+      </div>
+      <div class="row error-row">
+        <div class="col-xg-2 line-height-zero">&nbsp;</div>
+        <div class="error-message col-xg-10"
+             *ngIf="formGroupAdd.get('task_desc').hasError('required') && formGroupAdd.get('task_desc').touched">
+          Description is required
+        </div>
+        <div class="error-message col-xg-10"
+             *ngIf="formGroupAdd.get('task_desc').hasError('minlength') && formGroupAdd.get('task_desc').touched">
+          Minimum of 2 characters
+        </div>
+      </div>
+
+      <!-- Category -->
+      <div class="form-group row" [ngClass]="{'has-error': (!selected_category.valid && selected_category.touched), 'has-success': (selected_category.valid && selected_category.touched)}">
+        <label for="selected_category" class="col-xg-2 control-label">Category</label>
+
+        <div class="col-xg-10">
+          <ng-select #addCategorySelectBox
+                     [items]="items_categories"
+                     [disabled]="disabled || formGroupAdd.disabled"
+                     (removed)="removeSelectBoxValue('selected_category', $event)"
+                     (selected)="selectedSelectBoxValue('selected_category', $event)"
+                     placeholder="No Category selected">
+          </ng-select>
+        </div>
+
+      </div>
+      <div class="row error-row">
+        <div class="col-xg-2 line-height-zero">&nbsp;</div>
+        <div class="error-message col-xg-10"
+             *ngIf="formGroupAdd.get('selected_category').hasError('required') && formGroupAdd.get('selected_category').touched">
+          Category is required
+        </div>
+      </div>
+
+      <!-- Asset -->
+      <div class="form-group row">
+        <label for="selected_location" class="col-xg-2 control-label">Asset</label>
+
+        <div class="col-xg-10">
+          <ng-select #addAssetSelectBox
+                     [items]="items_assets"
+                     [disabled]="disabled || formGroupAdd.disabled"
+                     (removed)="removeSelectBoxValue('selected_asset', $event)"
+                     (selected)="selectedSelectBoxValue('selected_asset', $event)"
+                     placeholder="No Asset selected">
+          </ng-select>
+        </div>
+
+      </div>
+      <div class="row error-row">
+        <div class="col-xg-2 line-height-zero">&nbsp;</div>
+        <div class="error-message col-xg-10" *ngIf="error_msg.asset != null">
+          {{error_msg.asset}}
+        </div>
+      </div>
+
+      <!-- Location -->
+      <div class="form-group row" [ngClass]="{'has-error': (!selected_location.valid && selected_location.touched), 'has-success': (selected_location.valid && selected_location.touched)}">
+        <label for="selected_location" class="col-xg-2 control-label">Location</label>
+
+        <div class="col-xg-10">
+          <ng-select #addLocationSelectBox
+                     [items]="items_locations"
+                     [disabled]="disabled || formGroupAdd.disabled"
+                     (removed)="removeSelectBoxValue('selected_location', $event)"
+                     (selected)="selectedSelectBoxValue('selected_location', $event)"
+                     placeholder="No Location selected">
+          </ng-select>
+        </div>
+
+      </div>
+      <div class="row error-row">
+        <div class="col-xg-2 line-height-zero">&nbsp;</div>
+        <div class="error-message col-xg-10" *ngIf="error_msg.location != null">
+          {{error_msg.location}}
+        </div>
+      </div>
+
+      <!-- Location Info -->
+      <div class="form-group row">
+        <label for="inputEmail3" class="col-xg-2 control-label">Location Info</label><br />
+        <textarea [formControl]="location_info" class="form-control" id="inputEmail3" placeholder="Location Info" pInputTextArea></textarea>
+      </div>
+
+      <!-- Assignee -->
+      <div class="form-group row" *ngIf="_defFieldPermissions.selected_assignee != 'hidden'">
+        <label for="selected_location" class="control-label">Assignee</label>
+
+        <div class="col-xg-10">
+          <ng-select #addAssigneeSelectBox
+                     [items]="items_assignees"
+                     [disabled]="_defFieldPermissions.selected_assignee == 'disabled'"
+                     (removed)="removeSelectBoxValue('selected_assignee', $event)"
+                     (selected)="selectedSelectBoxValue('selected_assignee', $event)"
+                     placeholder="No Assignee selected">
+          </ng-select>
+        </div>
+
+      </div>
+      <div class="row error-row">
+        <div class="col-xg-2 line-height-zero">&nbsp;</div>
+        <div class="error-message col-xg-10" *ngIf="error_msg.assignee != null">
+          {{error_msg.assignee}}
+        </div>
+      </div>
+
+      <!-- Status -->
+      <div class="form-group row" [ngClass]="{'has-error': (!selected_status.valid && selected_status.touched), 'has-success': (selected_status.valid && selected_status.touched)}" *ngIf="actionType != null && actionType.id != -1">
+        <label for="selected_status" class="col-xg-2 control-label">Status</label>
+
+        <div class="col-xg-10">
+          <ng-select #addStatusSelectBox
+                     [items]="items_statuses"
+                     [disabled]="_defFieldPermissions.selected_status == 'disabled'"
+                     (removed)="removeSelectBoxValue('selected_status', $event)"
+                     (selected)="selectedSelectBoxValue('selected_status', $event)"
+                     placeholder="No Status selected">
+          </ng-select>
+        </div>
+
+      </div>
+      <div class="row error-row">
+        <div class="col-xg-2 line-height-zero">&nbsp;</div>
+        <div class="error-message col-xg-10" *ngIf="error_msg.status != null">
+          {{error_msg.status}}
+        </div>
+      </div>
+
+      <!-- Priority -->
+      <div class="form-group row" [ngClass]="{'has-error': (!selected_priority.valid && selected_priority.touched), 'has-success': (selected_priority.valid && selected_priority.touched)}">
+        <label for="selected_priority" class="col-xg-2 control-label">Priority</label>
+
+        <div class="col-xg-10">
+          <ng-select #addPrioritySelectBox
+                     [items]="items_priorities"
+                     [disabled]="disabled || formGroupAdd.disabled"
+                     (removed)="removeSelectBoxValue('selected_priority', $event)"
+                     (selected)="selectedSelectBoxValue('selected_priority', $event)"
+                     placeholder="No Priority selected">
+          </ng-select>
+        </div>
+
+      </div>
+      <div class="row error-row">
+        <div class="col-xg-2 line-height-zero">&nbsp;</div>
+        <div class="error-message col-xg-10" *ngIf="error_msg.priority != null">
+          {{error_msg.priority}}
+        </div>
+      </div>
+
+      <!-- Contact Person -->
+      <div class="form-group row" [ngClass]="{'has-error': (!contact_person.valid && contact_person.touched), 'has-success': (contact_person.valid && contact_person.touched)}">
+        <label for="inputEmail3" class="control-label">Contact Person</label><br />
+        <input [formControl]="contact_person" type="text" class="form-control" id="inputEmail3" placeholder="Contact Person">
+      </div>
+      <div class="row error-row">
+        <div class="col-xg-2 line-height-zero">&nbsp;</div>
+        <div class="error-message col-xg-10"
+             *ngIf="formGroupAdd.get('contact_person').hasError('required') && formGroupAdd.get('contact_person').touched">
+          Contact Person is required
+        </div>
+        <div class="error-message col-xg-10"
+             *ngIf="formGroupAdd.get('contact_person').hasError('minlength') && formGroupAdd.get('contact_person').touched">
+          Minimum of 2 characters
+        </div>
+      </div>
+
+      <!-- Contact Person Number -->
+      <div class="form-group row" [ngClass]="{'has-error': (!contact_number.valid && contact_number.touched), 'has-success': (contact_number.valid && contact_number.touched)}">
+        <label for="inputEmail3" class="control-label">Contact Number</label><br />
+        <input [formControl]="contact_number" type="text" class="form-control" id="inputEmail3" placeholder="Contact Number">
+      </div>
+      <div class="row error-row">
+        <div class="col-xg-2 line-height-zero">&nbsp;</div>
+        <div class="error-message col-xg-10"
+             *ngIf="formGroupAdd.get('contact_number').hasError('required') && formGroupAdd.get('contact_number').touched">
+          Contact Number is required
+        </div>
+        <div class="error-message col-xg-10"
+             *ngIf="formGroupAdd.get('contact_number').hasError('minlength') && formGroupAdd.get('contact_number').touched">
+          Minimum of 2 characters
+        </div>
+      </div>
+
+      <!-- Start Date -->
+      <div class="form-group row">
+        <label for="selected_duedate" class="control-label">Start Date</label><br />
+
+        <div class="col-xg-10">
+          <ng2-datepicker (outputEvents)="selectedDate('selected_startdate', $event)" [formControl]="selected_startdate"></ng2-datepicker>
+        </div>
+      </div>
+      <div class="row error-row">
+        <div class="col-xg-2 line-height-zero">&nbsp;</div>
+        <div class="error-message col-xg-10" *ngIf="formGroupAdd.get('selected_startdate').hasError('required') && formGroupAdd.get('selected_startdate').touched">
+          Start date is Required
+        </div>
+      </div>
+
+      <!-- Start Time -->
+      <div class="form-group row">
+        <label for="selected_duedate" class="control-label">Start Time</label><br />
+
+        <div class="col-xg-10">
+          <ng2-datepicker (outputEvents)="selectedStartTime($event)" [formControl]="selected_starttime" ></ng2-datepicker>
+        </div>
+      </div>
+      <div class="row error-row">
+        <div class="col-xg-2 line-height-zero">&nbsp;</div>
+        <div class="error-message col-xg-10" *ngIf="formGroupAdd.get('selected_starttime').hasError('required') && formGroupAdd.get('selected_starttime').touched">
+          Start date is Required
+        </div>
+      </div>
+
+      <!-- Due Date -->
+      <div class="form-group row">
+        <label for="selected_duedate" class="control-label">Due</label><br />
+
+        <div class="col-xg-10">
+          <ng2-datepicker (outputEvents)="selectedDate('selected_duedate', $event)" [formControl]="selected_duedate"></ng2-datepicker>
+        </div>
+      </div>
+      <div class="row error-row">
+        <div class="col-xg-2 line-height-zero">&nbsp;</div>
+        <div class="error-message col-xg-10" *ngIf="formGroupAdd.get('selected_duedate').hasError('required') && formGroupAdd.get('selected_duedate').touched">
+          Due date is Required
+        </div>
+      </div>
+
+      <!-- Solution -->
+      <div class="form-group row">
+        <label for="solution" class="col-xg-2 control-label">Solution</label><br />
+        <textarea [formControl]="solution" class="form-control" id="solution" placeholder="Solution" pInputTextArea></textarea>
+      </div>
+    </div>
+
+    <div class="tab-pane" id="files" role="tabpanel">
+      <p-fileUpload name="myfile[]" url="http://localhost:3000/upload" multiple="multiple"></p-fileUpload>
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <div class="col-sm-3">
+      <button type="button" class="btn btn-default btn-cancel" (click)="onCancel()">Cancel</button>
+    </div>
+    <div class="col-sm-6">
+      &nbsp;
+    </div>
+    <div class="col-sm-3" *ngIf="defSaveButtonPermissions.action[actionType.workflowActionId] == null ? (defSaveButtonPermissions.default == 'show') : (defSaveButtonPermissions.action[actionType.workflowActionId] == 'show')">
+      <button [disabled]="!formGroupAdd.valid" type="submit" class="btn btn-default btn-save">Save</button>
+    </div>
+  </div>
+</form>

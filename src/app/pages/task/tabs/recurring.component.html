@@ -1,0 +1,88 @@
+﻿<!-- Repeat -->
+<div class="form-group row">
+  <label for="selected_repeat" class="col-xg-2 control-label">Repeat</label>
+
+  <div class="col-xg-10">
+    <ng-select #addRepeatSelectBox
+               [items]="items_repeats"
+               [disabled]="disabled"
+               (removed)="removeSelectBoxValue('selected_repeat', $event)"
+               (selected)="selectedSelectBoxValue('selected_repeat', $event)"
+               placeholder="No Repeat selected">
+    </ng-select>
+  </div>
+  <div class="row error-row">
+    <div class="col-xg-2 line-height-zero">&nbsp;</div>
+    <div class="error-message col-xg-10" *ngIf="error_msg.repeat != null">
+      {{error_msg.repeat}}
+    </div>
+  </div>
+</div>
+
+<!-- Repeat Every -->
+<div class="form-group row" [ngClass]="{'has-error': (!repeat_every.valid && repeat_every.touched), 'has-success': (repeat_every.valid && repeat_every.touched)}">
+  <label for="inputEmail3" class="control-label">Every</label><br />
+  <input [formControl]="repeat_every" type="text" class="form-control" id="inputEmail3" placeholder="">
+</div>
+<div class="row error-row">
+  <div class="col-xg-2 line-height-zero">&nbsp;</div>
+  <div class="error-message col-xg-10"
+       *ngIf="formGroupAdd.get('repeat_every').hasError('required') && formGroupAdd.get('repeat_every').touched">
+    Every is required
+  </div>
+</div>
+
+<!-- Repeat Every Period -->
+<div class="form-group row">
+  <label for="selected_repeat" class="col-xg-2 control-label">Every Period</label>
+
+  <div class="col-xg-10">
+    <ng-select #addRepeatSelectBox
+               [items]="items_period_duration"
+               [disabled]="disabled"
+               (removed)="removeSelectBoxValue('selected_repeat_period', $event)"
+               (selected)="selectedSelectBoxValue('selected_repeat_period', $event)"
+               placeholder="No Period selected">
+    </ng-select>
+  </div>
+  <div class="row error-row">
+    <div class="col-xg-2 line-height-zero">&nbsp;</div>
+    <div class="error-message col-xg-10" *ngIf="error_msg.repeat != null">
+      {{error_msg.repeat}}
+    </div>
+  </div>
+</div>
+
+<!-- Due After -->
+<div class="form-group row" [ngClass]="{'has-error': (!due_after.valid && due_after.touched), 'has-success': (due_after.valid && due_after.touched)}">
+  <label for="inputEmail3" class="control-label">Due After</label><br />
+  <input [formControl]="due_after" type="text" class="form-control" id="inputEmail3" placeholder="">
+</div>
+<div class="row error-row">
+  <div class="col-xg-2 line-height-zero">&nbsp;</div>
+  <div class="error-message col-xg-10"
+       *ngIf="formGroupAdd.get('due_after').hasError('required') && formGroupAdd.get('due_after').touched">
+    Due After is required
+  </div>
+</div>
+
+<!-- Due After Period -->
+<div class="form-group row">
+  <label for="selected_repeat" class="col-xg-2 control-label">Due Period</label>
+
+  <div class="col-xg-10">
+    <ng-select #addRepeatSelectBox
+               [items]="items_period_duration"
+               [disabled]="disabled"
+               (removed)="removeSelectBoxValue('selected_dueperiod', $event)"
+               (selected)="selectedSelectBoxValue('selected_dueperiod', $event)"
+               placeholder="No Period selected">
+    </ng-select>
+  </div>
+  <div class="row error-row">
+    <div class="col-xg-2 line-height-zero">&nbsp;</div>
+    <div class="error-message col-xg-10" *ngIf="error_msg.repeat != null">
+      {{error_msg.repeat}}
+    </div>
+  </div>
+</div>

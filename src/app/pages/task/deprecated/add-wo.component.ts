@@ -5,15 +5,18 @@ import { FormGroup, AbstractControl, FormBuilder, Validators, ValidatorFn } from
 import { EntityService } from './entity.service';
 import { ModalDirective } from 'ng2-bootstrap';
 
-import { TaskService } from './task.service';
-import { LocationService } from '../../services/location.service';
-import { UsersService } from '../users/users.service';
+import { TaskService } from '../task.service';
+import { LocationService } from '../../../services/location.service';
+import { AssetService } from '../../../services/asset.service';
+import { UsersService } from '../../users/users.service';
+
+import { TabContentRecurringComponent } from './tabs/recurring.component';
 
 @Component({
     selector: 'add-wo',
     templateUrl: 'add-wo.component.html',
     styleUrls: ['./../styles/basic-theme.scss', './../styles/primeng.min.css', './../styles/modals.scss'],
-    providers: [LocationService, UsersService],
+    providers: [LocationService, UsersService, AssetService],
     encapsulation: ViewEncapsulation.None,
 })
 export class AddNewWorkOrderComponent{
@@ -55,7 +58,8 @@ export class AddNewWorkOrderComponent{
      public selected_dueperiod;
      public due_after;
      public repeat_every;
-     
+
+     public items_assets: any = [];
      public items_categories: any = [{ text: 'Complaints', id: 1}];
      public items_locations: any = [{ text: 'Lantai 3', id: 1 }, { text: 'Lantai 5', id: 2 }];
      public items_repeats: any = [
@@ -86,19 +90,131 @@ export class AddNewWorkOrderComponent{
          category: null,
          location: null,
      };
-     
+
+
+     private _fieldPermissionDefinitions = [ 
+         // PREVENTIVE_REQUEST
+         {
+             create: {
+                 tab: {
+                     default: "show",
+                     files: "hide",
+                     expenses: "hide",
+                 },
+                 field: {
+                     default: "show",
+                     wo_number: "hide",
+                     status: "hide",
+                     entity: "hide",
+                     due_date: "hide",
+                     solution: "hide",
+                     vendor: "hide",
+                     
+                 }
+             }
+         },
+         // RECURRING_REQUEST
+         {
+             create: {
+                 tab: {
+                     default: "show",
+                     files: "hide",
+                     expenses: "hide"
+                 },
+                 field: {
+                     default: "show",
+                     wo_number: "hide",
+                     status: "hide",
+                     entity: "hide",
+                     asset: "hide",
+                     due_date: "hide",
+                     solution: "hide",
+                     vendor: "hide",
+                 }
+             }
+         },
+         // SINGLE_TIME_REQUEST
+         {
+             create: {
+                 tab: {
+                     default: "show",
+                     recurring: "hide",
+                 },
+                 field: {
+                     default: "show",
+                     wo_number: "hide",
+                     status: "hide",
+                     entity: "hide",
+                 }
+             }
+         },
+         // TENANT_REQUEST
+         {
+             create: {
+                 tab: {
+                     default: "show",
+                     recurring: "hide",
+                 },
+                 field: {
+                     default: "show",
+                     wo_number: "hide",
+                     status: "hide",
+
+                 }
+             }
+         },
+         // GUEST_REQUEST
+         {
+             create: {
+                 tab: {
+                     default: "show",
+                     recurring: "hide",
+                 },
+                 field: {
+                     wo_number: "hide",
+                     status: "hide",
+                 }
+             }
+         },
+         // OWNER_REQUEST
+         {
+             create: {
+                 tab: {
+                     default: "show",
+                     recurring: "hide",
+                 },
+                 field: {
+                     wo_number: "hide",
+                     status: "hide"
+                 }
+             }
+         }
+     ];
+
+     public _selectedFieldPermission;
+
+     //@ViewChild(TabContentRecurringComponent)
+     //private tabRecurring: TabContentRecurringComponent;
+
      constructor(
         public fb: FormBuilder,
         public cdr: ChangeDetectorRef,
         private _locationService: LocationService,
         private _taskService: TaskService,
-        private _userService: UsersService
+        private _userService: UsersService,
+        private _assetService: AssetService
      ){
         
      }
      
      ngOnInit(){
          console.log("oninit");
+
+         if (this.actionType.id == -1) {
+             // if CREATE
+             this._selectedFieldPermission = this._fieldPermissionDefinitions[this.selectedWoType.id - 1].create;
+             console.log("set selected field permission", this._selectedFieldPermission);
+         }
 
          // define Add New Form Group
          // If Preventive Maintenance is selected
@@ -121,7 +237,7 @@ export class AddNewWorkOrderComponent{
                  'selected_starttime': ['',null],
                  'selected_dueperiod': ['', null],
                  'due_after': ['', null],
-                 'repeat_every': ['', null] // repeat every
+                 'repeat_every': ['', null]
              });
              this.task_name = this.formGroupAdd.controls['task_name'];
              this.task_desc = this.formGroupAdd.controls['task_desc'];
@@ -143,14 +259,29 @@ export class AddNewWorkOrderComponent{
          //}
 
          this._locationService.getLocations().subscribe((locations) => {
-             // TODO: Uncomment later
-             //this.items_locations = locations.data;
+             console.log("location response", locations);
+             var lstLocations = locations.data;
+             this.items_locations = [];
+             for (var i = 0; i < lstLocations.length; i++) {
+                 this.items_locations.push({ text: lstLocations[i].name, id: lstLocations[i].locationId });
+             }
+             console.log("items_locations", this.items_locations);
          });
 
          // load entities based on selected wo type
          if (this.selectedWoType.id == this.PREVENTIVE_REQUEST) {
              
          }
+
+         // load all assets
+         this._assetService.getAssets().subscribe((assets) => {
+             var lstAssets = assets.data;
+
+             this.items_assets = [];
+             for (var i = 0; i < lstAssets.length; i++) {
+                 this.items_assets.push({ text: lstAssets[i].fullname, id: lstAssets[i].userId });
+             }
+         });
 
          // load all users as assignee
          this._userService.getUsers().subscribe((users) => {
@@ -324,5 +455,27 @@ export class AddNewWorkOrderComponent{
 
      validateSelectedRepeat(): ValidatorFn {
          return null;
+     }
+
+     public getFieldPermissionByField(fieldName: string, isField: boolean): string {
+         var showType = "show"
+         // if caller is field
+         if (isField) {
+             //console.log("getFieldPermissionByField - isField", this._selectedFieldPermission.field[fieldName]);
+             if (this._selectedFieldPermission.field[fieldName] != null) {
+                 showType = this._selectedFieldPermission.field[fieldName];
+             } else {
+                 showType = this._selectedFieldPermission.field.default;
+             }
+         } else {
+             //console.log("getFieldPermissionByField - !isField", this._selectedFieldPermission.tab[fieldName]);
+             if (this._selectedFieldPermission.tab[fieldName] != null) {
+                 showType = this._selectedFieldPermission.tab[fieldName];
+             } else {
+                 showType = this._selectedFieldPermission.tab.default;
+             }
+         }
+
+         return showType;
      }
  }
