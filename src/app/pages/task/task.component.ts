@@ -1,4 +1,4 @@
-﻿import {Component, Input, ViewContainerRef, ChangeDetectorRef, ViewChild, ViewEncapsulation, ComponentFactoryResolver, ComponentRef, OnDestroy } from '@angular/core';
+import {Component, Input, ViewContainerRef, ChangeDetectorRef, ViewChild, ViewEncapsulation, ComponentFactoryResolver, ComponentRef, OnDestroy } from '@angular/core';
 //import { Observable } from 'rxjs/Observable';
 //import 'rxjs/add/operator/map';
 import { FormGroup, AbstractControl, FormBuilder, Validators, FormControl } from '@angular/forms';
@@ -30,7 +30,7 @@ import { AddNewWorkOrderComponent } from './add-wo.component';
 @Component({
   selector: 'my-task',
   templateUrl: './task.component.html',
-  styleUrls: ['./../styles/basic-theme.scss', './../styles/primeng.min.css', './../styles/modals.scss'],
+  styleUrls: ['./../styles/basic-theme.scss', './../styles/primeng.min.css', './../styles/modals.scss','./task.component.css'],
   encapsulation: ViewEncapsulation.None,
   providers: [TaskService, LocationService],
   entryComponents: [AddNewWorkOrderComponent]

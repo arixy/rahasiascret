@@ -1,7 +1,10 @@
-﻿<div class="widgets">
-    <ba-card title="My Task" baCardClass="with-scroll">
+<div class="widgets">
+    <ba-card title="" baCardClass="with-scroll">
         <div class="ui-helper-clearfix">
-            <div class="btn-group" dropdown style="float: left">
+           <div class="search-global">
+				<input #gb pInputText type="text" placeholder="Search"><i class="icon ion-ios-search"></i>
+            </div>
+            <div class="btn-group" dropdown style="float: right">
                 <button id="addNewWorkOrder" type="button" class="btn btn-primary" dropdownToggle>
                     Add New Work Order <span class="caret"></span>
                 </button>
@@ -34,18 +37,21 @@
             <p-dataTable #dt [value]="myTasks" [lazy]="true" (onLazyLoad)="refresh($event, dt)" [rows]="2" [paginator]="true" [totalRecords]="totalRecords" sortField="dateUpdated" sortOrder="-1">
                 <p-header>
                     <div class="ui-helper-clearfix">
+                    <button type="button" iconPos="left" label="CSV" (click)="dt.exportCSV()" style="float:left" class="btn-export__csv">
+                        <i class="icon ion-ios-download-outline"></i>
+                    </button>
                         <div class="btn-group" dropdown style="float: right">
-                            <button id="resetFilters" type="button" class="btn btn-primary" (click)="resetFilters(dt)">
-                                Reset Filters
+                            <button title="Reset" id="resetFilters" type="button" class="btn-sets-right" (click)="resetFilters(dt)">
+                                <i class="icon ion-ios-loop"></i>
                             </button>
 
-                            <button id="resetFilters" type="button" class="btn btn-primary" (click)="refresh($event, dt)">
-                                Refresh
+                            <button title="Refresh" id="resetFilters" type="button" class="btn-sets-right" (click)="refresh($event, dt)">
+                                <i class="icon ion-ios-reload"></i>
                             </button>
                         </div>
                     </div>
                 </p-header>
-                <p-column styleClass="col-button">
+                <p-column [style]="{'width':'80px'}" styleClass="col-button">
                         <template pTemplate="header">
                             Action
                         </template>
@@ -62,17 +68,18 @@
                                 </div>
                         </template>
                 </p-column>
-                <p-column field="woNumber" header="WO #" [sortable]="true" [filter]="true"></p-column>
-                <p-column field="woCategoryName" header="Category" [sortable]="true" [filter]="true"></p-column>
-                <p-column field="woPriorityName" header="Priority" [sortable]="true" [filter]="true"></p-column>
-                <p-column field="taskName" header="Task" [sortable]="true" [filter]="true" filterPlaceholder="Search"></p-column>
-                <p-column field="assetName" header="Asset" [sortable]="true" [filter]="true"></p-column>
-                <p-column field="locationName" header="Location" [sortable]="true" [filter]="true" filterPlaceholder="Search"></p-column>
-                <p-column field="start" header="Start" [sortable]="true"></p-column>
-                <p-column field="dueDate" header="Due" [sortable]="true"></p-column>
-                <p-column field="currentStatusName" header="Status" [sortable]="true" [filter]="true"></p-column>
-                <p-column field="assignee" header="Assignee" [sortable]="true" [filter]="true"></p-column>
-                <p-column field="dateUpdated" header="Last Updated" [sortable]="true">
+                <p-column [style]="{'width':'100px'}" field="woNumber" header="WO #" [sortable]="true" [filter]="true"></p-column>
+                <p-column field="woCategoryName" [style]="{'width':'110px'}" header="Category" [sortable]="true" [filter]="true"></p-column>
+                <p-column field="woPriorityName" header="Priority" [sortable]="true" [style]="{'width':'90px'}" [filter]="true"></p-column>
+                <p-column field="taskName" [style]="{'width':'120px'}" header="Task" [sortable]="true" [filter]="true" filterPlaceholder="Search"></p-column>
+                <p-column field="assetName" [style]="{'width':'110px'}" header="Asset" [sortable]="true" [filter]="true"></p-column>
+                <p-column field="locationName" header="Location" [sortable]="true" [style]="{'width':'120px'}" [filter]="true" filterPlaceholder="Search"></p-column>
+                <!-- <p-column field="start" header="Start" [sortable]="true"></p-column>
+                 -->
+                 <p-column [filter]="true" [style]="{'width':'110px'}" field="dueDate" header="Due" [sortable]="true"></p-column>
+                <p-column field="currentStatusName" [style]="{'width':'110px'}" header="Status" [sortable]="true" [filter]="true"></p-column>
+                <p-column field="assignee" [style]="{'width':'100px'}" header="Assignee" [sortable]="true" [filter]="true"></p-column>
+                <p-column [field]="true" [style]="{'width':'140px'}" field="dateUpdated" header="Last Updated" styleClass="top-aligned-table" [sortable]="true">
                     <template pTemplate="body" let-update="rowData">
                         {{update.dateUpdated | date: 'shortDate'}}
                     </template>

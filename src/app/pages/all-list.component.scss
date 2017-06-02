@@ -1,6 +1,6 @@
 .all-list__card{
-    color: #ffffff;
-    background-color: rgba(255, 255, 255, 0.1);
+    color: #22272a;
+    background-color: #fff;
     border: 0;
     border-radius: 7px;
     position: relative;
@@ -8,18 +8,18 @@
     box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.15);
 }
 .all-list__card h3{
-	border-bottom: 1px solid #fff;
+	border-bottom: 1px solid #d7d7d7;
     /* padding-top: 12px; */
     padding: 10px 10px;
-    color:#fff;
+    color: #22272a;
 }
 .all-list__card p{
 	padding: 10px 0px 35px 10px;
-    color: #fff;
+    color: #22272a;
 }
 .all-list__card h3:hover {
-    color: #efefef;
+    color: #00ABFF;
 }
 .all-list__card p:hover {
-    color: #efefef;
+    color: #00ABFF;
 }

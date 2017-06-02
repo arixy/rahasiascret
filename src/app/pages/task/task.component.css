@@ -1,0 +1,26 @@
+body .ui-tabview.ui-tabview-top .ui-tabview-nav li.ui-state-active{
+	border-bottom: 1px solid #00abff !important;
+    background-color: #fff !important;
+    border: none;
+}
+body .ui-tabview.ui-tabview-top .ui-tabview-nav li.ui-state-active a{
+	color:#2d353c !important;
+}
+body .ui-tabview.ui-tabview-top .ui-tabview-nav li:hover{
+	border-color: #fff !important;
+	border-bottom: 1px solid rgba(0, 171, 255, 0.13) !important;
+}
+body .ui-tabview.ui-tabview-top .ui-tabview-nav li{
+	line-height: 48px;
+    height: 48px;
+    padding: 0 35px;
+    font-size: 14px;
+    font-family: Roboto,"Helvetica Neue",sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    box-sizing: border-box;
+    opacity: .6;
+    min-width: 160px;
+    text-align: center;
+    position: relative;
+}

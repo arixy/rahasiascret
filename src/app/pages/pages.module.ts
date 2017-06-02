@@ -42,6 +42,9 @@ import { ScheduleComponent } from './schedule/schedule.component';
 import { AddNewWorkOrderComponent } from './task/add-wo.component';
 // add primeng
 import { TabViewModule, FileUploadModule, PanelModule } from 'primeng/primeng';
+
+import {MdTabsModule} from '@angular/material';
+
 @NgModule({
   imports: [CommonModule, NgaModule, routing, SelectModule, Ng2SmartTableModule, ModalModule.forRoot(), ReactiveFormsModule,
            DatePickerModule,
@@ -54,8 +57,9 @@ import { TabViewModule, FileUploadModule, PanelModule } from 'primeng/primeng';
            TreeModule,
            DropdownModule.forRoot(),
            TabViewModule,
-      FileUploadModule,
-      PanelModule,
+		   FileUploadModule,
+		   PanelModule,
+		   MdTabsModule,
            ],
   declarations: [
       Pages, 

@@ -70,12 +70,22 @@ button.btn-custom:focus{
 body .ui-widget-header{
 	background: transparent !important;
     border: none !important;
-	margin-bottom: 1em;
+	/* margin-bottom: 1em; */
+}
+body .ui-datatable thead th.ui-state-active {
+    background-color: #52b1e0;
+    border-color: #52b1e0;
 }
 .btn-export__csv{
    	border: none;
     background: transparent;
     font-size: 36px !important;
+    color: #01ABFF;
+}
+.btn-sets-right {
+    border: none;
+    background: transparent;
+    font-size: 32px !important;
     color: #01ABFF;
 }
 .content_confirm h3{
@@ -113,6 +123,43 @@ button.btn-no{
 button.btn-no:hover,button.btn-yes:hover{
 	-webkit-box-shadow: 0 0 20px 5px #00ABFF;
 	box-shadow: 0 0 20px 5px #00ABFF;
+}
+/* .mat-tab-label {
+    min-width: 110px !important;
+}
+ */
+.search-global input{
+	padding: 5px;
+	width: 253px;
+	border: none;
+}
+.search-global i{
+	font-size: 15px;
+	color: #d7d7d7;
+	padding: 5px;
+}
+.search-global{
+	background: #fff;
+    display: inline-block;
+    padding: 3px;
+    border-bottom: 1px solid #d7d7d7;
+	float: left;
+}	
+.ui-paginator .ui-paginator-page {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    border: solid 1px #d7d7d7;
+}
+body .ui-paginator .ui-state-active {
+    background: #00ABFF;
+}
+
+th.top-aligned-table {
+    vertical-align: top;
+}
+.ui-datatable .ui-sortable-column-icon {
+    display: block !important;
+    float: right;
 }
 @media only screen and (max-width: 589px) {
 	.modal.in .modal-dialog{
