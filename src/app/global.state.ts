@@ -44,9 +44,11 @@ export class GlobalState {
 export class GlobalConfigs {
     //public static readonly APP_BASE_URL = "http://10.17.50.178/api/v1";
     public static readonly APP_BASE_URL = "http://ec2-52-40-147-30.us-west-2.compute.amazonaws.com/api/v1";
+    //public static readonly APP_BASE_URL = 'http://192.168.250.67/api/v1';
 }
 export class WorkflowActions {
-    public static readonly VIEW = 0;
+    public static readonly CREATE = -1;
+    public static readonly VIEW = -2;
     public static readonly EDIT = 2;
     public static readonly DELETE = 3;
     public static readonly ASSIGN_REASSIGN = 4;

@@ -4,11 +4,13 @@ import { UUID } from 'angular2-uuid';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 
+import { GlobalConfigs  } from '../../global.state';
 @Injectable()
 export class RoleService{
 	private role_data: any;
 	redirectUrl: string;
-	private appUrl = 'http://ec2-52-40-147-30.us-west-2.compute.amazonaws.com/api/v1/admin/';
+    //private appUrl = 'http://ec2-52-40-147-30.us-west-2.compute.amazonaws.com/api/v1/admin/';
+    private appUrl = GlobalConfigs.APP_BASE_URL + '/admin/';
 
   constructor(private http: Http){
 //    this.role_data = [

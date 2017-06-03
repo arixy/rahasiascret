@@ -3,16 +3,25 @@
     <li class="nav-item">
       <a class="nav-link active" data-toggle="tab" href="#general">General</a>
     </li>
-    <li class="nav-item disabled">
+    <li class="nav-item" *ngIf="isSchedule">
       <a class="nav-link" data-toggle="tab" href="#recurring">Recurring</a>
     </li>
     <li class="nav-item">
+      <a class="nav-link" data-toggle="tab" href="#expenses" *ngIf="!isSchedule">Expenses</a>
+    </li>
+    <li class="nav-item" *ngIf="!isSchedule">
       <a class="nav-link" data-toggle="tab" href="#files">Files</a>
     </li>
   </ul>
 
   <div class="tab-content">
     <div class="tab-pane active" id="general" role="tabpanel">
+      <!-- WO Number -->
+      <div class="form-group row" *ngIf="!isSchedule">
+        <label for="inputEmail3" class="control-label">WO Number</label><br />
+        <input [formControl]="wo_number" type="text" class="form-control" id="inputEmail3" placeholder="WO Number">
+      </div>
+
       <!-- Task Name -->
       <div class="form-group row" [ngClass]="{'has-error': (!task_name.valid && task_name.touched), 'has-success': (task_name.valid && task_name.touched)}">
         <label for="inputEmail3" class="control-label">Task</label><br />
@@ -55,7 +64,7 @@
         <div class="col-xg-10">
           <ng-select #addCategorySelectBox
                      [items]="items_categories"
-                     [disabled]="disabled"
+                     [disabled]="disabled || selected_category.disabled"
                      (removed)="removeSelectBoxValue('selected_category', $event)"
                      (selected)="selectedSelectBoxValue('selected_category', $event)"
                      placeholder="No Category selected">
@@ -72,13 +81,13 @@
       </div>
 
       <!-- Asset -->
-      <div class="form-group row">
+      <!--<div class="form-group row">
         <label for="selected_location" class="col-xg-2 control-label">Asset</label>
 
         <div class="col-xg-10">
           <ng-select #addAssetSelectBox
                      [items]="items_assets"
-                     [disabled]="disabled"
+                     [disabled]="disabled || selected_asset.disabled"
                      (removed)="removeSelectBoxValue('selected_asset', $event)"
                      (selected)="selectedSelectBoxValue('selected_asset', $event)"
                      placeholder="No Asset selected">
@@ -91,7 +100,7 @@
         <div class="error-message col-xg-10" *ngIf="error_msg.asset != null">
           {{error_msg.asset}}
         </div>
-      </div>
+      </div>-->
 
       <!-- Location -->
       <div class="form-group row" [ngClass]="{'has-error': (!selected_location.valid && selected_location.touched), 'has-success': (selected_location.valid && selected_location.touched)}">
@@ -100,7 +109,7 @@
         <div class="col-xg-10">
           <ng-select #addLocationSelectBox
                      [items]="items_locations"
-                     [disabled]="disabled"
+                     [disabled]="disabled || selected_location.disabled"
                      (removed)="removeSelectBoxValue('selected_location', $event)"
                      (selected)="selectedSelectBoxValue('selected_location', $event)"
                      placeholder="No Location selected">
@@ -121,36 +130,14 @@
         <textarea [formControl]="location_info" class="form-control" id="inputEmail3" placeholder="Location Info" pInputTextArea></textarea>
       </div>
 
-      <!-- Entity -->
-      <div class="form-group row">
-        <label for="selected_location" class="col-xg-2 control-label">Entity</label>
-
-        <div class="col-xg-10">
-          <ng-select #addEntitySelectBox
-                     [items]="items_entities"
-                     [disabled]="disabled"
-                     (removed)="removeSelectBoxValue('selected_entity', $event)"
-                     (selected)="selectedSelectBoxValue('selected_entity', $event)"
-                     placeholder="No Entity selected">
-          </ng-select>
-        </div>
-
-      </div>
-      <div class="row error-row">
-        <div class="col-xg-2 line-height-zero">&nbsp;</div>
-        <div class="error-message col-xg-10" *ngIf="error_msg.entity != null">
-          {{error_msg.entity}}
-        </div>
-      </div>
-
       <!-- Assignee -->
-      <div class="form-group row">
+      <div class="form-group row" *ngIf="_defFieldPermissions.selected_assignee != 'hidden'">
         <label for="selected_location" class="control-label">Assignee</label>
 
         <div class="col-xg-10">
           <ng-select #addAssigneeSelectBox
                      [items]="items_assignees"
-                     [disabled]="disabled"
+                     [disabled]="_defFieldPermissions.selected_assignee == 'disabled'"
                      (removed)="removeSelectBoxValue('selected_assignee', $event)"
                      (selected)="selectedSelectBoxValue('selected_assignee', $event)"
                      placeholder="No Assignee selected">
@@ -166,13 +153,13 @@
       </div>
 
       <!-- Status -->
-      <div class="form-group row" [ngClass]="{'has-error': (!selected_status.valid && selected_status.touched), 'has-success': (selected_status.valid && selected_status.touched)}" *ngIf="actionType != null && actionType.id != -1">
+      <div class="form-group row" [ngClass]="{'has-error': (!selected_status.valid && selected_status.touched), 'has-success': (selected_status.valid && selected_status.touched)}" *ngIf="actionType != null && actionType.workflowActionId != -1">
         <label for="selected_status" class="col-xg-2 control-label">Status</label>
 
         <div class="col-xg-10">
           <ng-select #addStatusSelectBox
                      [items]="items_statuses"
-                     [disabled]="disabled"
+                     [disabled]="_defFieldPermissions.selected_status == 'disabled'"
                      (removed)="removeSelectBoxValue('selected_status', $event)"
                      (selected)="selectedSelectBoxValue('selected_status', $event)"
                      placeholder="No Status selected">
@@ -194,7 +181,7 @@
         <div class="col-xg-10">
           <ng-select #addPrioritySelectBox
                      [items]="items_priorities"
-                     [disabled]="disabled"
+                     [disabled]="disabled || selected_priority.disabled"
                      (removed)="removeSelectBoxValue('selected_priority', $event)"
                      (selected)="selectedSelectBoxValue('selected_priority', $event)"
                      placeholder="No Priority selected">
@@ -206,6 +193,21 @@
         <div class="col-xg-2 line-height-zero">&nbsp;</div>
         <div class="error-message col-xg-10" *ngIf="error_msg.priority != null">
           {{error_msg.priority}}
+        </div>
+      </div>
+
+      <!-- Vendor -->
+      <div class="form-group row" *ngIf="!isSchedule">
+        <label for="selected_priority" class="col-xg-2 control-label">Vendor</label>
+
+        <div class="col-xg-10">
+          <ng-select #addVendorSelectBox
+                     [items]="items_vendors"
+                     [disabled]="disabled || selected_vendor.disabled"
+                     (removed)="removeSelectBoxValue('selected_vendor', $event)"
+                     (selected)="selectedSelectBoxValue('selected_vendor', $event)"
+                     placeholder="No Vendor selected">
+          </ng-select>
         </div>
       </div>
 
@@ -248,7 +250,8 @@
         <label for="selected_duedate" class="control-label">Start Date</label><br />
 
         <div class="col-xg-10">
-          <ng2-datepicker (outputEvents)="selectedDate('selected_startdate', $event)" [formControl]="selected_startdate"></ng2-datepicker>
+          <!--<ng2-datepicker (outputEvents)="selectedDate('selected_startdate', $event)" [formControl]="selected_startdate"></ng2-datepicker>-->
+          <p-calendar [formControl]="selected_startdate" [showIcon]="true" dateFormat="yy-mm-dd" [yearNavigator]="true" [yearRange]="'2017:2222'"></p-calendar>
         </div>
       </div>
       <div class="row error-row">
@@ -263,7 +266,8 @@
         <label for="selected_duedate" class="control-label">Start Time</label><br />
 
         <div class="col-xg-10">
-          <ng2-datepicker (outputEvents)="selectedStartTime($event)"></ng2-datepicker>
+          <!--<ng2-datepicker (outputEvents)="selectedStartTime($event)" [formControl]="selected_starttime" ></ng2-datepicker>-->
+          <p-calendar [formControl]="selected_starttime" [showIcon]="true" dateFormat="yy-mm-dd" [timeOnly]="true"></p-calendar>
         </div>
       </div>
       <div class="row error-row">
@@ -274,11 +278,12 @@
       </div>
 
       <!-- Due Date -->
-      <div class="form-group row">
+      <div class="form-group row" *ngIf="!isSchedule">
         <label for="selected_duedate" class="control-label">Due</label><br />
 
         <div class="col-xg-10">
-          <ng2-datepicker (outputEvents)="selectedDate('selected_duedate', $event)" [formControl]="selected_duedate"></ng2-datepicker>
+          <!--<ng2-datepicker (outputEvents)="selectedDate('selected_duedate', $event)" [formControl]="selected_duedate"></ng2-datepicker>-->
+          <p-calendar [formControl]="selected_duedate" [showIcon]="true" dateFormat="yy-mm-dd" [yearNavigator]="true" [yearRange]="'2017:2222'"></p-calendar>
         </div>
       </div>
       <div class="row error-row">
@@ -286,6 +291,11 @@
         <div class="error-message col-xg-10" *ngIf="formGroupAdd.get('selected_duedate').hasError('required') && formGroupAdd.get('selected_duedate').touched">
           Due date is Required
         </div>
+      </div>
+      <!-- Solution -->
+      <div class="form-group row" *ngIf="!isSchedule">
+        <label for="solution" class="col-xg-2 control-label">Solution</label><br />
+        <textarea [formControl]="solution" class="form-control" id="solution" placeholder="Solution" pInputTextArea></textarea>
       </div>
     </div>
 
@@ -299,7 +309,6 @@
           <ng-select #addRepeatSelectBox
                      [items]="items_repeats"
                      [disabled]="disabled"
-                     [active]="[selected_repeat]"
                      (removed)="removeSelectBoxValue('selected_repeat', $event)"
                      (selected)="selectedSelectBoxValue('selected_repeat', $event)"
                      placeholder="No Repeat selected">
@@ -334,8 +343,8 @@
           <ng-select #addRepeatSelectBox
                      [items]="items_period_duration"
                      [disabled]="disabled"
-                     (removed)="removeSelectBoxValue('selected_repeat_repeat_period', $event)"
-                     (selected)="selectedSelectBoxValue('selected_repeat_repeat_period', $event)"
+                     (removed)="removeSelectBoxValue('selected_every_period', $event)"
+                     (selected)="selectedSelectBoxValue('selected_every_period', $event)"
                      placeholder="No Period selected">
           </ng-select>
         </div>
@@ -368,8 +377,8 @@
           <ng-select #addRepeatSelectBox
                      [items]="items_period_duration"
                      [disabled]="disabled"
-                     (removed)="removeSelectBoxValue('selected_dueperiod', $event)"
-                     (selected)="selectedSelectBoxValue('selected_dueperiod', $event)"
+                     (removed)="removeSelectBoxValue('selected_due_period', $event)"
+                     (selected)="selectedSelectBoxValue('selected_due_period', $event)"
                      placeholder="No Period selected">
           </ng-select>
         </div>
@@ -380,6 +389,11 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- Expenses Tab Content -->
+    <div class="tab-pane" id="expenses" role="tabpanel">
+      <wo-expenses [actionType]="actionType" [selectedWO]="selectedWO" [selectedWoType]="selectedWoType" [(expenses)]="wo_expenses" [formGroup]="formGroupAdd" [isCanEdit]="isCanEditExpenses"></wo-expenses>
     </div>
 
     <div class="tab-pane" id="files" role="tabpanel">
@@ -394,7 +408,7 @@
     <div class="col-sm-6">
       &nbsp;
     </div>
-    <div class="col-sm-3">
+    <div class="col-sm-3" *ngIf="actionType != null && actionType.workflowActionId != -2">
       <button [disabled]="!formGroupAdd.valid" type="submit" class="btn btn-default btn-save">Save</button>
     </div>
   </div>

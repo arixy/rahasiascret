@@ -1,0 +1,24 @@
+﻿<div class="row">
+  <button class="btn btn-primary" (click)="addExpenses()" *ngIf="isCanEdit">Add Expense</button>
+  <br/>
+  <table style="width: 100% !important;">
+    <thead>
+      <tr>
+        <th>Expense Type</th>
+        <th>Amount</th>
+        <th>Description</th>
+        <th>Reference Number</th>
+        <th>Reference Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let expense of expenses">
+        <td><ng-select [items]="items_expenses_type" class="form-control" [disabled]="!isCanEdit"></ng-select></td>
+        <td><input type="text" class="form-control" value="{{expense.amount}}" [disabled]="!isCanEdit" /></td>
+        <td><textarea [(ngModel)]="expense.description" class="form-control" id="inputEmail3" placeholder="Description" [disabled]="!isCanEdit" pInputTextArea></textarea></td>
+        <td><input type="text" class="form-control" value="{{expense.refNumber}}" [disabled]="!isCanEdit"/></td>
+        <td><p-calendar class="form-control" [(ngModel)]="expense.refDate" [disabled]="!isCanEdit"></p-calendar></td>
+      </tr>
+    </tbody>
+  </table>
+</div>

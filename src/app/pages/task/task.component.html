@@ -30,6 +30,13 @@
                 </ul>-->
             </div>
         </div>
+      <!-- Test Purpose -->
+      <div class="col-sm-3">
+        <ng-select [items]="__lst_type" (selected)="__setSelectedType($event)" placeholder="Select Type"></ng-select>
+        <ng-select [items]="__lst_actions" (selected)="__setSelectedAction($event)" placeholder="Select Mode"></ng-select>
+        <button (click)="testOpenModal()">Open</button>
+      </div>
+      <!-- End of Test Purpose -->
         <div style="width: 100%; overflow-x: auto; overflow-y: auto;">
             <p-dataTable #dt [value]="myTasks" [lazy]="true" (onLazyLoad)="refresh($event, dt)" [rows]="10" [paginator]="true" [totalRecords]="totalRecords" sortField="dateUpdated" sortOrder="-1">
                 <p-header>
@@ -66,8 +73,8 @@
                 <p-column field="woCategoryName" header="Category" [sortable]="true" [filter]="true"></p-column>
                 <p-column field="woPriorityName" header="Priority" [sortable]="true" [filter]="true"></p-column>
                 <p-column field="taskName" header="Task" [sortable]="true" [filter]="true" filterPlaceholder="Search"></p-column>
-                <p-column field="woAssetName" header="Asset" [sortable]="true" [filter]="true"></p-column>
-                <p-column field="woLocationName" header="Location" [sortable]="true" [filter]="true" filterPlaceholder="Search"></p-column>
+                <p-column field="assetName" header="Asset" [sortable]="true" [filter]="true"></p-column>
+                <p-column field="locationName" header="Location" [sortable]="true" [filter]="true" filterPlaceholder="Search"></p-column>
                 <p-column field="start" header="Start" [sortable]="true"></p-column>
                 <p-column field="dueDate" header="Due" [sortable]="true"></p-column>
                 <p-column field="currentStatusName" header="Status" [sortable]="true" [filter]="true"></p-column>

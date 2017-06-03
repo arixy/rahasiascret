@@ -47,8 +47,9 @@ import { RecurringRequestComponent } from './task/forms/recurringrequest.compone
 import { PreventiveRequestComponent } from './task/forms/preventiverequest.component';
 //import { AddNewWorkOrderComponent } from './task/add-wo.component';
 //import { TabContentRecurringComponent } from './task/tabs/recurring.component';
+import { WorkOrderExpensesComponent } from './task/forms/subforms/workorder-expenses.component';
 // add primeng
-import { TabViewModule, FileUploadModule, PanelModule } from 'primeng/primeng';
+import { TabViewModule, FileUploadModule, PanelModule, CalendarModule } from 'primeng/primeng';
 @NgModule({
   imports: [CommonModule, NgaModule, routing, SelectModule, Ng2SmartTableModule, ModalModule.forRoot(), ReactiveFormsModule,
            DatePickerModule,
@@ -63,6 +64,7 @@ import { TabViewModule, FileUploadModule, PanelModule } from 'primeng/primeng';
            TabViewModule,
       FileUploadModule,
       PanelModule,
+      CalendarModule
            ],
   declarations: [
       Pages, 
@@ -86,6 +88,7 @@ import { TabViewModule, FileUploadModule, PanelModule } from 'primeng/primeng';
       GuestRequestComponent,
       RecurringRequestComponent,
       PreventiveRequestComponent,
+      WorkOrderExpensesComponent
       //AddNewWorkOrderComponent,
       //TabContentRecurringComponent
     ],

@@ -33,6 +33,8 @@ import { GuestRequestComponent } from './forms/guestrequest.component';
 import { RecurringRequestComponent } from './forms/recurringrequest.component';
 import { PreventiveRequestComponent } from './forms/preventiverequest.component';
 
+import { WorkOrderStatuses } from '../../global.state';
+
 @Component({
   selector: 'my-task',
   templateUrl: './task.component.html',
@@ -42,8 +44,86 @@ import { PreventiveRequestComponent } from './forms/preventiverequest.component'
   entryComponents: [SingleRequestComponent, TenantRequestComponent, OwnerRequestComponent, GuestRequestComponent, RecurringRequestComponent, PreventiveRequestComponent]
 })
 export class TaskComponent implements OnDestroy{
+    // #TEST REGION
+    public __lst_type = [
+        { id: 1, text: "Preventive Maintenance" },
+        { id: 2, text: "Recurring Request" },
+        { id: 3, text: "Single Request" },
+        { id: 4, text: "Tenant Request" },
+        { id: 5, text: "Guest Request" },
+        { id: 6, text: "Owner Request" }
+    ];
+
+    public __lst_actions = [
+        {id: -1, text: "Create"},
+        { id: -2, text: "View" },
+        { id: -3, text: "View (Schedule)"},
+        { id: 2, text: "Edit" },
+        { id: -4, text: "Edit (Schedule)" },
+        { id: 3, text: "Delete" },
+        { id: 4, text: "Assign/Reassign" },
+        { id: 5, text: "Cancel" },
+        { id: 6, text: "Pending" },
+        { id: 7, text: "In Progress" },
+        { id: 8, text: "Close for Confirmation" },
+        { id: 9, text: "Complete" },
+        { id: 10, text: "Return" },
+    ];
+
+    public __sel_type: { id, text };
+    public __sel_action: { id, text };
+
+    public __setSelectedType(event) {
+        this.__sel_type = event;
+    }
+
+    public __setSelectedAction(event) {
+        this.__sel_action = event;
+    }
+
+    public testOpenModal() {
+        this.viewModalBody.clear();
+        if (this.__sel_type.id == this.SINGLE_TIME_REQUEST) {
+            this.currentOpenModal = this.createNewSingleRequestComponent(this.viewModalBody, SingleRequestComponent);
+            // send specific parameters if needed
+            //this.currentOpenModal.instance.variable_name = value
+        } else if (this.__sel_type.id == this.TENANT_REQUEST) {
+            this.currentOpenModal = this.createNewTenantRequestComponent(this.viewModalBody, TenantRequestComponent);
+        } else if (this.__sel_type.id == this.GUEST_REQUEST) {
+            this.currentOpenModal = this.createNewGuestRequestComponent(this.viewModalBody, GuestRequestComponent);
+        } else if (this.__sel_type.id == this.OWNER_REQUEST) {
+            this.currentOpenModal = this.createNewOwnerRequestComponent(this.viewModalBody, OwnerRequestComponent);
+        } else if (this.__sel_type.id == this.RECURRING_REQUEST) {
+            this.currentOpenModal = this.createNewRecurringRequestComponent(this.viewModalBody, RecurringRequestComponent);
+        } else if (this.__sel_type.id == this.PREVENTIVE_REQUEST) {
+            this.currentOpenModal = this.createNewPreventiveRequestComponent(this.viewModalBody, PreventiveRequestComponent);
+        }
+
+        this.currentOpenModal.instance.selectedWoType = this.__sel_type;
+
+        if (this.__sel_action.id == -3) {
+            // Edit WO
+            this.currentOpenModal.instance.actionType = { workflowActionId: -2, name: this.__sel_action.text };
+            this.currentOpenModal.instance.isSchedule = true;
+        } else if (this.__sel_action.id == -4) {
+            // Edit WO
+            this.currentOpenModal.instance.actionType = { workflowActionId: 2, name: this.__sel_action.text };
+            this.currentOpenModal.instance.isSchedule = true;
+        } else {
+            this.currentOpenModal.instance.actionType = { workflowActionId: this.__sel_action.id, name: this.__sel_action.text };
+        }
+        
+
+        // change modal title
+        this.modalTitle = "ADD NEW WO - " + this.__sel_type.text + "(" + this.__sel_action.text + ")";
+
+        this.addNewModal.show();
+    }
+    // #END TEST REGION
+
     private myTasks : any;
     private totalRecords;
+
     readonly PREVENTIVE_REQUEST = 1;
     readonly RECURRING_REQUEST = 2;
     readonly SINGLE_TIME_REQUEST = 3;
@@ -94,7 +174,7 @@ export class TaskComponent implements OnDestroy{
     private _taskService: TaskService,
     private _locationService: LocationService
     ) {
-        // hardcoded wo type list
+      // hardcoded wo type list
       this.woTypes = [{ id: 1, label: "Preventive Maintenance"},
                         {id: 2, label: "Recurring Request"},
                         {id: 3, label: "Single Request"},
@@ -156,8 +236,8 @@ export class TaskComponent implements OnDestroy{
         }
         
         this.currentOpenModal.instance.selectedWoType = selectedType;
-        this.currentOpenModal.instance.actionType = { id: -1, label: "Create" };
-        
+        this.currentOpenModal.instance.actionType = { workflowActionId: -1, name: "Create" };
+
         // change modal title
         this.modalTitle = "ADD NEW WO - " + selectedType.label;
 
@@ -165,7 +245,7 @@ export class TaskComponent implements OnDestroy{
         console.log(this.addNewModal);
     }
     
-    createNewSingleRequestComponent(view: ViewContainerRef, componentBody: { new (fb, cdr, _locationService, _taskService, _userService, _assetService): SingleRequestComponent }): ComponentRef<SingleRequestComponent>{
+    createNewSingleRequestComponent(view: ViewContainerRef, componentBody: { new (fb, cdr, _locationService, _taskService, _userService, _assetService, _roleService, _workOrderService): SingleRequestComponent }): ComponentRef<SingleRequestComponent>{
         // create content component
         let addNewContent = this.componentFactoryResolver.resolveComponentFactory(componentBody);
         
@@ -175,7 +255,7 @@ export class TaskComponent implements OnDestroy{
         return modalContentRef;
     }
 
-    createNewTenantRequestComponent(view: ViewContainerRef, componentBody: { new (fb, cdr, _locationService, _taskService, _userService, _assetService): TenantRequestComponent }): ComponentRef<TenantRequestComponent> {
+    createNewTenantRequestComponent(view: ViewContainerRef, componentBody: { new (fb, cdr, _locationService, _taskService, _userService, _assetService, _roleService, _entityService, _workOrderService): TenantRequestComponent }): ComponentRef<TenantRequestComponent> {
         // create content component
         let addNewContent = this.componentFactoryResolver.resolveComponentFactory(componentBody);
 
@@ -185,7 +265,7 @@ export class TaskComponent implements OnDestroy{
         return modalContentRef;
     }
 
-    createNewOwnerRequestComponent(view: ViewContainerRef, componentBody: { new (fb, cdr, _locationService, _taskService, _userService, _assetService): OwnerRequestComponent }): ComponentRef<OwnerRequestComponent> {
+    createNewOwnerRequestComponent(view: ViewContainerRef, componentBody: { new (fb, cdr, _locationService, _taskService, _userService, _assetService, _roleService, _entityService, _workOrderService): OwnerRequestComponent }): ComponentRef<OwnerRequestComponent> {
         // create content component
         let addNewContent = this.componentFactoryResolver.resolveComponentFactory(componentBody);
 
@@ -195,7 +275,7 @@ export class TaskComponent implements OnDestroy{
         return modalContentRef;
     }
 
-    createNewGuestRequestComponent(view: ViewContainerRef, componentBody: { new (fb, cdr, _locationService, _taskService, _userService, _assetService): GuestRequestComponent }): ComponentRef<GuestRequestComponent> {
+    createNewGuestRequestComponent(view: ViewContainerRef, componentBody: { new (fb, cdr, _locationService, _taskService, _userService, _assetService, _roleService, _entityService, _workOrderService): GuestRequestComponent }): ComponentRef<GuestRequestComponent> {
         // create content component
         let addNewContent = this.componentFactoryResolver.resolveComponentFactory(componentBody);
 
@@ -205,7 +285,7 @@ export class TaskComponent implements OnDestroy{
         return modalContentRef;
     }
 
-    createNewRecurringRequestComponent(view: ViewContainerRef, componentBody: { new (fb, cdr, _locationService, _taskService, _userService, _assetService): RecurringRequestComponent }): ComponentRef<RecurringRequestComponent> {
+    createNewRecurringRequestComponent(view: ViewContainerRef, componentBody: { new (fb, cdr, _locationService, _taskService, _userService, _assetService, _roleService, _workOrderService): RecurringRequestComponent }): ComponentRef<RecurringRequestComponent> {
         // create content component
         let addNewContent = this.componentFactoryResolver.resolveComponentFactory(componentBody);
 
@@ -215,7 +295,7 @@ export class TaskComponent implements OnDestroy{
         return modalContentRef;
     }
 
-    createNewPreventiveRequestComponent(view: ViewContainerRef, componentBody: { new (fb, cdr, _locationService, _taskService, _userService, _assetService): PreventiveRequestComponent }): ComponentRef<PreventiveRequestComponent> {
+    createNewPreventiveRequestComponent(view: ViewContainerRef, componentBody: { new (fb, cdr, _locationService, _taskService, _userService, _assetService, _roleService, _workOrderService): PreventiveRequestComponent }): ComponentRef<PreventiveRequestComponent> {
         // create content component
         let addNewContent = this.componentFactoryResolver.resolveComponentFactory(componentBody);
 
@@ -317,8 +397,8 @@ export class TaskComponent implements OnDestroy{
                         this.myTasks[i].actions = [];
                     }
 
-                    this.myTasks[i].actions.unshift({ workflowActionId: 0, name: "View" });
-                    this.myTasks[i].actions.push({ workflowActionId: 4, name: "Assign/Reassign" });
+                    this.myTasks[i].actions.unshift({ workflowActionId: -2, name: "View" });
+                    //this.myTasks[i].actions.push({ workflowActionId: 4, name: "Assign/Reassign" });
                     this.myTasks[i].dateUpdated = new Date(this.myTasks[i].dateUpdated);
                 }
 
