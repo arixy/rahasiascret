@@ -50,6 +50,9 @@ import { PreventiveRequestComponent } from './task/forms/preventiverequest.compo
 import { WorkOrderExpensesComponent } from './task/forms/subforms/workorder-expenses.component';
 // add primeng
 import { TabViewModule, FileUploadModule, PanelModule, CalendarModule } from 'primeng/primeng';
+
+import {MdTabsModule} from '@angular/material';
+
 @NgModule({
   imports: [CommonModule, NgaModule, routing, SelectModule, Ng2SmartTableModule, ModalModule.forRoot(), ReactiveFormsModule,
            DatePickerModule,
@@ -62,8 +65,9 @@ import { TabViewModule, FileUploadModule, PanelModule, CalendarModule } from 'pr
            TreeModule,
            DropdownModule.forRoot(),
            TabViewModule,
-      FileUploadModule,
-      PanelModule,
+		   FileUploadModule,
+		   PanelModule,
+		   MdTabsModule,
       CalendarModule
            ],
   declarations: [
