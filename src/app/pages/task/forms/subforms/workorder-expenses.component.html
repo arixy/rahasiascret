@@ -1,24 +1,76 @@
 ﻿<div class="row">
-  <button class="btn btn-primary" (click)="addExpenses()" *ngIf="isCanEdit">Add Expense</button>
-  <br/>
-  <table style="width: 100% !important;">
-    <thead>
-      <tr>
-        <th>Expense Type</th>
-        <th>Amount</th>
-        <th>Description</th>
-        <th>Reference Number</th>
-        <th>Reference Date</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let expense of expenses">
-        <td><ng-select [items]="items_expenses_type" class="form-control" [disabled]="!isCanEdit"></ng-select></td>
-        <td><input type="text" class="form-control" value="{{expense.amount}}" [disabled]="!isCanEdit" /></td>
-        <td><textarea [(ngModel)]="expense.description" class="form-control" id="inputEmail3" placeholder="Description" [disabled]="!isCanEdit" pInputTextArea></textarea></td>
-        <td><input type="text" class="form-control" value="{{expense.refNumber}}" [disabled]="!isCanEdit"/></td>
-        <td><p-calendar class="form-control" [(ngModel)]="expense.refDate" [disabled]="!isCanEdit"></p-calendar></td>
-      </tr>
-    </tbody>
-  </table>
+  <p-dataTable [value]="getExpenses()">
+    <p-header>
+      <div class="ui-helper-clearfix" style="text-align: left;">
+        <button type="button" class="btn btn-primary" (click)="addExpenses()" *ngIf="isCanEdit">Add Expense</button>
+      </div>
+    </p-header>
+    <p-column header="Expense Type" [style]="{'width':'200px'}">
+      <template let-expense="rowData" pTemplate="body">
+        <ng-select class="form-control"
+                   [items]="items_expenses_types"
+                   [disabled]="!isCanEdit"
+                   [active]="expense.active"
+                   (selected)="setSelectedExpenseType(expense, $event)"
+                   (removed)="removeSelectedExpenseType(expense, $event)">
+        </ng-select>
+      </template>
+    </p-column>
+    <p-column header="Amount">
+      <template let-expense="rowData" pTemplate="body">
+        <input #numberOnly type="text" class="form-control" [(ngModel)]="expense.amount" [disabled]="!isCanEdit"/>
+      </template>
+    </p-column>
+    <p-column header="Description">
+      <template let-expense="rowData" pTemplate="body">
+        <input type="text" class="form-control" [(ngModel)]="expense.description" [disabled]="!isCanEdit" />
+      </template>
+    </p-column>
+    <p-column header="Reference Number">
+      <template let-expense="rowData" pTemplate="body">
+        <input type="text" class="form-control" [(ngModel)]="expense.referenceNumber" [disabled]="!isCanEdit" />
+      </template>
+    </p-column>
+    <p-column header="Reference Date">
+      <template let-expense="rowData" pTemplate="body">
+        <p-calendar [(ngModel)]="expense.referenceDate" [disabled]="!isCanEdit" [inputStyle]="{'width':'80%'}" [showIcon]="true" dateFormat="yy-mm-dd" [yearNavigator]="true" [yearRange]="'2017:2222'"></p-calendar>
+      </template>
+    </p-column>
+    <p-column header="Action" [style]="{'width':'120px'}" *ngIf="isCanEdit">
+      <template let-expense="rowData" pTemplate="body">
+        <button type="button" (click)="removeExpense(expense)" class="btn btn-danger">Remove</button>
+      </template>
+    </p-column>
+  </p-dataTable>
+    <!--<br />
+    <table style="width: 100% !important;">
+      <thead>
+        <tr>
+          <th>Expense Type</th>
+          <th>Amount</th>
+          <th>Description</th>
+          <th>Reference Number</th>
+          <th>Reference Date</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let expense of getExpenses()">
+          <td>
+            <ng-select class="form-control"
+                       [items]="items_expenses_types"
+                       [disabled]="!isCanEdit"
+                       [active]="expense.active"
+                       (selected)="setSelectedExpenseType(expense, $event)"
+                       (removed)="removeSelectedExpenseType(expense, $event)">
+            </ng-select>
+          </td>
+          <td><input type="text" class="form-control" [(ngModel)]="expense.amount" [disabled]="!isCanEdit" /></td>
+          <td><input type="text" [(ngModel)]="expense.description" class="form-control" id="inputEmail3" placeholder="Description" [disabled]="!isCanEdit" /></td>
+          <td><input type="text" class="form-control" [(ngModel)]="expense.referenceNumber" [disabled]="!isCanEdit" /></td>
+          <td><p-calendar class="form-control" [(ngModel)]="expense.referenceDate" [disabled]="!isCanEdit"></p-calendar></td>
+          <td><button type="button" (click)="removeExpense(expense)">Remove</button></td>
+        </tr>
+      </tbody>
+    </table>-->
 </div>

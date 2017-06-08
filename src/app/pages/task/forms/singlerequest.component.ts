@@ -12,6 +12,9 @@ import { LocationService } from '../../../services/location.service';
 import { AssetService } from '../../../services/asset.service';
 import { UsersService } from '../../users/users.service';
 import { RoleService } from '../../role/role.service';
+import { PriorityService } from '../../priorities/priority.service';
+import { ExpenseTypeService } from '../../expense-type/expense-type.service';
+import { EntityService } from '../../entities/entity.service';
 import { WorkOrderService } from '../../../services/work-order.service';
 
 import { WorkflowActions, WorkOrderStatuses } from '../../../global.state';
@@ -19,7 +22,7 @@ import { WorkflowActions, WorkOrderStatuses } from '../../../global.state';
 @Component({
     selector: 'form-single-request',
     templateUrl: './singlerequest.component.html',
-    providers: [LocationService, AssetService, UsersService, RoleService, WorkOrderService]
+    providers: [LocationService, AssetService, UsersService, RoleService, WorkOrderService, ExpenseTypeService, PriorityService, EntityService]
 })
 export class SingleRequestComponent {
     public selectedWoType: { id, label };
@@ -48,23 +51,36 @@ export class SingleRequestComponent {
     public solution;
 
     public selected_startdate;
-    public selected_starttime;
+    //public selected_starttime;
     public selected_duedate;
 
     // expenses
     public isCanEditExpenses = true;
-    public wo_expenses = [{ expenseTypeName: "Pembelian", amount:"120000", description:"", refNumber: "", refDate: new Date()}];
+    public wo_expenses = [
+        //{ workOrderExpenseId: 1, expenseTypeId: 1, expenseTypeName: "Pembelian", amount: "120000", description: "", referenceNumber: "", referenceDate: new Date(), isActive: true, active: [{id: 1, text: "Pembelian"}] },
+    ];
 
     // files
-    public existingFiles;
-    public existingPhotos;
+    public isCanEditFiles = true;
+    public existingFiles = [
+        //{
+        //    workOrderId: 1,
+        //    workOrderFileId: 1,
+        //    name: "sample.txt",
+        //    notes: "sample file",
+        //    path: "http://10.17.50.178/api/v1/files/work-order/17",
+        //    isActive: true,
+        //    actualFile: null // used for new uploaded file
+        //}
+    ];
+    public existingPhotos = [];
 
-    public items_assets: any = [{text: 'Lampu Maspion', id: 1}];
-    public items_categories: any = [{ text: 'Complaints', id: 1 }];
-    public items_locations: any = [{ text: 'Lantai 3', id: 1 }, { text: 'Lantai 5', id: 2 }];
-    public items_priorities: any = [{ text: 'High', id: 1 }];
-    public items_entities: any = [{ text: 'Obrol', id: 1 }];
-    public items_assignees: any = [{ text: 'My Self', id: 1 }];
+    public items_assets: any = [];
+    public items_categories: any = [];
+    public items_locations: any = [];
+    public items_priorities: any = [];
+    public items_entities: any = [];
+    public items_assignees: any = [];
     public items_statuses: any = [
         { text: 'Scheduled', id: 0 },
         { text: 'Backlog', id: 1 },
@@ -76,6 +92,7 @@ export class SingleRequestComponent {
         { text: 'Pending', id: 7 },
     ];
     public items_vendors: any = [];
+    public items_expenses_types: any = [];
 
     // error message container
     public error_msg = {
@@ -102,9 +119,10 @@ export class SingleRequestComponent {
     @ViewChild("addLocationSelectBox") _addLocationSelectBox: SelectComponent;
     @ViewChild("addAssetSelectBox") _addAssetSelectBox: SelectComponent;
     @ViewChild("addCategorySelectBox") _addCategorySelectBox: SelectComponent;
+    @ViewChild("addPrioritySelectBox") _addPrioritySelectBox: SelectComponent;
     @ViewChild("addAssigneeSelectBox") _addAssigneeSelectBox: SelectComponent;
     @ViewChild("addVendorSelectBox") _addVendorSelectBox: SelectComponent;
-    
+    //@ViewChild("fileuploadBox") _fileuploadBox: FileUpload;
     
 
     constructor(
@@ -115,7 +133,10 @@ export class SingleRequestComponent {
         private _assetService: AssetService,
         private _userService: UsersService,
         private _roleService: RoleService,
-        private _workOrderService: WorkOrderService
+        private _workOrderService: WorkOrderService,
+        private _expenseTypeService: ExpenseTypeService,
+        private _priorityService: PriorityService,
+        private _entityService: EntityService
     ){
     
     }
@@ -124,7 +145,7 @@ export class SingleRequestComponent {
         this.formGroupAdd = this.fb.group({
             'wo_number': ['', null],
             'task_name': ['', Validators.compose([Validators.required, Validators.minLength(2)])],
-            'task_desc': ['', null],
+            'task_desc': ['', Validators.compose([Validators.required, Validators.minLength(2)])],
             'selected_category': ['', null],
             'selected_asset': ['', null],
             'selected_location': ['', null],
@@ -132,13 +153,13 @@ export class SingleRequestComponent {
             'selected_assignee': ['',null],
             'selected_status': ['', null],
             'selected_priority': ['', null],
-            'selected_vendor': ['', null],
             'contact_person': ['', null],
             'contact_number': ['', null],
+            'selected_vendor': ['', null],
             'solution': ['', null],
             
             'selected_startdate': ['', null],
-            'selected_starttime': ['', null],
+            //'selected_starttime': ['', null],
             'selected_duedate': ['', null],
         });
         this.wo_number = this.formGroupAdd.controls['wo_number'];
@@ -151,18 +172,54 @@ export class SingleRequestComponent {
         this.selected_assignee = this.formGroupAdd.controls['selected_assignee'];
         this.selected_status = this.formGroupAdd.controls['selected_status'];
         this.selected_priority = this.formGroupAdd.controls['selected_priority'];
-        this.selected_vendor = this.formGroupAdd.controls['selected_vendor'];
         this.contact_person = this.formGroupAdd.controls['contact_person'];
         this.contact_number = this.formGroupAdd.controls['contact_number'];
+        this.selected_vendor = this.formGroupAdd.controls['selected_vendor'];
         this.solution = this.formGroupAdd.controls['solution'];
 
         this.selected_startdate = this.formGroupAdd.controls['selected_startdate'];
-        this.selected_starttime = this.formGroupAdd.controls['selected_starttime'];
+        //this.selected_starttime = this.formGroupAdd.controls['selected_starttime'];
         this.selected_duedate = this.formGroupAdd.controls['selected_duedate'];
 
         if (this.selectedWO != null) {
             this.loadWorkOrderDataAndSetPermission();
         } else {
+            // get vendors
+            this._entityService.getEntitiesByType(1).subscribe((response) => {
+                console.log("vendors", response.data);
+
+                var tmpLstVendors = response.data;
+                this.items_vendors = [];
+                for (var i = 0; i < tmpLstVendors.length; i++) {
+                    var currentItem = { id: tmpLstVendors[i].entityId, text: tmpLstVendors[i].name };
+                    this.items_vendors.push(currentItem);
+                }
+            });
+
+            // get priorities
+            this._priorityService.getPriorities().subscribe((response) => {
+                console.log("priorities", response.data);
+
+                var tmpLstPriorities = response.data;
+                this.items_priorities = [];
+                for (var i = 0; i < tmpLstPriorities.length; i++) {
+                    var currentItem = { id: tmpLstPriorities[i].woPriorityId, text: tmpLstPriorities[i].name };
+                    this.items_priorities.push(currentItem);
+                }
+            });
+
+            // get categories
+            this._workOrderService.getWOs().subscribe((response) => {
+                console.log("categories response", response.data);
+
+                var tmpLstCategories = response.data;
+                this.items_categories = [];
+                for (var i = 0; i < tmpLstCategories.length; i++) {
+                    var currentItem = { id: tmpLstCategories[i].woCategoryId, text: tmpLstCategories[i].name };
+                    this.items_categories.push(currentItem);
+                }
+            });
+
             // load all locations
             this._locationService.getLocations().subscribe((locations) => {
                 console.log("location response", locations);
@@ -221,6 +278,13 @@ export class SingleRequestComponent {
             this.selectedWO = response.data.workOrder;
             this.existingFiles = response.data.files;
             this.existingPhotos = response.data.photos;
+            this.wo_expenses = response.data.expenses;
+
+            // loop wo_expenses to set active item to be used in workorder-expenses.component
+            for (var woe = 0; woe < this.wo_expenses.length; woe++) {
+                this.wo_expenses[woe].active = [{ id: this.wo_expenses[woe].expenseTypeId, text: this.wo_expenses[woe].expenseTypeName }];
+                this.wo_expenses[woe].referenceDate = new Date(this.wo_expenses[woe].referenceDate);
+            }
 
             // show current values
             this.formGroupAdd.patchValue({
@@ -231,8 +295,9 @@ export class SingleRequestComponent {
                 "contact_person": this.selectedWO.contactPerson,
                 "contact_number": this.selectedWO.contactNumber,
 
-                "selected_startdate": new Date(this.selectedWO.startDate),
-                "selected_starttime": new Date(this.selectedWO.startDate + " " + this.selectedWO.startTime),
+                //"selected_startdate": new Date(this.selectedWO.startDate),
+                //"selected_starttime": new Date(this.selectedWO.startDate + " " + this.selectedWO.startTime),
+                "selected_startdate": new Date(this.selectedWO.startDate + " " + this.selectedWO.startTime),
                 "selected_duedate": new Date(this.selectedWO.dueDate)
             });
 
@@ -241,6 +306,61 @@ export class SingleRequestComponent {
             // load all other required items
             // then set default value for select box
 
+            // get vendors
+            this._entityService.getEntitiesByType(1).subscribe((response) => {
+                console.log("vendors", response.data);
+
+                var tmpLstVendors = response.data;
+                this.items_vendors = [];
+                for (var i = 0; i < tmpLstVendors.length; i++) {
+                    var currentItem = { id: tmpLstVendors[i].entityId, text: tmpLstVendors[i].name };
+                    this.items_vendors.push(currentItem);
+
+                    if (currentItem.id == this.selectedWO.vendorId) {
+                        //this.selected_cate = currentItem;
+                        this.selected_vendor.setValue(currentItem);
+                        this._addVendorSelectBox.active = [currentItem];
+                    }
+                }
+            });
+
+            // get priorities
+            this._priorityService.getPriorities().subscribe((response) => {
+                console.log("priorities", response.data);
+
+                var tmpLstPriorities = response.data;
+                this.items_priorities = [];
+                for (var i = 0; i < tmpLstPriorities.length; i++) {
+                    var currentItem = { id: tmpLstPriorities[i].woPriorityId, text: tmpLstPriorities[i].name };
+                    this.items_priorities.push(currentItem);
+
+                    if (currentItem.id == this.selectedWO.woPriorityId) {
+                        //this.selected_cate = currentItem;
+                        this.selected_priority.setValue(currentItem);
+                        this._addPrioritySelectBox.active = [currentItem];
+                    }
+                }
+            });
+
+            // get categories
+            this._workOrderService.getWOs().subscribe((response) => {
+                console.log("categories response", response.data);
+
+                var tmpLstCategories = response.data;
+                this.items_categories = [];
+                for (var i = 0; i < tmpLstCategories.length; i++) {
+                    var currentItem = { id: tmpLstCategories[i].woCategoryId, text: tmpLstCategories[i].name };
+                    this.items_categories.push(currentItem);
+
+                    if (currentItem.id == this.selectedWO.woCategoryId) {
+                        //this.selected_cate = currentItem;
+                        this.selected_category.setValue(currentItem);
+                        this._addCategorySelectBox.active = [currentItem];
+                    }
+                }
+            });
+
+            // get locations
             this._locationService.getLocations().subscribe((locations) => {
                 console.log("location response", locations);
                 var lstLocations = locations.data;
@@ -250,7 +370,8 @@ export class SingleRequestComponent {
                     this.items_locations.push(currentItem);
 
                     if (currentItem.id == this.selectedWO.locationId) {
-                        this.selected_location = currentItem;
+                        //this.selected_location = currentItem;
+                        this.selected_location.setValue(currentItem);
                         this._addLocationSelectBox.active = [currentItem];
                     }
                 }
@@ -271,7 +392,7 @@ export class SingleRequestComponent {
 
                     if (currentItem.id == this.selectedWO.assetId) {
                         console.log("Matching Asset with WO's Asset", currentItem);
-                        this.selected_asset = currentItem;
+                        this.selected_asset.setValue(currentItem);
                         this._addAssetSelectBox.active = [currentItem];
                     }
                 }
@@ -286,11 +407,12 @@ export class SingleRequestComponent {
                     // clear assignee list
                     this.items_assignees = [];
                     for (var i = 0; i < lstUsers.length; i++) {
-                        this.items_assignees.push({ text: lstUsers[i].fullname, id: lstUsers[i].userId });
+                        var currentItem = { text: lstUsers[i].fullname, id: lstUsers[i].userId };
+                        this.items_assignees.push(currentItem);
 
-                        if (lstUsers[i].userId == this.selectedWO.currentAssigneeId) {
-                            //this.selected_
-                            this._addAssigneeSelectBox.active = [{ text: lstUsers[i].fullname, id: lstUsers[i].userId }];
+                        if (currentItem.id == this.selectedWO.currentAssigneeId) {
+                            this.selected_assignee.setValue(currentItem);
+                            this._addAssigneeSelectBox.active = [currentItem];
                         }
                     }
                 });
@@ -305,6 +427,7 @@ export class SingleRequestComponent {
                 this.formGroupAdd.disable();
                 this.disabled = true;
                 this.isCanEditExpenses = false;
+                this.isCanEditFiles = false;
                 //this._defFieldPermissions.selected_assignee = 'disabled';
                 this._defFieldPermissions.btn_submit = 'hide';
 
@@ -314,6 +437,7 @@ export class SingleRequestComponent {
                 //this.formGroupAdd.disable();
                 this.disabled = true;
                 this.isCanEditExpenses = false;
+                this.isCanEditFiles = false;
 
                 this.wo_number.disable();
                 this.task_name.disable();
@@ -329,13 +453,8 @@ export class SingleRequestComponent {
                 this.solution.disable();
 
                 this.selected_startdate.disable();
-                this.selected_starttime.disable();
+                //this.selected_starttime.disable();
                 this.selected_duedate.disable();
-
-                //this._defFieldPermissions.selected_assignee = "show";
-                //this._defFieldPermissions.selected_startdate = "show";
-                //this._defFieldPermissions.selected_starttime = "show";
-                //this._defFieldPermissions.selected_duedate = "show";
 
             } else if (this.actionType.workflowActionId == WorkflowActions.CANCEL
                 || this.actionType.workflowActionId == WorkflowActions.PENDING
@@ -343,6 +462,7 @@ export class SingleRequestComponent {
                 // disable all
                 this.disabled = true;
                 this.isCanEditExpenses = false;
+                this.isCanEditFiles = false;
 
                 this.wo_number.disable();
                 this.task_name.disable();
@@ -358,48 +478,31 @@ export class SingleRequestComponent {
                 this.contact_number.disable();
                 this.solution.disable();
 
-                //this._defFieldPermissions.selected_assignee = "disabled";
-                //this._defFieldPermissions.selected_startdate = "disabled";
-                //this._defFieldPermissions.selected_starttime = "disabled";
-                //this._defFieldPermissions.selected_duedate = "disabled";
-
                 this.selected_startdate.disable();
-                this.selected_starttime.disable();
+                //this.selected_starttime.disable();
                 this.selected_duedate.disable();
             } else if (this.actionType.workflowActionId == WorkflowActions.COMPLETE
                 || this.actionType.workflowActionId == WorkflowActions.CLOSE_FOR_CONFIRMATION) {
-                try {
-                    this.wo_number.disable();
-                    this.task_name.disable();
-                    this.task_desc.disable();
-                    this.selected_category.disable();
-                    this.selected_asset.disable();
-                    this.selected_priority.disable();
-                    this.selected_assignee.disable();
-                    this.selected_status.disable();
-                    this.selected_location.disable();
-                    this.location_info.disable();
-                    this.contact_number.disable();
-                    this.contact_person.disable();
+                this.wo_number.disable();
+                this.task_name.disable();
+                this.task_desc.disable();
+                this.selected_category.disable();
+                this.selected_asset.disable();
+                this.selected_priority.disable();
+                this.selected_assignee.disable();
+                this.selected_status.disable();
+                this.selected_location.disable();
+                this.location_info.disable();
+                this.contact_number.disable();
+                this.contact_person.disable();
 
-                    this.selected_startdate.disable();
-                    this.selected_starttime.disable();
-                    this.selected_duedate.disable();
-
-                    //this._defFieldPermissions.selected_assignee = "disabled";
-                } catch (e) {
-                    console.log("ERROR", e);
-                }
+                this.selected_startdate.disable();
+                //this.selected_starttime.disable();
+                this.selected_duedate.disable();
             } else {
                 this.wo_number.disable();
                 this.selected_assignee.disable();
                 this.selected_status.disable();
-
-                //this._defFieldPermissions.selected_assignee = "disabled";
-                //this._defFieldPermissions.selected_status = "disabled";
-
-                // filter by status
-                //if (this.selectedWO.currentStatusId == )
             }
 
         });
@@ -417,7 +520,7 @@ export class SingleRequestComponent {
 
                 // manual validation VALID
 
-                var formatted_object = Object.assign({}, {
+                var workorder_object = {
                     workOrderId: this.selectedWO == null ? null : this.selectedWO.workOderId,
                     woNumber: this.wo_number.value,
                     woTypeId: this.selectedWoType.id,
@@ -433,9 +536,10 @@ export class SingleRequestComponent {
                     // TODO: check later
                     currentAssigneeId: this.selected_assignee.value.id,
                     // TODO: check later
-                    mainPicId: this.selected_assignee.value.id,
+                    //mainPicId: this.selected_assignee.value.id,
                     // TODO: need to change to UTC+0 first
                     startDate: this.selected_startdate.value,
+                    startTime: this.selected_startdate.value,
                     repeatOptionId: null,
                     every: null,
                     everyPeriodId: null,
@@ -453,10 +557,74 @@ export class SingleRequestComponent {
                     contactPerson: this.contact_person.value,
                     contactNumber: this.contact_number.value,
                     solution: this.solution.value,
-                    expenses: this.wo_expenses
-                });
+                    vendorId: this.selected_vendor.value.id
+                };
 
+                var formatted_object = {
+                    workOrder: workorder_object,
+                    action: {
+                        actionId: this.actionType.workflowActionId,
+                        actionName: this.actionType.name
+                    },
+                    expenses: this.wo_expenses.filter(function (expense) {
+                        return expense.isActive;
+                    }),
+                    deletedExpenses: this.readyDeletedExpenses(),
+                    files: this.readyFilesData(),
+                    deletedFiles: this.readyDeletedFilesData(),
+                    photos: this.readyPhotosData(),
+                    deletedPhotos: this.readyDeletedPhotosData(),
+                };
                 console.log("To Send", formatted_object);
+
+                let formData: FormData = new FormData();
+                formData.append("params", JSON.stringify(formatted_object));
+
+                // TODO: Loop through newlyAddedFiles
+                //formData.append("files", this.newlyAdded);
+                for (var i = 0; i < this.existingFiles.length; i++) {
+                    if (this.existingFiles[i].isActive == false) continue;
+
+                    //let actualFile: File = this.newlyAddedFiles[i].actualFile;
+                    //if (actualFile.type.includes("image")) {
+                    //    formData.append("photos", actualFile);
+                    //} else {
+                    //    formData.append("files", actualFile);
+                    //}
+                    if (this.existingFiles[i].isActive && this.existingFiles[i].workOrderFileId == null) {
+                        let actualFile: File = this.existingFiles[i].actualFile;
+                        formData.append("files", actualFile);
+                    }
+                }
+
+                for (var i = 0; i < this.existingPhotos.length; i++) {
+                    if (this.existingPhotos[i].isActive == false) continue;
+
+                    //let actualFile: File = this.newlyAddedFiles[i].actualFile;
+                    //if (actualFile.type.includes("image")) {
+                    //    formData.append("photos", actualFile);
+                    //} else {
+                    //    formData.append("files", actualFile);
+                    //}
+                    if (this.existingPhotos[i].isActive && this.existingPhotos[i].workOrderFileId == null) {
+                        let actualFile: File = this.existingPhotos[i].actualFile;
+                        formData.append("photos", actualFile);
+                    }
+                }
+
+                // TODO: uncomment later
+                // TODO: change function name and maybe location?
+                if (this.actionType.workflowActionId == WorkflowActions.CREATE) {
+                    this._taskService.addNewWorkOrder(formData).subscribe((response) => {
+                        console.log("save response", response);
+                        this.onCancel();
+                    });
+                } else {
+                    this._taskService.updateWorkOrder(formData).subscribe((response) => {
+                        console.log("save response", response);
+                        this.onCancel();
+                    });
+                }
             }
         } catch (e) {
             console.log("ERROR", e);
@@ -477,6 +645,21 @@ export class SingleRequestComponent {
         console.log("selectedStartTime", event);
     }
 
+    removeSelectBoxValue(field, event) {
+        console.log("removeSelectBoxValue", field, event);
+
+        // handle every possible field here
+        switch (field.toLowerCase()) {
+            case 'selected_priority': this.selected_priority.setValue(null); break;
+            case 'selected_assignee': this.selected_assignee.setValue(null); break;
+            case 'selected_location': this.selected_location.setValue(null); break;
+            case 'selected_status': this.selected_status.setValue(null); break;
+            case 'selected_asset': this.selected_asset.setValue(null); break;
+            case 'selected_category': this.selected_category.setValue(null); break;
+            case 'selected_vendor': this.selected_vendor.setValue(null); break;
+        }
+    }
+
     selectedSelectBoxValue(field, event) {
         console.log("selectedSelectBoxValue", field, event);
 
@@ -488,6 +671,7 @@ export class SingleRequestComponent {
             case 'selected_status': this.selected_status.setValue(event); break;
             case 'selected_asset': this.selected_asset.setValue(event); break;
             case 'selected_category': this.selected_category.setValue(event); break;
+            case 'selected_vendor': this.selected_vendor.setValue(event); break;
         }
     }
 
@@ -495,5 +679,82 @@ export class SingleRequestComponent {
     onCancel() {
         console.log("cancel");
         this._taskService.announceEvent("addNewModal_btnCancelOnClick");
+    }
+
+    readyFilesData() {
+        var currentActiveFiles = [];
+
+        for (var i = 0; i < this.existingFiles.length; i++) {
+            var tmpFile = this.existingFiles[i];
+
+            if (tmpFile.isActive
+                //&& !tmpFile.actualFile.type.includes("image") 
+                && tmpFile.workOrderFileId == null) {
+                currentActiveFiles.push({ name: tmpFile.name, notes: tmpFile.notes });
+            }
+        }
+
+        return currentActiveFiles;
+    }
+
+    readyPhotosData() {
+        var currentActivePhotos = [];
+
+        for (var i = 0; i < this.existingPhotos.length; i++) {
+            var tmpFile = this.existingPhotos[i];
+
+            if (tmpFile.isActive
+                //&& tmpFile.actualFile.type.includes("image")
+                && tmpFile.workOrderPhotoId == null) {
+                currentActivePhotos.push({ name: tmpFile.name, notes: tmpFile.notes });
+            }
+        }
+
+        return currentActivePhotos;
+    }
+
+    readyDeletedFilesData() {
+        var deletedFiles = [];
+
+        for (var i = 0; i < this.existingFiles.length; i++) {
+            var tmpFile = this.existingFiles[i];
+
+            if (!tmpFile.isActive
+                && tmpFile.workOrderFileId != null) {
+                deletedFiles.push(tmpFile.workOrderFileId);
+            }
+        }
+
+        return deletedFiles;
+    }
+
+    readyDeletedPhotosData() {
+        var deletedPhotos = [];
+
+        for (var i = 0; i < this.existingPhotos.length; i++) {
+            var tmpFile = this.existingPhotos[i];
+
+            if (!tmpFile.isActive
+                && tmpFile.workOrderPhotoId != null) {
+                deletedPhotos.push(tmpFile.workOrderPhotoId);
+            }
+        }
+
+        return deletedPhotos;
+    }
+
+    readyDeletedExpenses() {
+        var deletedExpenses = [];
+
+        for (var i = 0; i < this.wo_expenses.length; i++) {
+            var tmpExpense = this.wo_expenses[i];
+
+            if (!tmpExpense.isActive
+                && tmpExpense.workOrderExpenseId != null) {
+                deletedExpenses.push(tmpExpense.workOrderExpenseId);
+            }
+        }
+
+        return deletedExpenses;
     }
 }

@@ -1,5 +1,5 @@
 ﻿import { Injectable } from '@angular/core';
-import { Http, Response, Headers, RequestOptions } from '@angular/http';
+import { Http, Response, Headers, RequestOptions, ResponseContentType } from '@angular/http';
 import { UUID } from 'angular2-uuid';
 import { Observable } from 'rxjs/Observable';
 import { Subject }    from 'rxjs/Subject';
@@ -70,5 +70,84 @@ export class TaskService{
 
     public announceEvent(eventName: string){
         this.eventEmitted.next(eventName);
+    }
+    // Move to other file?
+    public addNewWorkOrder(formData: FormData) {
+        //console.log("prepareSend", formData);
+
+        var headers = new Headers();
+        //headers.append('Content-Type', 'multipart/form-data');
+        var bearer = "Bearer " + localStorage.getItem('bearer_token');
+
+        headers.append('Authorization', bearer);
+        headers.append('Access-Control-Allow-Origin', '*');
+        headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
+
+        //formData.append('taskName', 'testing');
+
+        var options = new RequestOptions({ headers: headers });
+        return this.http.post(this.appUrl + '/work-order/add', formData, options).map(this.extractData);
+    }
+
+    // Move to other file?
+    public updateWorkOrder(formData: FormData) {
+        //console.log("prepareSend", formData);
+
+        var headers = new Headers();
+        //headers.append('Content-Type', 'multipart/form-data');
+        var bearer = "Bearer " + localStorage.getItem('bearer_token');
+
+        headers.append('Authorization', bearer);
+        headers.append('Access-Control-Allow-Origin', '*');
+        headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
+
+        //formData.append('taskName', 'testing');
+
+        var options = new RequestOptions({ headers: headers });
+        return this.http.post(this.appUrl + '/work-order/action', formData, options).map(this.extractData);
+    }
+
+    // Deprecated: maybe deleted later
+    public getImage() {
+        var headers = new Headers();
+        //headers.append('Content-Type', 'multipart/form-data');
+        var bearer = "Bearer " + localStorage.getItem('bearer_token');
+
+        headers.append('Authorization', bearer);
+        headers.append("Accept", "application/octet-stream");
+        headers.append('Access-Control-Allow-Origin', '*');
+        headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
+
+        //formData.append('taskName', 'testing');
+
+        var options = new RequestOptions({ headers: headers, responseType: ResponseContentType.Blob });
+        //return this.http.get(this.appUrl + '/images/work-order/16', options);
+        return this.http.get(this.appUrl + '/files/work-order/20', options);
+    }
+
+    public getImageById(imageId: number) {
+        var bearer = "Bearer " + localStorage.getItem('bearer_token');
+
+        var headers = new Headers();
+        headers.append('Authorization', bearer);
+        headers.append("Accept", "application/octet-stream");
+        headers.append('Access-Control-Allow-Origin', '*');
+        headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
+
+        var options = new RequestOptions({ headers: headers, responseType: ResponseContentType.Blob });
+        return this.http.get(this.appUrl + '/images/work-order/' + imageId, options);
+    }
+
+    public getFileById(imageId: number) {
+        var bearer = "Bearer " + localStorage.getItem('bearer_token');
+
+        var headers = new Headers();
+        headers.append('Authorization', bearer);
+        headers.append("Accept", "application/octet-stream");
+        headers.append('Access-Control-Allow-Origin', '*');
+        headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
+
+        var options = new RequestOptions({ headers: headers, responseType: ResponseContentType.Blob });
+        return this.http.get(this.appUrl + '/files/work-order/' + imageId, options);
     }
 }
