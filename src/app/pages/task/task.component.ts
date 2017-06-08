@@ -360,9 +360,9 @@ export class TaskComponent implements OnDestroy{
         }else{
             this.modalTitle = selectedAction.name + " ";
         }
-        for(var i=0; i < this.__lst_type.length; i++){
-            if(this.__lst_type[i].id == modelData.woTypeId){
-                this.modalTitle += this.__lst_type[i].text;
+        for(var i=0; i < this.woTypes.length; i++){
+            if (this.woTypes[i].id == modelData.woTypeId){
+                this.modalTitle += this.woTypes[i].label;
                 break;
             }
         }
