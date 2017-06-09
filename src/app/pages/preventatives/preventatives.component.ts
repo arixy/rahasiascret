@@ -4,11 +4,12 @@ import { ModalDirective } from 'ng2-bootstrap';
 import { Observable } from 'rxjs/Observable';
 import { FormGroup, AbstractControl, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { DatePickerOptions, DateModel } from 'ng2-datepicker';
-
+import { DataTable, TabViewModule } from "primeng/primeng";
 import { AssetService } from '../../services/asset.service';
 import { LocationService } from '../../services/location.service';
 import { WorkOrderService } from '../../services/work-order.service';
 import { MaintenanceService } from './maintenance.service';
+import { TaskService } from './../task/task.service';
 
 import { ExpensesComponent } from './component/expenses/expenses.component';
 
@@ -36,6 +37,26 @@ export class Preventatives {
     public maintenances;
     public maintenances$: Observable<any>;
     
+    private myTasks : any;
+    private totalRecords;
+
+    readonly PREVENTIVE_REQUEST = 1;
+    readonly RECURRING_REQUEST = 2;
+    readonly SINGLE_TIME_REQUEST = 3;
+    readonly TENANT_REQUEST = 4;
+    readonly GUEST_REQUEST = 5;
+    readonly OWNER_REQUEST = 6;
+
+    // wo type list
+    private woTypes;
+
+    // selected wo type
+    public selectedWoType: {id, label};
+
+    // static
+    private readonly DEFAULT_ITEM_PER_PAGE : number = 10;
+    private readonly DEFAULT_SORT_FIELD : string = "dateUpdated";
+
     
     // Variables for Maintenance Order
     public task;
@@ -138,8 +159,18 @@ export class Preventatives {
     public assetService: AssetService,
     public locationService: LocationService,
     public maintenanceService: MaintenanceService,
+    private _taskService: TaskService,
     public fb: FormBuilder
   ) {
+      
+      // hardcoded wo type list
+      this.woTypes = [{ id: 1, label: "Preventive Maintenance"},
+                        {id: 2, label: "Recurring Request"},
+                        {id: 3, label: "Single Request"},
+                        {id: 4, label: "Tenant Request"},
+                        {id: 5, label: "Guest Request"},
+                        {id: 6, label: "Owner Request"},
+                       ];
       // DATA MAPPING
       
       this.initial_wo_number = Math.floor(Math.random() * 100) + 1;
@@ -393,4 +424,73 @@ export class Preventatives {
         this.editModal.hide();
     }
     
+    refresh($event, table){
+        console.log("customRefresh");
+        console.log($event);
+        console.log(table);
+
+        this.getAllMyTasks(this.buildFilter(table));
+    }
+
+    resetFilters(table : DataTable){
+        console.log("resetFilters");
+        console.log(table);
+
+        table.filters = {};
+        table.globalFilter = "";
+
+        this.getAllMyTasks(this.buildFilter(table));
+    }
+
+
+    private buildFilter(table : DataTable){
+        if(table == null){
+            return {
+                "filters": {},
+                "first": 0,
+                "rows": this.DEFAULT_ITEM_PER_PAGE,
+                "globalFilter": "",
+                "multiSortMeta": null,
+                "sortField": this.DEFAULT_SORT_FIELD,
+                "sortOrder": -1
+            }
+        }
+        else{
+            return {
+                "filters": table.filters,
+                "first": table.first,
+                "rows": table.rows,
+                "globalFilter": table.globalFilter,
+                "multiSortMeta": table.multiSortMeta,
+                "sortField": table.sortField,
+                "sortOrder": table.sortOrder
+            };
+        }
+    }
+
+    private getAllMyTasks(filters){
+        this._taskService.getAllMyTasks(filters).subscribe(
+            (response)=>{
+                console.log("Response Data");
+                console.log(response);
+
+                this.myTasks = response.data;
+
+                for(var i = 0; i < this.myTasks.length; i++){
+                    if (this.myTasks[i].actions == null) {
+                        this.myTasks[i].actions = [];
+                    }
+
+                    this.myTasks[i].actions.unshift({ workflowActionId: -2, name: "View" });
+                    //this.myTasks[i].actions.push({ workflowActionId: 4, name: "Assign/Reassign" });
+                    this.myTasks[i].dateUpdated = new Date(this.myTasks[i].dateUpdated);
+                }
+
+                if(response.paging != null)
+                    this.totalRecords = response.paging.total;
+                else
+                    this.totalRecords = 0;
+            }
+        );
+    }
 }

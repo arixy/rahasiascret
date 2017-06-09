@@ -1,19 +1,234 @@
 <div class="widgets">
 <div class="row">
-    <ba-card title="Preventive" baCardClass="with-scroll">
-      <p-dataTable #dt [value]="maintenances">
+   <div class="ui-helper-clearfix">
+            <div class="btn-group" dropdown style="float: right">
+                <button id="addNewWorkOrder" type="button" class="btn btn-primary" dropdownToggle>
+                    Add New Work Order <span class="caret"></span>
+                </button>
+                <ul dropdownMenu role="menu" class="table-header-dropdown dropdown-menu" aria-labelledby="addNewWorkOrder">
+                    <li role="menuitem" *ngFor="let type of woTypes">
+                        <a class="dropdown-item" (click)="createNewWorkOrder(type)">{{type.label}}</a>
+                    </li>
+                </ul>
+
+            </div>
+        </div>
+    
+    <ba-card title="Work Orders" baCardClass="with-scroll">
+        
+        <div style="width: 100%; overflow-x: auto; overflow-y: auto;">
+            <p-dataTable #dt [value]="myTasks" [lazy]="true" (onLazyLoad)="refresh($event, dt)" [rows]="2" [paginator]="true" [totalRecords]="totalRecords" sortField="dateUpdated" sortOrder="-1">
+                <p-header>
+                    <div class="ui-helper-clearfix">
+                    <button type="button" iconPos="left" label="CSV" (click)="dt.exportCSV()" style="float:left" class="btn-export__csv">
+                        <i class="icon ion-ios-download-outline"></i>
+                    </button>
+                        <div class="btn-group" dropdown style="float: right">
+                            <button title="Reset" id="resetFilters" type="button" class="btn-sets-right-filter" (click)="resetFilters(dt)">
+                                <!-- <img class="reset-filter" src="./assets/img/clear-filter.svg" /> -->
+                                <!-- <span>&nbsp;</span>
+                                <object class="reset-filter-object" type="image/svg+xml" data="./assets/img/clear-filter.svg"></object> -->
+                                <svg (click)="resetFilters(dt)"
+                               xmlns:dc="http://purl.org/dc/elements/1.1/"
+                               xmlns:cc="http://creativecommons.org/ns#"
+                               xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                               xmlns:svg="http://www.w3.org/2000/svg"
+                               xmlns="http://www.w3.org/2000/svg"
+                               xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+                               xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+                               width="40"
+                               height="43"
+                               preserveAspectRatio="xMinYMin meet"
+                                 viewBox="0 0 40 43">
+                                <style type="text/css">
+                                    svg {
+                                        cursor: pointer;
+                                        width: 26px;
+                                        height: 26px;
+                                        position: relative;
+                                        top: 2px;
+                                    }
+                                    svg * {
+                                        transition: all .2s ease-out;
+                                        stroke-width: 1.5 !important;
+                                    }
+                                    svg:hover path {
+                                        stroke: #fff !important;
+                                    }
+                                    .btn-sets-right-filter:hover path {
+                                        stroke: #fff !important;
+                                    }
+                                </style>
+                              <defs
+                                 id="defs4" />
+                              <g
+                                 inkscape:label="Layer 1"
+                                 inkscape:groupmode="layer"
+                                 id="layer1"
+                                 transform="translate(0,-1009.3622)">
+                                <path class="main-line"
+                                   style="fill:none;stroke:#00abff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+                                   d="m 2.8280048,1019.4764 34.7684222,0"
+                                   id="path2985"
+                                   inkscape:connector-curvature="0" />
+                                <path class="main-line"
+                                   inkscape:connector-curvature="0"
+                                   id="path3755"
+                                   d="m 9.8048228,1029.3127 20.8147862,0"
+                                   style="fill:none;stroke:#00abff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+                                <path class="main-line"
+                                   style="fill:none;stroke:#00abff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+                                   d="m 16.134497,1039.149 8.155438,0"
+                                   id="path3757"
+                                   inkscape:connector-curvature="0" />
+                                <g
+                                   id="layer2"
+                                   transform="matrix(0.7901613,0,0,0.78363052,0.57269904,225.98743)"
+                                   style="stroke:#00abff;stroke-width:1.27082705;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none">
+                                  <path class="main-line"
+                                     inkscape:connector-curvature="0"
+                                     id="path3761"
+                                     d="m 33.303572,1044.3265 9.330357,-9.3304"
+                                     style="fill:none;stroke:#00abff;stroke-width:1.27082705;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+                                  <path class="main-line"
+                                     style="fill:none;stroke:#00abff;stroke-width:1.27082705;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+                                     d="m 42.633929,1044.3265 -9.330357,-9.3304"
+                                     id="path3763"
+                                     inkscape:connector-curvature="0" />
+                                </g>
+                              </g>
+                            </svg>
+                            </button>
+
+                            <button title="Refresh" id="resetFilters" type="button" class="btn-sets-right" (click)="refresh($event, dt)">
+                                <i class="icon ion-ios-reload"></i>
+                            </button>
+                        </div>
+                    </div>
+                </p-header>
+                <p-column [style]="{'width':'110px'}" styleClass="col-button">
+                        <template pTemplate="header">
+                            Action
+                        </template>
+                        <template let-mytask="rowData" pTemplate="body">
+                                <div class="btn-group" dropdown>
+                                  <button id="single-button" type="button" class="btn btn-primary" dropdownToggle>
+                                    Action <span class="caret"></span>
+                                  </button>
+                                  <ul dropdownMenu role="menu" aria-labelledby="single-button">
+                                    <li role="menuitem" *ngFor="let action of mytask.actions">
+                                        <a  class="dropdown-item" (click)="doAction(mytask, action)">{{action.label}}</a>
+                                    </li>
+                                  </ul>
+                                </div>
+                        </template>
+                </p-column>
+                <p-column [style]="{'width':'100px'}" field="woNumber" header="WO #" [sortable]="true" [filter]="true"></p-column>
+                <p-column field="woCategoryName" [style]="{'width':'110px'}" header="Category" [sortable]="true" [filter]="true"></p-column>
+                <p-column field="woPriorityName" header="Priority" [sortable]="true" [style]="{'width':'90px'}" [filter]="true"></p-column>
+                <p-column field="taskName" [style]="{'width':'120px'}" header="Task" [sortable]="true" [filter]="true" filterPlaceholder="Search"></p-column>
+                <p-column field="assetName" [style]="{'width':'110px'}" header="Asset" [sortable]="true" [filter]="true"></p-column>
+                <p-column field="locationName" header="Location" [sortable]="true" [style]="{'width':'120px'}" [filter]="true" filterPlaceholder="Search"></p-column>
+                <p-column field="start" header="Start" [sortable]="true" styleClass="top-aligned-table"></p-column>
+                 <p-column [filter]="false" [style]="{'width':'110px'}" styleClass="top-aligned-table" field="dueDate" header="Due" [sortable]="true"></p-column>
+                <p-column field="currentStatusName" [style]="{'width':'110px'}" header="Status" [sortable]="true" [filter]="true"></p-column>
+                <p-column field="assignee" [style]="{'width':'100px'}" header="Assignee" [sortable]="true" [filter]="true"></p-column>
+                <p-column [field]="true" [style]="{'width':'140px'}" field="dateUpdated" header="Last Updated" styleClass="top-aligned-table" [sortable]="true">
+                    <template pTemplate="body" let-update="rowData">
+                        {{update.dateUpdated | date: 'shortDate'}}
+                    </template>
+                </p-column>
+            </p-dataTable>
+        </div>
+    </ba-card>
+    <ba-card title="Schedule" baCardClass="with-scroll">
+      <p-dataTable #dtschedule [value]="maintenances">
           <p-header>
             <div class="ui-helper-clearfix">
                 <button type="button" iconPos="left" label="CSV" (click)="dt.exportCSV()" style="float:left" class="btn-export__csv">
                     <i class="icon ion-ios-download-outline"></i>
                 </button>
-                <div class="btn-group add-btn-group" dropdown>
-                    <button class="btn btn-primary" style="float:right" dropdownToggle><i class="fa fa-plus add-button-icon"></i> Add New WO <span class="caret"></span></button>
-                    <ul dropdownMenu role="menu" aria-labelledby="single-button">
-                        <li role="menuitem"><a class="dropdown-item" (click)="addNewPreventative()">Recurring</a></li>
-                        <li role="menuitem"><a class="dropdown-item" (click)="addNewPreventative()">Single Request</a></li>
-                    </ul>
-                </div>
+                <div class="btn-group" dropdown style="float: right">
+                            <button title="Reset" id="resetFilters" type="button" class="btn-sets-right-filter" (click)="resetFilters(dt)">
+                                <!-- <img class="reset-filter" src="./assets/img/clear-filter.svg" /> -->
+                                <!-- <span>&nbsp;</span>
+                                <object class="reset-filter-object" type="image/svg+xml" data="./assets/img/clear-filter.svg"></object> -->
+                                <svg (click)="resetFilters(dt)"
+                               xmlns:dc="http://purl.org/dc/elements/1.1/"
+                               xmlns:cc="http://creativecommons.org/ns#"
+                               xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                               xmlns:svg="http://www.w3.org/2000/svg"
+                               xmlns="http://www.w3.org/2000/svg"
+                               xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+                               xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+                               width="40"
+                               height="43"
+                               preserveAspectRatio="xMinYMin meet"
+                                 viewBox="0 0 40 43">
+                                <style type="text/css">
+                                    svg {
+                                        cursor: pointer;
+                                        width: 26px;
+                                        height: 26px;
+                                        position: relative;
+                                        top: 2px;
+                                    }
+                                    svg * {
+                                        transition: all .2s ease-out;
+                                        stroke-width: 1.5 !important;
+                                    }
+                                    svg:hover path {
+                                        stroke: #fff !important;
+                                    }
+                                    .btn-sets-right-filter:hover path {
+                                        stroke: #fff !important;
+                                    }
+                                </style>
+                              <defs
+                                 id="defs4" />
+                              <g
+                                 inkscape:label="Layer 1"
+                                 inkscape:groupmode="layer"
+                                 id="layer1"
+                                 transform="translate(0,-1009.3622)">
+                                <path class="main-line"
+                                   style="fill:none;stroke:#00abff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+                                   d="m 2.8280048,1019.4764 34.7684222,0"
+                                   id="path2985"
+                                   inkscape:connector-curvature="0" />
+                                <path class="main-line"
+                                   inkscape:connector-curvature="0"
+                                   id="path3755"
+                                   d="m 9.8048228,1029.3127 20.8147862,0"
+                                   style="fill:none;stroke:#00abff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+                                <path class="main-line"
+                                   style="fill:none;stroke:#00abff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+                                   d="m 16.134497,1039.149 8.155438,0"
+                                   id="path3757"
+                                   inkscape:connector-curvature="0" />
+                                <g
+                                   id="layer2"
+                                   transform="matrix(0.7901613,0,0,0.78363052,0.57269904,225.98743)"
+                                   style="stroke:#00abff;stroke-width:1.27082705;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none">
+                                  <path class="main-line"
+                                     inkscape:connector-curvature="0"
+                                     id="path3761"
+                                     d="m 33.303572,1044.3265 9.330357,-9.3304"
+                                     style="fill:none;stroke:#00abff;stroke-width:1.27082705;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+                                  <path class="main-line"
+                                     style="fill:none;stroke:#00abff;stroke-width:1.27082705;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+                                     d="m 42.633929,1044.3265 -9.330357,-9.3304"
+                                     id="path3763"
+                                     inkscape:connector-curvature="0" />
+                                </g>
+                              </g>
+                            </svg>
+                            </button>
+
+                            <button title="Refresh" id="resetFilters" type="button" class="btn-sets-right" (click)="refresh($event, dt)">
+                                <i class="icon ion-ios-reload"></i>
+                            </button>
+                        </div>
             </div>
         </p-header>
           <p-column styleClass="col-button">

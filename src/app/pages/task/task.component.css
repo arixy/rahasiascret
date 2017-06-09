@@ -1,14 +1,13 @@
 body .ui-tabview.ui-tabview-top .ui-tabview-nav li.ui-state-active{
-	border-bottom: 1px solid #00abff !important;
+	border-bottom: 2px solid #00abff !important;
     background-color: #fff !important;
     border: none;
 }
 body .ui-tabview.ui-tabview-top .ui-tabview-nav li.ui-state-active a{
-	color:#2d353c !important;
+	color: #00abff !important;
 }
 body .ui-tabview.ui-tabview-top .ui-tabview-nav li:hover{
-	border-color: #fff !important;
-	border-bottom: 1px solid rgba(0, 171, 255, 0.13) !important;
+	background: #d7d7d7 !important;	
 }
 body .ui-tabview.ui-tabview-top .ui-tabview-nav li{
 	line-height: 48px;
@@ -23,4 +22,40 @@ body .ui-tabview.ui-tabview-top .ui-tabview-nav li{
     min-width: 160px;
     text-align: center;
     position: relative;
+}
+.ui-tabview .ui-tabview-nav li a {
+    float: none !important;
+}
+img.reset-filter {
+    width: 35px;
+    position: relative;
+    bottom: 2px;
+}
+
+button[type="button"]{
+   outline:none;
+}
+button[type="button"]::-moz-focus-inner {
+   border: 0;
+}
+.table-header-dropdown li a{
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+body .ui-datatable .ui-datatable-header{
+    padding: 0 1.25em .75em;
+}
+.ui-helper-clearfix {
+    margin-bottom: 0.75em;
+}
+ba-card .ui-helper-clearfix {
+    margin-bottom: 0;
+}
+.reset-filter-object {
+    width: 25px;
+    height: 25px;
+    position: relative;
+    top: 2px;
+    left: 1px;
 }

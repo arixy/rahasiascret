@@ -1,19 +1,7 @@
-﻿<form [formGroup]="formGroupAdd" (ngSubmit)="onSubmit(formGroupAdd.value)" class="form-horizontal">
-  <ul class="nav nav-pills nav-justified" role="tablist">
-    <li class="nav-item">
-      <a class="nav-link active" data-toggle="tab" href="#general">General</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" data-toggle="tab" href="#expenses">Expenses</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" data-toggle="tab" href="#files">Files</a>
-    </li>
-  </ul>
-
-  <div class="tab-content">
-    <div class="tab-pane active" id="general" role="tabpanel">
-      <!-- WO Number -->
+<form [formGroup]="formGroupAdd" (ngSubmit)="onSubmit(formGroupAdd.value)" class="form-horizontal">
+ <p-tabView>
+     <p-tabPanel header="General">
+         <!-- WO Number -->
       <div class="form-group row" *ngIf="actionType != null && actionType.workflowActionId != -1">
         <label for="inputEmail3" class="control-label">WO Number</label><br />
         <input [formControl]="wo_number" type="text" class="form-control" id="inputEmail3" placeholder="WO Number">
@@ -295,19 +283,17 @@
         <label for="solution" class="col-xg-2 control-label">Solution</label><br />
         <textarea [formControl]="solution" class="form-control" id="solution" placeholder="Solution" pInputTextArea></textarea>
       </div>
-    </div>
+     </p-tabPanel>
+     <p-tabPanel header="Expenses">
+         <wo-expenses [actionType]="actionType" [selectedWO]="selectedWO" [selectedWoType]="selectedWoType" [(expenses)]="wo_expenses" [formGroup]="formGroupAdd" [isCanEdit]="isCanEditExpenses"></wo-expenses>
+     </p-tabPanel>
+     <p-tabPanel header="Files">
+         <!--<p-fileUpload name="myfile[]" url="http://localhost:3000/upload" multiple="multiple"></p-fileUpload>-->
+          <!--<wo-files [actionType]="actionType" [selectedWO]="selectedWO" [selectedWoType]="selectedWoType" (files)="wo_files" (photos)="photos"></wo-files>-->
+     </p-tabPanel>
+</p-tabView>
+  
 
-    <!-- Expenses Tab Content -->
-    <div class="tab-pane" id="expenses" role="tabpanel">
-      <wo-expenses [actionType]="actionType" [selectedWO]="selectedWO" [selectedWoType]="selectedWoType" [(expenses)]="wo_expenses" [formGroup]="formGroupAdd" [isCanEdit]="isCanEditExpenses"></wo-expenses>
-    </div>
-
-    <!-- Files Tab Content -->
-    <div class="tab-pane" id="files" role="tabpanel">
-      <!--<p-fileUpload name="myfile[]" url="http://localhost:3000/upload" multiple="multiple"></p-fileUpload>-->
-      <!--<wo-files [actionType]="actionType" [selectedWO]="selectedWO" [selectedWoType]="selectedWoType" (files)="wo_files" (photos)="photos"></wo-files>-->
-    </div>
-  </div>
 
   <div class="form-group row">
     <div class="col-sm-3">
