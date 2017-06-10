@@ -48,6 +48,7 @@ import { PreventiveRequestComponent } from './task/forms/preventiverequest.compo
 //import { AddNewWorkOrderComponent } from './task/add-wo.component';
 //import { TabContentRecurringComponent } from './task/tabs/recurring.component';
 import { WorkOrderExpensesComponent } from './task/forms/subforms/workorder-expenses.component';
+import { WorkOrderFilesComponent } from './task/forms/subforms/workorder-files.component';
 // add primeng
 import { TabViewModule, FileUploadModule, PanelModule, CalendarModule } from 'primeng/primeng';
 
@@ -92,7 +93,8 @@ import {MdTabsModule} from '@angular/material';
       GuestRequestComponent,
       RecurringRequestComponent,
       PreventiveRequestComponent,
-      WorkOrderExpensesComponent
+      WorkOrderExpensesComponent,
+      WorkOrderFilesComponent
       //AddNewWorkOrderComponent,
       //TabContentRecurringComponent
     ],

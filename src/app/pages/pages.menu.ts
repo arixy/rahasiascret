@@ -30,7 +30,7 @@ export const PAGES_MENU = [
         path: 'tasks',
         data: {
             menu: {
-                title: 'Tasks',
+                title: 'My Tasks',
                 icon: 'ion-ios-checkmark-outline',
                 selected: false,
                 expanded: false,

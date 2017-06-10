@@ -44,7 +44,7 @@ button.btn-custom:focus{
 }
 
 .modal-content{
-	width: 550px;
+	/*width: 550px;  commented by Mike: To make modal larger */
     margin: 0 auto;
 }
 
@@ -219,4 +219,25 @@ th.top-aligned-table {
 	.ui-datatable-tablewrapper{
 		overflow-x: auto;
 	}
+}
+/* Added by Mike */
+.ui-fileupload-buttonbar button:not(.ui-fileupload-choose) {
+  display: none !important;
+}
+
+.ui-datepicker{
+  background-color: white !important;
+}
+
+.ui-datepicker-year{
+  width: auto !important;
+}
+
+.link{
+  color: royalblue;
+  cursor: pointer;
+}
+
+.link:hover{
+  color: mediumblue;
 }
