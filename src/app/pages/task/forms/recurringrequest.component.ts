@@ -1,7 +1,7 @@
 ﻿import { Component, Input, ChangeDetectorRef, ViewChild, ViewEncapsulation } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
-import { FormGroup, AbstractControl, FormBuilder, Validators, ValidatorFn } from '@angular/forms';
+import { FormGroup, AbstractControl, FormBuilder, Validators, ValidatorFn, FormControl } from '@angular/forms';
 //import { EntityService } from './entity.service';
 import { ModalDirective } from 'ng2-bootstrap';
 import { DatePickerOptions } from 'ng2-datepicker';
@@ -19,6 +19,8 @@ import { PriorityService } from '../../priorities/priority.service';
 
 import { WorkflowActions, WorkOrderStatuses } from '../../../global.state';
 
+import { CustomValidators } from './custom-validators';
+
 @Component({
     selector: 'form-recurring-request',
     templateUrl: './recurringrequest.component.html',
@@ -26,7 +28,7 @@ import { WorkflowActions, WorkOrderStatuses } from '../../../global.state';
 })
 export class RecurringRequestComponent {
     public selectedWoType: { id, label };
-    public actionType: { workflowActionId, name }; // JSON of Action
+    public actionType: { workflowActionId, name, toRoleId, toRoleTypeId, toUserId }; // JSON of Action
     public selectedWO;
 
     // flag to disable almost all form
@@ -102,6 +104,7 @@ export class RecurringRequestComponent {
         location: null,
     };
 
+    // DEPRECATED
     public _defFieldPermissions = {
         // just put fields that is different from other select box
         // show, hidden, disabled
@@ -122,7 +125,7 @@ export class RecurringRequestComponent {
         }
     }
 
-
+    @ViewChild("addStatusSelectBox") _addStatusSelectBox: SelectComponent;
     @ViewChild("addLocationSelectBox") _addLocationSelectBox: SelectComponent;
     @ViewChild("addCategorySelectBox") _addCategorySelectBox: SelectComponent;
     @ViewChild("addPrioritySelectBox") _addPrioritySelectBox: SelectComponent;
@@ -152,7 +155,7 @@ export class RecurringRequestComponent {
         this.formGroupAdd = this.fb.group({
             'wo_number': ['', null],
             'task_name': ['', Validators.compose([Validators.required, Validators.minLength(2)])],
-            'task_desc': ['', null],
+            'task_desc': ['', Validators.compose([Validators.required, Validators.minLength(2)])],
             'selected_category': ['', null],
             'selected_location': ['', null],
             'location_info': ['', null],
@@ -161,18 +164,18 @@ export class RecurringRequestComponent {
             'selected_priority': ['', null],
             'selected_vendor': ['', null],
             'contact_person': ['', null],
-            'contact_number': ['', null],
+            'contact_number': ['', Validators.compose([CustomValidators.numberOnly])],
             'solution': ['', null],
 
-            'selected_startdate': ['', null],
+            'selected_startdate': ['', Validators.compose([Validators.required])],
             'selected_starttime': ['', null],
             'selected_duedate': ['', null],
 
-            'selected_repeat': ['', null],
-            'repeat_every': ['', null],
-            'selected_every_period': ['', null],
+            'selected_repeat': ['', Validators.compose([this.validateRepeat.bind(this)])],
+            'repeat_every': ['', Validators.compose([this.validateRepeatEvery.bind(this)])],
+            'selected_every_period': ['', Validators.compose([this.validateRepeatEveryPeriod.bind(this)])],
             'selected_due_period': ['', null],
-            'due_after': ['',null]
+            'due_after': ['', Validators.compose([CustomValidators.numberOnly])]
         });
         this.wo_number = this.formGroupAdd.controls['wo_number'];
         this.task_name = this.formGroupAdd.controls['task_name'];
@@ -203,6 +206,7 @@ export class RecurringRequestComponent {
         } else {
             if (this.actionType.workflowActionId == WorkflowActions.CREATE) {
                 this.isSchedule = true;
+                //this.selected_assignee.disable();
             }
 
             // get priorities
@@ -242,16 +246,16 @@ export class RecurringRequestComponent {
 
             // load all users as assignee
             // clear assignee list
-            this._userService.getUsers().subscribe((users) => {
-                var lstUsers = users.data;
+            //this._userService.getAssigneeByTypeId("User", 1).subscribe((users) => {
+            //    var lstUsers = users.data;
 
-                this.items_assignees = [];
-                for (var i = 0; i < lstUsers.length; i++) {
-                    this.items_assignees.push({ text: lstUsers[i].fullname, id: lstUsers[i].userId });
-                }
+            //    this.items_assignees = [];
+            //    for (var i = 0; i < lstUsers.length; i++) {
+            //        this.items_assignees.push({ text: lstUsers[i].fullname, id: lstUsers[i].userId });
+            //    }
 
-                console.log("list assignees", this.items_assignees);
-            });
+            //    console.log("list assignees", this.items_assignees);
+            //});
         }
     }
 
@@ -276,6 +280,9 @@ export class RecurringRequestComponent {
                 "location_info": this.selectedWO.locationInfo,
                 "contact_person": this.selectedWO.contactPerson,
                 "contact_number": this.selectedWO.contactNumber,
+                "solution": this.selectedWO.solution,
+                "due_after": this.selectedWO.dueAfter,
+                "repeat_every": this.selectedWO.every,
 
                 "selected_startdate": new Date(this.selectedWO.startDate),
                 "selected_starttime": new Date(this.selectedWO.startDate + " " + this.selectedWO.startTime),
@@ -299,6 +306,14 @@ export class RecurringRequestComponent {
 
             // load all other required items
             // then set default value for select box
+
+            // statuses
+            for (var i = 0; i < this.items_statuses.length; i++) {
+                if (this.items_statuses[i].id == this.selectedWO.currentStatusId) {
+                    this.selected_status.setValue(this.items_statuses[i]);
+                    this._addStatusSelectBox.active = [this.items_statuses[i]];
+                }
+            }
 
             // get priorities
             this._priorityService.getPriorities().subscribe((response) => {
@@ -341,6 +356,63 @@ export class RecurringRequestComponent {
                 console.log("items_locations", this.items_locations);
             });
 
+            // load all users as assignee
+            if (this.actionType.toRoleId != null) {
+                console.log("get assignee by type: Role", this.actionType);
+                this._userService.getAssigneeByTypeId("Role", this.actionType.toRoleId).subscribe((users) => {
+                    var lstUsers = users.data;
+                    console.log(lstUsers);
+
+                    // clear assignee list
+                    this.items_assignees = [];
+                    for (var i = 0; i < lstUsers.length; i++) {
+                        var currentItem = { text: lstUsers[i].fullname, id: lstUsers[i].userId };
+                        this.items_assignees.push(currentItem);
+
+                        if (currentItem.id == this.selectedWO.currentAssigneeId) {
+                            this.selected_assignee.setValue(currentItem);
+                            this._addAssigneeSelectBox.active = [currentItem];
+                        }
+                    }
+                });
+            } else if (this.actionType.toRoleTypeId != null) {
+                console.log("get assignee by type: RoleType", this.actionType);
+                this._userService.getAssigneeByTypeId("RoleType", this.actionType.toRoleTypeId).subscribe((users) => {
+                    var lstUsers = users.data;
+                    console.log(lstUsers);
+
+                    // clear assignee list
+                    this.items_assignees = [];
+                    for (var i = 0; i < lstUsers.length; i++) {
+                        var currentItem = { text: lstUsers[i].fullname, id: lstUsers[i].userId };
+                        this.items_assignees.push(currentItem);
+
+                        if (currentItem.id == this.selectedWO.currentAssigneeId) {
+                            this.selected_assignee.setValue(currentItem);
+                            this._addAssigneeSelectBox.active = [currentItem];
+                        }
+                    }
+                });
+            } else {
+                console.log("get assignee by type: user");
+                this._userService.getAssigneeByTypeId("User", 1).subscribe((users) => {
+                    var lstUsers = users.data;
+                    console.log(lstUsers);
+
+                    // clear assignee list
+                    this.items_assignees = [];
+                    for (var i = 0; i < lstUsers.length; i++) {
+                        var currentItem = { text: lstUsers[i].fullname, id: lstUsers[i].userId };
+                        this.items_assignees.push(currentItem);
+
+                        if (currentItem.id == this.selectedWO.currentAssigneeId) {
+                            this.selected_assignee.setValue(currentItem);
+                            this._addAssigneeSelectBox.active = [currentItem];
+                        }
+                    }
+                });
+            }
+
 
             // PERMISSION SHOULD BE HERE
             if (this.actionType.workflowActionId == WorkflowActions.VIEW) {
@@ -351,6 +423,7 @@ export class RecurringRequestComponent {
                 this.formGroupAdd.disable();
                 this.disabled = true;
                 this.isCanEditExpenses = false;
+                this.isCanEditFiles = false;
                 this.selected_assignee.disable();
                 //this._defFieldPermissions.selected_assignee = "disabled";
             } else if (this.actionType.workflowActionId == WorkflowActions.ASSIGN_REASSIGN
@@ -359,6 +432,7 @@ export class RecurringRequestComponent {
                 //this.formGroupAdd.disable();
                 this.disabled = true;
                 this.isCanEditExpenses = false;
+                this.isCanEditFiles = false;
 
                 this.wo_number.disable();
                 this.task_name.disable();
@@ -372,7 +446,6 @@ export class RecurringRequestComponent {
                 this.contact_person.disable();
                 this.contact_number.disable();
                 this.solution.disable();
-                this.selected_assignee.disable();
 
                 this.selected_startdate.disable();
                 this.selected_starttime.disable();
@@ -383,6 +456,8 @@ export class RecurringRequestComponent {
                 || this.actionType.workflowActionId == WorkflowActions.IN_PROGRESS) {
                 // disable all
                 this.disabled = true;
+                this.isCanEditExpenses = false;
+                //this.isCanEditFiles = false;
 
                 this.wo_number.disable();
                 this.task_name.disable();
@@ -403,6 +478,9 @@ export class RecurringRequestComponent {
                 this.selected_duedate.disable();
             } else if (this.actionType.workflowActionId == WorkflowActions.COMPLETE
                 || this.actionType.workflowActionId == WorkflowActions.CLOSE_FOR_CONFIRMATION) {
+                //this.isCanEditExpenses = false;
+                //this.isCanEditFiles = false;
+
                 this.wo_number.disable();
                 this.task_name.disable();
                 this.task_desc.disable();
@@ -428,6 +506,12 @@ export class RecurringRequestComponent {
                 this.wo_number.disable();
                 this.selected_assignee.disable();
                 this.selected_status.disable();
+            } else {
+                // unknown mode, disable all
+                this.disabled = true;
+                this.isCanEditExpenses = false;
+                this.isCanEditFiles = false;
+                this.formGroupAdd.disable();
             }
         });
     }
@@ -445,7 +529,7 @@ export class RecurringRequestComponent {
                 // manual validation VALID
 
                 var workorder_object = Object.assign({}, {
-                    workOrderId: this.selectedWO == null ? null : this.selectedWO.workOderId,
+                    workOrderId: this.selectedWO == null ? null : this.selectedWO.workOrderId,
                     woNumber: this.wo_number.value,
                     woTypeId: this.selectedWoType.id,
                     taskName: this.task_name.value,
@@ -477,7 +561,7 @@ export class RecurringRequestComponent {
                     completionHours: null,
                     pendingHours: null,
                     isComplete: false,
-                    workflowId: null,
+                    workflowId: this.selectedWO == null ? null : this.selectedWO.workflowId,
                     contactPerson: this.contact_person.value,
                     contactNumber: this.contact_number.value,
                     solution: this.solution.value,
@@ -516,7 +600,7 @@ export class RecurringRequestComponent {
                 for (var i = 0; i < this.existingPhotos.length; i++) {
                     if (this.existingPhotos[i].isActive == false) continue;
 
-                    if (this.existingPhotos[i].isActive && this.existingPhotos[i].workOrderFileId == null) {
+                    if (this.existingPhotos[i].isActive && this.existingPhotos[i].workOrderPhotoId == null) {
                         let actualFile: File = this.existingPhotos[i].actualFile;
                         formData.append("photos", actualFile);
                     }
@@ -528,12 +612,20 @@ export class RecurringRequestComponent {
                 if (this.actionType.workflowActionId == WorkflowActions.CREATE) {
                     this._taskService.addNewWorkOrder(formData).subscribe((response) => {
                         console.log("save response", response);
-                        this.onCancel();
+                        if (response.resultCode.code == 0) {
+                            this._taskService.announceEvent("addNewModal_btnSaveOnClick_createSuccess");
+                        } else {
+                            // an error occured
+                        }
                     });
                 } else {
                     this._taskService.updateWorkOrder(formData).subscribe((response) => {
-                        console.log("save response", response);
-                        this.onCancel();
+                        console.log("update response", response);
+                        if (response.resultCode.code == 0) {
+                            this._taskService.announceEvent("addNewModal_btnSaveOnClick_updateSuccess");
+                        } else {
+                            // an error occured
+                        }
                     });
                 }
             }
@@ -554,11 +646,18 @@ export class RecurringRequestComponent {
             case 'selected_location': this.selected_location.setValue(null); break;
             case 'selected_status': this.selected_status.setValue(null); break;
             case 'selected_category': this.selected_category.setValue(null); break;
-            case 'selected_repeat': this.selected_repeat.setValue(null); break;
+            case 'selected_repeat': {
+                this.selected_repeat.setValue(null);
+                this.selected_every_period.updateValueAndValidity();
+                this.repeat_every.updateValueAndValidity();
+                break;
+            }
             case 'selected_every_period': this.selected_every_period.setValue(null); break;
             case 'selected_due_period': this.selected_due_period.setValue(null); break;
             case 'selected_vendor': this.selected_vendor.setValue(null); break;
         }
+
+        this.formGroupAdd.markAsDirty();
     }
 
     selectedSelectBoxValue(field, event) {
@@ -571,11 +670,33 @@ export class RecurringRequestComponent {
             case 'selected_location': this.selected_location.setValue(event); break;
             case 'selected_status': this.selected_status.setValue(event); break;
             case 'selected_category': this.selected_category.setValue(event); break;
-            case 'selected_repeat': this.selected_repeat.setValue(event); break;
+            case 'selected_repeat': {
+                this.selected_repeat.setValue(event);
+                this.selected_every_period.updateValueAndValidity();
+                this.repeat_every.updateValueAndValidity();
+                break;
+            }
             case 'selected_every_period': this.selected_every_period.setValue(event); break;
             case 'selected_due_period': this.selected_due_period.setValue(event); break;
             case 'selected_vendor': this.selected_vendor.setValue(event); break;
         }
+
+        this.formGroupAdd.markAsDirty();
+    }
+
+    touchSelectBox(field, event) {
+        console.log("touchSelectBox", field, event);
+        switch (field.toLowerCase()) {
+            case 'selected_repeat': {
+                this.selected_repeat.markAsTouched();
+                this.selected_every_period.updateValueAndValidity();
+                this.repeat_every.updateValueAndValidity();
+                break;
+            }
+            case 'selected_every_period': this.selected_every_period.markAsTouched(); break;
+        }
+
+        this.formGroupAdd.markAsDirty();
     }
 
     // btn cancel
@@ -659,5 +780,102 @@ export class RecurringRequestComponent {
         }
 
         return deletedExpenses;
+    }
+
+    validateRepeat(input: FormControl) {
+        console.log("validateRepeat", input);
+        if (this.actionType.workflowActionId == WorkflowActions.CREATE
+            || (this.actionType.workflowActionId == WorkflowActions.EDIT && this.isSchedule)) {
+            if (input.value == null || input.value == "") {
+                return { required: true };
+            }
+        }
+
+        return null;
+    }
+
+    validateRepeatEvery(input: FormControl) {
+        console.log("validateRepeatEvery", input);
+        if (this.actionType.workflowActionId == WorkflowActions.CREATE
+            || (this.actionType.workflowActionId == WorkflowActions.EDIT && this.isSchedule)) {
+            // if selected repeat is EVERY
+            if (this.selected_repeat != null && this.selected_repeat.value != null && this.selected_repeat.value.id == 6) {
+                if (input.value == null || input.value == "") {
+                    return { required: true };
+                } else {
+                    return CustomValidators.numberOnly(input);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    validateRepeatEveryPeriod(input: FormControl) {
+        console.log("validateRepeatEveryPeriod", input);
+        if (this.actionType.workflowActionId == WorkflowActions.CREATE
+            || (this.actionType.workflowActionId == WorkflowActions.EDIT && this.isSchedule)) {
+            // if selected repeat is EVERY
+            if (this.selected_repeat != null && this.selected_repeat.value != null && this.selected_repeat.value.id == 6) {
+                if (input.value == null || input.value == "" || input.value.id == null) {
+                    return { required: true };
+                }
+            }
+        }
+
+        return null;
+    }
+
+    isExpensesFormValid() {
+        //console.log("validateExpenses", this.wo_expenses);
+
+        if (this.wo_expenses != null) {
+            for (var i = 0; i < this.wo_expenses.length; i++) {
+                let tmpExpense = this.wo_expenses[i];
+                if (tmpExpense.isActive) {
+                    if (tmpExpense.expenseTypeId == null) {
+                        return false;
+                    } else {
+                        if (tmpExpense.amount == null || tmpExpense.amount == "") {
+                            return false;
+                        } else {
+                            let amountControl = new FormControl();
+                            amountControl.setValue(tmpExpense.amount);
+                            if (CustomValidators.numberOnly(amountControl) != null) {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    isFilesFormValid() {
+        //console.log("validateFiles", this.existingFiles, this.existingPhotos);
+
+        if (this.existingFiles != null) {
+            for (var i = 0; i < this.existingFiles.length; i++) {
+                if (this.existingFiles[i].isActive && this.existingFiles[i].workOrderFileId == null) {
+                    if (this.existingFiles[i].notes == "") {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        if (this.existingPhotos != null) {
+            for (var i = 0; i < this.existingPhotos.length; i++) {
+                if (this.existingPhotos[i].isActive && this.existingPhotos[i].workOrderPhotoId == null) {
+                    if (this.existingPhotos[i].notes == "") {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 }

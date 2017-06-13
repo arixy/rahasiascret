@@ -119,4 +119,23 @@ export class UsersService{
 		console.debug(body);
 		return body || { };
 	}
+    getAssigneeByTypeId(typeName, typeId): Observable<any> {
+        var headers = new Headers();
+        headers.append('Content-Type', 'application/x-www-form-urlencoded');
+        var bearer = "Bearer " + localStorage.getItem('bearer_token');
+
+        headers.append('Authorization', bearer);
+        headers.append('Access-Control-Allow-Origin', '*');
+        headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
+
+        var options = new RequestOptions({ headers: headers });
+        var load_url = this.appUrl + 'admin/user/assignee';
+        console.log('Options ', options);
+
+        let url_search_params = new URLSearchParams();
+        url_search_params.append('type', typeName);
+        url_search_params.append('id', typeId);
+
+        return this.http.post(load_url, url_search_params.toString(), options).map(this.extractData);
+    }
 }

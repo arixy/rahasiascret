@@ -39,7 +39,7 @@
       </div>-->
       <!-- End of Test Purpose -->
         <div style="width: 100%; overflow-x: auto; overflow-y: auto;">
-            <p-dataTable #dt [value]="myTasks" [lazy]="true" (onLazyLoad)="refresh($event, dt)" [rows]="2" [paginator]="true" [totalRecords]="totalRecords" sortField="dateUpdated" sortOrder="-1">
+            <p-dataTable #dt [value]="myTasks" [lazy]="true" (onLazyLoad)="refresh($event, dt)" [rows]="10" [paginator]="true" [totalRecords]="totalRecords" sortField="dateUpdated" sortOrder="-1">
                 <p-header>
                     <div class="ui-helper-clearfix">
                     <button type="button" iconPos="left" label="CSV" (click)="dt.exportCSV()" style="float:left" class="btn-export__csv">

@@ -33,7 +33,7 @@ import { GuestRequestComponent } from './forms/guestrequest.component';
 import { RecurringRequestComponent } from './forms/recurringrequest.component';
 import { PreventiveRequestComponent } from './forms/preventiverequest.component';
 
-import { WorkOrderStatuses, WorkflowActions } from '../../global.state';
+import { GlobalState, WorkOrderStatuses, WorkflowActions } from '../../global.state';
 
 @Component({
   selector: 'my-task',
@@ -176,6 +176,7 @@ export class TaskComponent implements OnDestroy{
     @ViewChild('addNewModal') addNewModal: ModalDirective;
     @ViewChild('editModal') editModal: ModalDirective;
     @ViewChild('deleteModal') deleteModal: ModalDirective;
+    @ViewChild('dt') taskListsTable: DataTable;
     //@Input() public source: LocalDataSource = new LocalDataSource();
 
     //@ViewChild('dynamicModalContent', {read: ViewContainerRef}) viewAddNewModal: ViewContainerRef;
@@ -203,22 +204,24 @@ export class TaskComponent implements OnDestroy{
                         {id: 6, label: "Owner Request"},
                        ];
 
-        // define Add New Form Group
-        this.formGroupAdd = fb.group({
-            'taskName': ['', Validators.compose([Validators.required, Validators.minLength(2)])],
-            'taskDesc': ['', Validators.compose([])],
-            'selectedCategory': ['', Validators.compose([])]
-        });
-        this.taskName = this.formGroupAdd.controls['taskName'];
+      this.subscription = this._taskService.eventEmitted$.subscribe(event => {
+          console.log("event: " + event);
 
-        this.subscription = this._taskService.eventEmitted$.subscribe(event => {
-            console.log("event: " + event);
+          // separate action between events
+          if (event == "addNewModal_btnCancelOnClick") {
             this.addNewModal.hide();
+          } else if (event == "addNewModal_btnSaveOnClick_createSuccess") {
+              this.addNewModal.hide();
+              this.getAllMyTasks(this.buildFilter(this.taskListsTable));
+          } else if (event == "addNewModal_btnSaveOnClick_updateSuccess") {
+              this.addNewModal.hide();
+              this.getAllMyTasks(this.buildFilter(this.taskListsTable));
+          }
         });
   	}
 
 	ngOnInit(){
-        this.getAllMyTasks(this.buildFilter(null));
+        //this.getAllMyTasks(this.buildFilter(this.taskListsTable));
 	}
 
     // btn Add New Work Order Listener
@@ -232,12 +235,9 @@ export class TaskComponent implements OnDestroy{
         // clear modal body
         this.viewModalBody.clear();
         
-        /*// create content component
-        let componentBody = new (this.fb, this.cdr) : AddNewWorkOrderComponent;
-        let addNewContent = this.componentFactoryResolver.resolveComponentFactory(componentBody);
         
-        // create actual component
-        this.currentOpenModal = this.viewModalBody.createComponent(addNewContent);*/
+        // change modal title
+        this.modalTitle = "Create " + selectedType.label;
 
         if (this.selectedWoType.id == this.SINGLE_TIME_REQUEST) {
             this.currentOpenModal = this.createNewSingleRequestComponent(this.viewModalBody, SingleRequestComponent);
@@ -258,8 +258,6 @@ export class TaskComponent implements OnDestroy{
         this.currentOpenModal.instance.selectedWoType = selectedType;
         this.currentOpenModal.instance.actionType = { workflowActionId: -1, name: "Create" };
 
-        // change modal title
-        this.modalTitle = "Create " + selectedType.label;
 
         this.addNewModal.show();
         console.log(this.addNewModal);
