@@ -303,7 +303,7 @@ export class TaskComponent implements OnDestroy{
         return modalContentRef;
     }
 
-    createNewRecurringRequestComponent(view: ViewContainerRef, componentBody: { new (fb, cdr, _locationService, _taskService, _userService, _assetService, _roleService, _workOrderService, _expenseTypeService, _priorityService, _entityService): RecurringRequestComponent }): ComponentRef<RecurringRequestComponent> {
+    createNewRecurringRequestComponent(view: ViewContainerRef, componentBody: { new (fb, cdr, _locationService, _taskService, _userService, _assetService, _roleService, _workOrderService, _expenseTypeService, _priorityService, _entityService, _periodService): RecurringRequestComponent }): ComponentRef<RecurringRequestComponent> {
         // create content component
         let addNewContent = this.componentFactoryResolver.resolveComponentFactory(componentBody);
 
@@ -313,7 +313,7 @@ export class TaskComponent implements OnDestroy{
         return modalContentRef;
     }
 
-    createNewPreventiveRequestComponent(view: ViewContainerRef, componentBody: { new (fb, cdr, _locationService, _taskService, _userService, _assetService, _roleService, _workOrderService, _expenseTypeService, _priorityService, _entityService): PreventiveRequestComponent }): ComponentRef<PreventiveRequestComponent> {
+    createNewPreventiveRequestComponent(view: ViewContainerRef, componentBody: { new (fb, cdr, _locationService, _taskService, _userService, _assetService, _roleService, _workOrderService, _expenseTypeService, _priorityService, _entityService, _periodService): PreventiveRequestComponent }): ComponentRef<PreventiveRequestComponent> {
         // create content component
         let addNewContent = this.componentFactoryResolver.resolveComponentFactory(componentBody);
 

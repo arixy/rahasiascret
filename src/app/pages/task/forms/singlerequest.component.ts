@@ -92,6 +92,8 @@ export class SingleRequestComponent {
         { text: 'Complete', id: 5 },
         { text: 'Cancel', id: 6 },
         { text: 'Pending', id: 7 },
+        { text: 'Escalated', id: 8 },
+        { text: 'Return', id: 9 },
     ];
     public items_vendors: any = [];
     public items_expenses_types: any = [];
@@ -152,7 +154,7 @@ export class SingleRequestComponent {
             'selected_category': ['', Validators.compose([this.validateSelectedCategory.bind(this)])],
             'selected_priority': ['', Validators.compose([this.validateSelectedPriority.bind(this)])],
             'selected_asset': ['', null],
-            'selected_location': ['', null],
+            'selected_location': ['', Validators.compose([Validators.required])],
             'location_info': ['', null],
             'selected_assignee': ['',null],
             'selected_status': ['', null],
@@ -295,7 +297,7 @@ export class SingleRequestComponent {
 
                 //"selected_startdate": new Date(this.selectedWO.startDate),
                 //"selected_starttime": new Date(this.selectedWO.startDate + " " + this.selectedWO.startTime),
-                "selected_startdate": new Date(this.selectedWO.startDate + " " + this.selectedWO.startTime),
+                "selected_startdate": new Date(this.selectedWO.startDate + "T" + this.selectedWO.startTime + "Z"),
                 "selected_duedate": new Date(this.selectedWO.dueDate)
             });
 
@@ -738,6 +740,7 @@ export class SingleRequestComponent {
         switch (field.toLowerCase()) {
             case 'selected_priority': this.selected_priority.markAsTouched(); break;
             case 'selected_category': this.selected_category.markAsTouched(); break;
+            case 'selected_location': this.selected_location.markAsTouched(); break;
         }
     }
 

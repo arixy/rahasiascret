@@ -138,14 +138,15 @@
                      [disabled]="disabled || selected_location.disabled"
                      (removed)="removeSelectBoxValue('selected_location', $event)"
                      (selected)="selectedSelectBoxValue('selected_location', $event)"
+                     (mousedown)="touchSelectBox('selected_location', $event)"
                      placeholder="No Location selected">
           </ng-select>
         </div>
       </div>
       <div class="row error-row">
         <div class="col-xg-2 line-height-zero">&nbsp;</div>
-        <div class="error-message col-xg-10" *ngIf="error_msg.location != null">
-          {{error_msg.location}}
+        <div class="error-message col-xg-10" *ngIf="formGroupAdd.get('selected_location').hasError('required') && formGroupAdd.get('selected_location').touched">
+          Location is required
         </div>
       </div>
 

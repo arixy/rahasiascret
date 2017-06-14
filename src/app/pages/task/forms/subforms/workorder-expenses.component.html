@@ -12,28 +12,53 @@
                    [disabled]="!isCanEdit"
                    [active]="expense.active"
                    (selected)="setSelectedExpenseType(expense, $event)"
-                   (removed)="removeSelectedExpenseType(expense, $event)">
+                   (removed)="removeSelectedExpenseType(expense, $event)"
+                   (mousedown)="markAsTouched(expense, 'expenseTypeTouched')">
         </ng-select>
+        <div class="error-message col-xg-10"
+             *ngIf="hasErrorExpenseType(expense).required && expense.expenseTypeTouched">
+          Expense Type is required
+        </div>
       </template>
     </p-column>
     <p-column header="Amount">
       <template let-expense="rowData" pTemplate="body">
-        <input #numberOnly type="text" class="form-control" [(ngModel)]="expense.amount" [disabled]="!isCanEdit"/>
+        <input #numberOnly type="text" class="form-control" [(ngModel)]="expense.amount" [disabled]="!isCanEdit" (blur)="markAsTouched(expense, 'amountTouched')"/>
+        <div class="error-message col-xg-10"
+             *ngIf="hasErrorExpenseAmount(expense).required && expense.amountTouched">
+          Amount is required
+        </div>
+        <div class="error-message col-xg-10"
+             *ngIf="hasErrorExpenseAmount(expense).nonnumber && expense.amountTouched">
+          Amount must be number only
+        </div>
       </template>
     </p-column>
     <p-column header="Description">
       <template let-expense="rowData" pTemplate="body">
-        <input type="text" class="form-control" [(ngModel)]="expense.description" [disabled]="!isCanEdit" />
+        <input type="text" class="form-control" [(ngModel)]="expense.description" [disabled]="!isCanEdit" (blur)="markAsTouched(expense, 'descTouched')"/>
+        <div class="error-message col-xg-10"
+             *ngIf="hasErrorExpenseDescription(expense).required && expense.descTouched">
+          Description is required
+        </div>
       </template>
     </p-column>
     <p-column header="Reference Number">
       <template let-expense="rowData" pTemplate="body">
-        <input type="text" class="form-control" [(ngModel)]="expense.referenceNumber" [disabled]="!isCanEdit" />
+        <input type="text" class="form-control" [(ngModel)]="expense.referenceNumber" [disabled]="!isCanEdit" (blur)="markAsTouched(expense, 'refNumberTouched')" />
+        <div class="error-message col-xg-10"
+             *ngIf="hasErrorRefNumber(expense).required && expense.refNumberTouched">
+          Reference Number is required
+        </div>
       </template>
     </p-column>
     <p-column header="Reference Date">
       <template let-expense="rowData" pTemplate="body">
-        <p-calendar [(ngModel)]="expense.referenceDate" [disabled]="!isCanEdit" [inputStyle]="{'width':'80%'}" [showIcon]="true" dateFormat="yy-mm-dd" [yearNavigator]="true" [yearRange]="'2017:2222'"></p-calendar>
+        <p-calendar [(ngModel)]="expense.referenceDate" [disabled]="!isCanEdit" [inputStyle]="{'width':'80%'}" [showIcon]="true" dateFormat="yy-mm-dd" [yearNavigator]="true" [yearRange]="'2017:2222'" (onBlur)="markAsTouched(expense, 'refDateTouched')"></p-calendar>
+        <div class="error-message col-xg-10"
+             *ngIf="hasErrorRefDate(expense).required && expense.refDateTouched">
+          Reference Date is required
+        </div>
       </template>
     </p-column>
     <p-column header="Action" [style]="{'width':'120px'}" *ngIf="isCanEdit">

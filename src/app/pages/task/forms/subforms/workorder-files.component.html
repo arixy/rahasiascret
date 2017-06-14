@@ -2,7 +2,7 @@
   <template let-file pTemplate="file">
   </template>
   <template pTemplate="content">
-    <p-dataTable [value]="existingPhotos.filter(filterActiveFiles)">
+    <p-dataTable [value]="getPhotosFiltered()">
       <p-header>
         <div class="ui-helper-clearfix" style="text-align: left;">
           <h4>Photos</h4>
@@ -19,8 +19,12 @@
           Notes
         </template>
         <template let-file="rowData" pTemplate="body">
-          <input type="text" [(ngModel)]="file.notes" class="form-control" *ngIf="file.workOrderPhotoId == null" />
+          <input type="text" [(ngModel)]="file.notes" class="form-control" *ngIf="file.workOrderPhotoId == null" (blur)="markAsTouched(file, 'noteTouched')"/>
           <span *ngIf="file.workOrderPhotoId != null">{{file.notes}}</span>
+          <div class="error-message col-xg-10"
+               *ngIf="file.notes.trim() == '' && file.noteTouched">
+            Notes is required
+          </div>
         </template>
       </p-column>
       <p-column [style]="{'width':'100px'}" *ngIf="isCanEdit">
@@ -39,7 +43,7 @@
   <template let-file pTemplate="file">
   </template>
   <template pTemplate="content">
-    <p-dataTable [value]="existingFiles.filter(filterActiveFiles)">
+    <p-dataTable [value]="getFilesFiltered()">
       <p-header>
         <div class="ui-helper-clearfix" style="text-align: left;">
           <h4>Files</h4>
@@ -56,8 +60,12 @@
           Notes
         </template>
         <template let-file="rowData" pTemplate="body">
-          <input type="text" [(ngModel)]="file.notes" class="form-control" *ngIf="file.workOrderFileId == null" />
+          <input type="text" [(ngModel)]="file.notes" class="form-control" *ngIf="file.workOrderFileId == null" (blur)="markAsTouched(file, 'noteTouched')"/>
           <span *ngIf="file.workOrderFileId != null">{{file.notes}}</span>
+          <div class="error-message col-xg-10"
+               *ngIf="file.notes.trim() == '' && file.noteTouched">
+            Notes is required
+          </div>
         </template>
       </p-column>
       <p-column [style]="{'width':'100px'}" *ngIf="isCanEdit">

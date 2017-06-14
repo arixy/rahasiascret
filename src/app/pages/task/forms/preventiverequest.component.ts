@@ -14,6 +14,7 @@ import { UsersService } from '../../users/users.service';
 import { RoleService } from '../../role/role.service';
 import { EntityService } from '../../entities/entity.service';
 import { WorkOrderService } from '../../../services/work-order.service';
+import { PeriodService } from '../../../services/period.service';
 import { ExpenseTypeService } from '../../expense-type/expense-type.service';
 import { PriorityService } from '../../priorities/priority.service';
 
@@ -87,16 +88,18 @@ export class PreventiveRequestComponent {
         { text: 'Complete', id: 5 },
         { text: 'Cancel', id: 6 },
         { text: 'Pending', id: 7 },
+        { text: 'Escalated', id: 8 },
+        { text: 'Return', id: 9 },
     ];
     public items_repeats: any = [
-        { text: 'Daily', id: 1 },
-        { text: 'Weekly', id: 2 },
-        { text: 'Monthly', id: 3 },
-        { text: 'Yearly', id: 4 },
-        { text: 'One-Time', id: 5 },
-        { text: 'Every', id: 6 },
+        //{ text: 'Daily', id: 1 },
+        //{ text: 'Weekly', id: 2 },
+        //{ text: 'Monthly', id: 3 },
+        //{ text: 'Yearly', id: 4 },
+        //{ text: 'One-Time', id: 5 },
+        //{ text: 'Every', id: 6 },
     ];
-    public items_period_duration: any = [{ text: 'day(s)', id: 1 }, { text: 'week(s)', id: 2 }, { text: 'month(s)', id: 3 }, { text: 'year(s)', id: 4 }];
+    public items_period_duration: any = [/*{ text: 'day(s)', id: 1 }, { text: 'week(s)', id: 2 }, { text: 'month(s)', id: 3 }, { text: 'year(s)', id: 4 }*/];
     public items_vendors: any = [];
 
     // error message container
@@ -147,7 +150,8 @@ export class PreventiveRequestComponent {
         private _workOrderService: WorkOrderService,
         private _expenseTypeService: ExpenseTypeService,
         private _priorityService: PriorityService,
-        private _entityService: EntityService
+        private _entityService: EntityService,
+        private _periodService: PeriodService
     ) {
 
     }
@@ -159,7 +163,7 @@ export class PreventiveRequestComponent {
             'task_desc': ['', Validators.compose([Validators.required, Validators.minLength(2)])],
             'selected_category': ['', null],
             'selected_asset': ['', null],
-            'selected_location': ['', null],
+            'selected_location': ['', Validators.compose([Validators.required])],
             'location_info': ['', null],
             'selected_assignee': ['', null],
             'selected_status': ['', null],
@@ -211,6 +215,30 @@ export class PreventiveRequestComponent {
                 this.isSchedule = true;
                 //this.selected_assignee.disable();
             }
+
+            // repeat options
+            this._periodService.getRepeatOptions().subscribe((response) => {
+                console.log("repeat options response", response.data);
+
+                var tmpLstRepeats = response.data;
+                this.items_repeats = [];
+                for (var i = 0; i < tmpLstRepeats.length; i++) {
+                    var currentItem = { id: tmpLstRepeats[i].repeatOptionId, text: tmpLstRepeats[i].name };
+                    this.items_repeats.push(currentItem);
+                }
+            });
+
+            // period durations
+            this._periodService.getPeriodDurations().subscribe((response) => {
+                console.log("period durations response", response.data);
+
+                var tmpLstDurations = response.data;
+                this.items_period_duration = [];
+                for (var i = 0; i < tmpLstDurations.length; i++) {
+                    var currentItem = { id: tmpLstDurations[i].periodDurationId, text: tmpLstDurations[i].name };
+                    this.items_period_duration.push(currentItem);
+                }
+            });
 
             // get priorities
             this._priorityService.getPriorities().subscribe((response) => {
@@ -299,8 +327,8 @@ export class PreventiveRequestComponent {
 
                 // due_after, every
 
-                "selected_startdate": new Date(this.selectedWO.startDate),
-                "selected_starttime": new Date(this.selectedWO.startDate + " " + this.selectedWO.startTime),
+                "selected_startdate": new Date(this.selectedWO.startDate + "T" + this.selectedWO.startTime + "Z"),
+                "selected_starttime": new Date(this.selectedWO.startDate + "T" + this.selectedWO.startTime + "Z"),
             });
 
             if (response.data.workOrder.currentStatusId != WorkOrderStatuses.SCHEDULED) {
@@ -316,6 +344,47 @@ export class PreventiveRequestComponent {
                 // only set selected_duedate when WO is not a schedule
                 this.formGroupAdd.patchValue({
                     "selected_duedate": new Date(this.selectedWO.dueDate)
+                });
+            } else {
+                // repeat options
+                this._periodService.getRepeatOptions().subscribe((response) => {
+                    console.log("repeat options response", response.data);
+
+                    var tmpLstRepeats = response.data;
+                    this.items_repeats = [];
+                    for (var i = 0; i < tmpLstRepeats.length; i++) {
+                        var currentItem = { id: tmpLstRepeats[i].repeatOptionId, text: tmpLstRepeats[i].name };
+                        this.items_repeats.push(currentItem);
+
+                        if (currentItem.id == this.selectedWO.repeatOptionId) {
+                            this.selected_repeat.setValue(currentItem);
+                            this._addRepeatSelectBox.active = [currentItem];
+                        }
+                    }
+                });
+
+                // period durations
+                this._periodService.getPeriodDurations().subscribe((response) => {
+                    console.log("period durations response", response.data);
+
+                    var tmpLstDurations = response.data;
+                    this.items_period_duration = [];
+                    for (var i = 0; i < tmpLstDurations.length; i++) {
+                        var currentItem = { id: tmpLstDurations[i].periodDurationId, text: tmpLstDurations[i].name };
+                        this.items_period_duration.push(currentItem);
+
+                        // repeat every period
+                        if (currentItem.id == this.selectedWO.everyPeriodId) {
+                            this.selected_every_period.setValue(currentItem);
+                            this._addRepeatPeriodSelectBox.active = [currentItem];
+                        }
+
+                        // due period
+                        if (currentItem.id == this.selectedWO.duePeriodId) {
+                            this.selected_due_period.setValue(currentItem);
+                            this._addDuePeriodSelectBox.active = [currentItem];
+                        }
+                    }
                 });
             }
 
@@ -719,6 +788,7 @@ export class PreventiveRequestComponent {
                 break;
             }
             case 'selected_every_period': this.selected_every_period.markAsTouched(); break;
+            case 'selected_location': this.selected_location.markAsTouched(); break;
         }
     }
 

@@ -13,6 +13,7 @@ import { ENV_PROVIDERS } from './environment';
 import { AuthenticationService } from './services/authentication.service';
 import { AuthGuard } from './services/auth-guard.service'; 
 import { LocationService } from './services/location.service';
+import { PeriodService } from './services/period.service';
 import { WorkOrderService } from './services/work-order.service';
 import { MaintenanceService } from './pages/preventatives/maintenance.service';
 import { PriorityService } from './pages/priorities/priority.service';
@@ -106,6 +107,7 @@ export function httpFactory(backend: XHRBackend, options: RequestOptions) {
     },
     TaskService,
     LocationService,
+    PeriodService
   ]
 })
 
