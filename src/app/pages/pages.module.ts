@@ -51,6 +51,7 @@ import { WorkOrderExpensesComponent } from './task/forms/subforms/workorder-expe
 import { WorkOrderFilesComponent } from './task/forms/subforms/workorder-files.component';
 // add primeng
 import { TabViewModule, FileUploadModule, PanelModule, CalendarModule } from 'primeng/primeng';
+import { TreeTableModule,TreeNode } from 'primeng/primeng';
 
 import {MdTabsModule} from '@angular/material';
 
@@ -69,7 +70,8 @@ import {MdTabsModule} from '@angular/material';
 		   FileUploadModule,
 		   PanelModule,
 		   MdTabsModule,
-      CalendarModule
+      CalendarModule,
+            TreeTableModule
            ],
   declarations: [
       Pages, 

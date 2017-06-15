@@ -12,6 +12,9 @@
 .modal-body{
 	padding: 0;
 }
+.modal .modal-content {
+    background: #fff !important; 
+}
 .custom-card{
 	background: transparent !important;
 	margin-bottom: 0;
@@ -220,6 +223,50 @@ th.top-aligned-table {
 		overflow-x: auto;
 	}
 }
+
+.ui-treetable tbody td {
+    overflow: visible !important;
+}
+
+.ui-treetable tbody > .ui-treetable-row td {
+    border-left: solid 1px #c7c7c7;
+}
+.ui-treetable tbody > .ui-treetable-row td:first-child {
+    border-left: none;
+}
+.ui-treetable-child-table-container .ui-treetable-row td {
+    border: 0 none;
+}
+
+body .ui-tabview.ui-tabview-top .ui-tabview-nav li.ui-state-active{
+	border-bottom: 2px solid #00abff !important;
+    background-color: #fff !important;
+    border: none;
+}
+body .ui-tabview.ui-tabview-top .ui-tabview-nav li.ui-state-active a{
+	color: #00abff !important;
+}
+body .ui-tabview.ui-tabview-top .ui-tabview-nav li:hover{
+	background: #d7d7d7 !important;	
+}
+body .ui-tabview.ui-tabview-top .ui-tabview-nav li{
+	line-height: 48px;
+    height: 48px;
+    padding: 0 35px;
+    font-size: 14px;
+    font-family: Roboto,"Helvetica Neue",sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    box-sizing: border-box;
+    opacity: .6;
+    min-width: 160px;
+    text-align: center;
+    position: relative;
+}
+.ui-tabview .ui-tabview-nav li a {
+    float: none !important;
+}
+
 /* Added by Mike */
 .ui-fileupload-buttonbar button:not(.ui-fileupload-choose) {
   display: none !important;

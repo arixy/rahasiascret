@@ -41,6 +41,45 @@ function convertToTree(flat_data){
         return treeData;
 }
 
+function convertToTreeData(flat_data){
+        console.log('Flat Data:', flat_data);
+        var dataMap = flat_data.reduce(function(map, node) {
+            map[node.data.assetId] = node;
+            return map;
+        }, {});
+        console.log('Data Map', dataMap);
+        // create the tree array
+        var treeData = [];
+        
+        flat_data.forEach(function(node) {
+            // add to parent
+            
+            var parent = dataMap[node.data.parentAssetId];
+            
+            // Handle infinite loop case where parentId = assetId of itself
+            if(node.data.parentAssetId == node.data.assetId){
+                parent = null;
+                
+            }
+            console.log('node:',node);
+            if (parent) {
+                // must check first if children already exist?
+                // create child array if it doesn't exist
+                (parent.children || (parent.children = []))
+                    // add node to child array
+                    .push(node);
+                console.log('parent:', parent);
+            } else {
+                // parent is null or missing
+                treeData.push(node);
+                console.log('tree push:', treeData);
+            }
+        });
+        //console.log('Tree Data inside convert:', treeData);
+        return treeData;
+}
+
+
 function transformAssetIdToId(asset_tree){
     var str = JSON.stringify(asset_tree);
     str = str.replace(/assetId/g, 'id');
@@ -85,8 +124,14 @@ export class Assets {
   public selected_wo = null;
   public selected_location = null;
   public selected_asset = null;
+  public selected_parent_asset = null;
   public treeAssets;
+  public treeAssetsWithData = null;
   public asset_edit;
+  public filterAssetName = null;
+  public filterAssetCode = null;
+  public wo_by_asset = null;
+  public asset_pointer = null;
 
     @Input() public source: LocalDataSource = new LocalDataSource();
 
@@ -98,6 +143,7 @@ export class Assets {
   @ViewChild('childModal') childModal: ModalDirective;
   @ViewChild('editChildModal') editChildModal: ModalDirective;
   @ViewChild('addSelectBox') addSelectBox: SelectComponent;
+  @ViewChild('viewHistoryModal') viewHistoryModal: ModalDirective;
   @ViewChild(TreeComponent)
   private assets_tree: TreeComponent;
 
@@ -141,13 +187,26 @@ export class Assets {
       this.assets$ = this.assetService.getAssets();
       this.assets$.subscribe(
         (data) => {
+            console.log('Data From Server', data);
             this.assets = data.data;
             this.items_asset = data.data;
+            
+            var assets_with_data = this.assets.map(
+                (asset) => {
+                    return Object.assign({}, {
+                       data: asset 
+                    });
+                }
+            );
+            console.log('Asset with Data', assets_with_data);
+            this.treeAssetsWithData = convertToTreeData(assets_with_data);
+            console.log('Tree Asset with Data', this.treeAssetsWithData);
             
             var temp_assets = JSON.parse(JSON.stringify(this.assets));
             this.treeAssets = convertToTree(temp_assets);
             
             this.treeAssets = transformAssetIdToId(this.treeAssets);
+            console.log('Assets Tree', this.treeAssets);
             
             this.items_asset = this.items_asset.map(
                 (asset_object) => {
@@ -236,11 +295,10 @@ export class Assets {
                 photo_file: this.add_photo_file
             });
             
-            if(this.selected_asset != null){
-                formatted_object.parent_asset_id = this.selected_asset.id;
+            if(this.selected_parent_asset != null){
+                formatted_object.parent_asset_id = this.selected_parent_asset.id;
             }
             
-            // TODO: Make sure to change API to Multipart!
             this.assetService.addAsset(formatted_object).subscribe(
                 (data) => {
                     console.log('Response Data', data);
@@ -270,13 +328,36 @@ export class Assets {
         
         this.childModal.show();
     }
+    public selectedAsset(event){
+        console.log('Selected Asset', event);
+        this.selected_parent_asset = event;
+    }
 
     public addRootNode(){
         
         this.childModal.show();
     }
-    
-    public editThisNode(event){
+    public deleteAsset(node){
+        
+    }
+    public viewAssetHistory(node){
+        console.log('Node', node);
+        this.asset_pointer = node;
+        this.viewHistoryModal.show();
+        // Initialize the Table Here
+        this.assetService.getWObyAsset(node.data.assetId).subscribe(
+            (data) => {
+                console.log('Data Get WO by Asset', data);
+                this.wo_by_asset = data.data;
+                
+            }
+        );
+        
+    }
+    public hideViewHistoryModal(){
+        this.viewHistoryModal.hide();
+    }
+    public editAsset(event){
         console.log('Editing:', event);
         this.asset_edit = event;
         
@@ -341,7 +422,13 @@ export class Assets {
     public selectedAssetEdit(value){
         this.asset_edit.selected_asset = value;
     }
-
+    public changeFilterName(event){
+        console.log('Filter Name Input', event);
+        //this.filterAssetName = ;
+    }
+    public changeFilterCode(event){
+        console.log('Filter Code Input', event);
+    }
     public onSubmitEdit(values,event) {
         //event.preventDefault();
         console.log('EditForm:', values);
@@ -368,7 +455,8 @@ export class Assets {
             }
             let response = this.assetService.updateAsset(formatted_object);
             
-            this.assets = this.assetService.getAssetsNormal();
+            // TODO: Change to NgOnInit perhaps
+            //this.assets = this.assetService.getAssetsNormal();
                         
             console.log('After Edit Locations', this.assets);
             var temp_assets = JSON.parse(JSON.stringify(this.assets));

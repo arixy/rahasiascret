@@ -1,5 +1,5 @@
 <div class="widgets">
-<div class="row">
+<!-- <div class="row">
     <div class="col-md-12">
       <ba-card title="Assets" baCardClass="with-scroll">
            <div class="add-new-button__container">
@@ -15,8 +15,282 @@
             </Tree>
       </ba-card>
     </div>
+  </div> -->
+  
+  <!-- Test with New Tree Component -->
+  <div class="row">
+    <div class="col-md-12">
+     <div class="ui-helper-clearfix add-new-button__container">
+               <button (click)="addRootNode()" class="btn btn-primary" style="float:right">Add New Asset</button>
+           </div>
+      <ba-card title="" baCardClass="with-scroll">
+           <p-treeTable class="ui-datatable" [value]="treeAssetsWithData">
+               <p-header>
+            <div class="ui-helper-clearfix">
+                <button type="button" iconPos="left" label="CSV" (click)="exportCSV()" style="float:left" class="btn-export__csv">
+                    <i class="icon ion-ios-download-outline"></i>
+                </button>
+                <div class="btn-group" dropdown style="float: right">
+                            <button title="Reset" id="resetFilters" type="button" class="btn-sets-right-filter" (click)="resetFilters()">
+                                <!-- <img class="reset-filter" src="./assets/img/clear-filter.svg" /> -->
+                                <!-- <span>&nbsp;</span>
+                                <object class="reset-filter-object" type="image/svg+xml" data="./assets/img/clear-filter.svg"></object> -->
+                                <svg (click)="resetFilters()"
+                               xmlns:dc="http://purl.org/dc/elements/1.1/"
+                               xmlns:cc="http://creativecommons.org/ns#"
+                               xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                               xmlns:svg="http://www.w3.org/2000/svg"
+                               xmlns="http://www.w3.org/2000/svg"
+                               xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+                               xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+                               width="40"
+                               height="43"
+                               preserveAspectRatio="xMinYMin meet"
+                                 viewBox="0 0 40 43">
+                                <style type="text/css">
+                                    svg {
+                                        cursor: pointer;
+                                        width: 26px;
+                                        height: 26px;
+                                        position: relative;
+                                        top: 2px;
+                                    }
+                                    svg * {
+                                        transition: all .2s ease-out;
+                                        stroke-width: 1.5 !important;
+                                    }
+                                    svg:hover path {
+                                        stroke: #fff !important;
+                                    }
+                                    .btn-sets-right-filter:hover path {
+                                        stroke: #fff !important;
+                                    }
+                                </style>
+                              <defs
+                                 id="defs4" />
+                              <g
+                                 inkscape:label="Layer 1"
+                                 inkscape:groupmode="layer"
+                                 id="layer1"
+                                 transform="translate(0,-1009.3622)">
+                                <path class="main-line"
+                                   style="fill:none;stroke:#00abff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+                                   d="m 2.8280048,1019.4764 34.7684222,0"
+                                   id="path2985"
+                                   inkscape:connector-curvature="0" />
+                                <path class="main-line"
+                                   inkscape:connector-curvature="0"
+                                   id="path3755"
+                                   d="m 9.8048228,1029.3127 20.8147862,0"
+                                   style="fill:none;stroke:#00abff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+                                <path class="main-line"
+                                   style="fill:none;stroke:#00abff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+                                   d="m 16.134497,1039.149 8.155438,0"
+                                   id="path3757"
+                                   inkscape:connector-curvature="0" />
+                                <g
+                                   id="layer2"
+                                   transform="matrix(0.7901613,0,0,0.78363052,0.57269904,225.98743)"
+                                   style="stroke:#00abff;stroke-width:1.27082705;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none">
+                                  <path class="main-line"
+                                     inkscape:connector-curvature="0"
+                                     id="path3761"
+                                     d="m 33.303572,1044.3265 9.330357,-9.3304"
+                                     style="fill:none;stroke:#00abff;stroke-width:1.27082705;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+                                  <path class="main-line"
+                                     style="fill:none;stroke:#00abff;stroke-width:1.27082705;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+                                     d="m 42.633929,1044.3265 -9.330357,-9.3304"
+                                     id="path3763"
+                                     inkscape:connector-curvature="0" />
+                                </g>
+                              </g>
+                            </svg>
+                            </button>
+
+                            <button title="Refresh" id="resetFilters" type="button" class="btn-sets-right" (click)="refresh($event)">
+                                <i class="icon ion-ios-reload"></i>
+                            </button>
+                        </div>
+            </div>
+        </p-header>
+                <!-- TODO: Add Location (Filter) & Date Updated Column --> 
+                <p-column [style]="{'width':'200px'}" [sortable]="true" field="size">
+                   <template pTemplate="header">
+                       Asset Code
+                       <input class="ui-column-filter" type="text" [ngModel]="filterAssetCode" (ngModelChange)="changeFilterCode($event)" />
+                   </template>
+                    <template let-node="rowData" pTemplate="body">
+                        {{node.data.assetNumber}}
+                    </template>
+                </p-column>
+                <p-column field="name" [filter]="true">
+                   <template pTemplate="header">
+                       Asset Name
+                       <input class="ui-column-filter" type="text" [ngModel]="filterAssetName" (ngModelChange)="changeFilterName($event)" />
+                   </template>
+                    <template let-node="rowData" pTemplate="body">
+                        {{node.data.name}}
+                    </template>
+                </p-column>
+                <p-column field="name" [filter]="true">
+                   <template pTemplate="header">
+                       Location
+                       <input class="ui-column-filter" type="text" [ngModel]="filterAssetName" (ngModelChange)="changeFilterName($event)" />
+                   </template>
+                    <template let-node="rowData" pTemplate="body">
+                        {{node.data.locationId}}
+                    </template>
+                </p-column>
+                <p-column styleClass="top-aligned-table" field="name" [filter]="true">
+                   <template pTemplate="header">
+                       Date Updated
+                       <input class="ui-column-filter" type="text" [ngModel]="filterAssetName" (ngModelChange)="changeFilterName($event)" />
+                   </template>
+                    <template let-node="rowData" pTemplate="body">
+                        {{node.data.dateUpdated | date: 'shortDate'}}
+                    </template>
+                </p-column>
+                <p-column styleClass="col-button">
+                   <template pTemplate="header">
+                        Action
+                    </template>
+                    <template let-node="rowData" pTemplate="body">
+                            <div class="btn-group" dropdown>
+                              <button id="single-button" type="button" class="btn btn-primary" dropdownToggle>
+                                Action <span class="caret"></span>
+                              </button>
+                              <ul dropdownMenu role="menu" aria-labelledby="single-button">
+                                <li role="menuitem"><a class="dropdown-item" (click)="editAsset(node)">Edit</a></li>
+                                <li role="menuitem"><a class="dropdown-item" (click)="deleteAsset(node)">Delete</a></li>
+                                <li role="menuitem"><a class="dropdown-item" (click)="viewAssetHistory(node)">View History</a></li>
+                              </ul>
+                            </div>
+                    </template>
+               </p-column>
+            </p-treeTable>
+      </ba-card>
+    </div>
   </div>
 </div>
+<div bsModal #viewHistoryModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+  <div *ngIf="asset_pointer" class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button class="close" aria-label="Close" (click)="hideViewHistoryModal()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">View Asset History for {{asset_pointer.data.assetNumber}}: {{asset_pointer.data.name}}</h4>
+		  <hr/>
+      </div>
+      <div class="modal-body">
+        <div>
+            <ba-card title="" baCardClass="with-scroll custom-card">
+                  <div *ngIf="wo_by_asset" style="width: 100%; overflow-x: auto; overflow-y: auto;">
+            <p-dataTable #dt [value]="wo_by_asset" [lazy]="false" (onLazyLoad)="refresh($event, dt)" [rows]="8" [paginator]="true" [totalRecords]="totalRecords" sortField="dateUpdated" sortOrder="-1">
+                <p-header>
+                    <div class="ui-helper-clearfix">
+                    <button type="button" iconPos="left" label="CSV" (click)="dt.exportCSV()" style="float:left" class="btn-export__csv">
+                        <i class="icon ion-ios-download-outline"></i>
+                    </button>
+                        <div class="btn-group" dropdown style="float: right">
+                            <button title="Reset" id="resetFilters" type="button" class="btn-sets-right-filter" (click)="resetFilters(dt)">
+                                <!-- <img class="reset-filter" src="./assets/img/clear-filter.svg" /> -->
+                                <!-- <span>&nbsp;</span>
+                                <object class="reset-filter-object" type="image/svg+xml" data="./assets/img/clear-filter.svg"></object> -->
+                                <svg (click)="resetFilters(dt)"
+                               xmlns:dc="http://purl.org/dc/elements/1.1/"
+                               xmlns:cc="http://creativecommons.org/ns#"
+                               xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                               xmlns:svg="http://www.w3.org/2000/svg"
+                               xmlns="http://www.w3.org/2000/svg"
+                               xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+                               xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+                               width="40"
+                               height="43"
+                               preserveAspectRatio="xMinYMin meet"
+                                 viewBox="0 0 40 43">
+                                <style type="text/css">
+                                    svg {
+                                        cursor: pointer;
+                                        width: 26px;
+                                        height: 26px;
+                                        position: relative;
+                                        top: 2px;
+                                    }
+                                    svg * {
+                                        transition: all .2s ease-out;
+                                        stroke-width: 1.5 !important;
+                                    }
+                                    svg:hover path {
+                                        stroke: #fff !important;
+                                    }
+                                    .btn-sets-right-filter:hover path {
+                                        stroke: #fff !important;
+                                    }
+                                </style>
+                              <defs
+                                 id="defs4" />
+                              <g
+                                 inkscape:label="Layer 1"
+                                 inkscape:groupmode="layer"
+                                 id="layer1"
+                                 transform="translate(0,-1009.3622)">
+                                <path class="main-line"
+                                   style="fill:none;stroke:#00abff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+                                   d="m 2.8280048,1019.4764 34.7684222,0"
+                                   id="path2985"
+                                   inkscape:connector-curvature="0" />
+                                <path class="main-line"
+                                   inkscape:connector-curvature="0"
+                                   id="path3755"
+                                   d="m 9.8048228,1029.3127 20.8147862,0"
+                                   style="fill:none;stroke:#00abff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+                                <path class="main-line"
+                                   style="fill:none;stroke:#00abff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+                                   d="m 16.134497,1039.149 8.155438,0"
+                                   id="path3757"
+                                   inkscape:connector-curvature="0" />
+                                <g
+                                   id="layer2"
+                                   transform="matrix(0.7901613,0,0,0.78363052,0.57269904,225.98743)"
+                                   style="stroke:#00abff;stroke-width:1.27082705;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none">
+                                  <path class="main-line"
+                                     inkscape:connector-curvature="0"
+                                     id="path3761"
+                                     d="m 33.303572,1044.3265 9.330357,-9.3304"
+                                     style="fill:none;stroke:#00abff;stroke-width:1.27082705;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+                                  <path class="main-line"
+                                     style="fill:none;stroke:#00abff;stroke-width:1.27082705;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+                                     d="m 42.633929,1044.3265 -9.330357,-9.3304"
+                                     id="path3763"
+                                     inkscape:connector-curvature="0" />
+                                </g>
+                              </g>
+                            </svg>
+                            </button>
+
+                            <button title="Refresh" id="resetFilters" type="button" class="btn-sets-right" (click)="refresh($event, dt)">
+                                <i class="icon ion-ios-reload"></i>
+                            </button>
+                        </div>
+                    </div>
+                </p-header>
+                <p-column [style]="{'width':'100px'}" field="woNumber" header="WO #" [sortable]="true" [filter]="true"></p-column>
+                <p-column field="woCategoryName" [style]="{'width':'110px'}" header="Category" [sortable]="true" [filter]="true"></p-column>
+                <p-column field="woPriorityName" header="Priority" [sortable]="true" [style]="{'width':'90px'}" [filter]="true"></p-column>
+                <p-column field="taskName" [style]="{'width':'120px'}" header="Task" [sortable]="true" [filter]="true" filterPlaceholder="Search"></p-column>
+                <p-column field="assetName" [style]="{'width':'110px'}" header="Asset" [sortable]="true" [filter]="true"></p-column>
+                <p-column field="locationName" header="Location" [sortable]="true" [style]="{'width':'120px'}" [filter]="true" filterPlaceholder="Search"></p-column>
+            </p-dataTable>
+        </div>
+            </ba-card>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <div bsModal #childModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -24,81 +298,96 @@
         <button class="close" aria-label="Close" (click)="hideChildModal()">
           <span aria-hidden="true">&times;</span>
         </button>
-        <h4 class="modal-title">Add New Child Asset</h4>
+        <h4 class="modal-title">Add New Asset</h4>
 		  <hr/>
       </div>
       <div class="modal-body">
         <div>
-            <ba-card title="Add New Asset" baCardClass="with-scroll custom-card">
+            <ba-card title="" baCardClass="with-scroll custom-card">
               <form [formGroup]="form" (ngSubmit)="onSubmit(form.value)" class="form-horizontal">
-              <div class="form-group row" [ngClass]="{'has-error': (!name.valid && name.touched), 'has-success': (name.valid && name.touched)}">
-                <div class="col-sm-12">
-					<label>Name</label>
-					<input [formControl]="name" type="text" class="form-control" id="inputEmail3" placeholder="Name">
-                </div>
-              </div>
-              <div class="form-group row" [ngClass]="{'has-error': (!description.valid && description.touched), 'has-success': (description.valid && description.touched)}">
-               <div class="col-sm-12">
-					<label>Description</label>
-					<input [formControl]="description" type="text" class="form-control" id="inputPassword3" placeholder="Description">
-                </div>
-              </div>
-              <div class="form-group row" [ngClass]="{'has-error': (!photo.valid && photo.touched), 'has-success': (photo.valid && photo.touched)}">
-                <div class="col-sm-12">
-					<label>Photo</label>
-					<input type="file" (change)="addPhotoSelected($event)" placeholder="Upload file" accept=".jpg,.jpeg,.png">
-                  <!-- <input [formControl]="photo" type="text" class="form-control" id="inputPassword3" placeholder="Photo"> -->
-                </div>
-              </div>
-              <div class="form-group row" [ngClass]="{'has-error': (!specification.valid && specification.touched), 'has-success': (specification.valid && specification.touched)}">
-                <div class="col-sm-12">
-					<label>Specification</label>
-                    <textarea [formControl]="specification" class="form-control" id="inputPassword3" placeholder="Specification"></textarea>
-                </div>
-              </div>
-              <div class="form-group row select-container">
-                 <div class="col-sm-12">
-					 <label>WO Category</label>
-                      <ng-select [allowClear]="true"
-                                  [items]="items_wocategory"
-                                  [disabled]="disabled"
-                                  (selected)="selectedWO($event)"
-                                  (removed)="removed($event)"
-                                  (typed)="typed($event)"
-                                  placeholder="No WO Category selected">
-                      </ng-select>
-                  </div>
-              </div>
-              <div class="form-group row select-container">
-                 <div class="col-sm-12">
-					 <label>Location</label>
-                      <ng-select [allowClear]="true"
-                                  [items]="items_location"
-                                  [disabled]="disabled"
-                                    (selected)="selectedLocation($event)"
-                                  (removed)="removed($event)"
-                                  (typed)="typed($event)"
-                                  placeholder="No Location selected">
-                      </ng-select>
-                  </div>
-              </div>
-              <div class="form-group row select-container">
-                 <div class="col-sm-12">
-					 <label>Parent Asset</label>
-                      <ng-select #addSelectBox
-                                 [allowClear]="true"
-                                  [items]="items_asset"
-                                  [disabled]="disabled"
-                                  (selected)="selectedAsset($event)"
-                                  placeholder="No Location selected">
-                      </ng-select>
-                  </div>
-              </div>
+              <p-tabView>
+                  <p-tabPanel header="General">
+                      <div class="form-group row" [ngClass]="{'has-error': (!name.valid && name.touched), 'has-success': (name.valid && name.touched)}">
+                        <div class="col-sm-12">
+                            <label>Name</label>
+                            <input [formControl]="name" type="text" class="form-control" id="inputEmail3" placeholder="Name">
+                        </div>
+                      </div>
+                      <div class="form-group row" [ngClass]="{'has-error': (!description.valid && description.touched), 'has-success': (description.valid && description.touched)}">
+                       <div class="col-sm-12">
+                            <label>Description</label>
+                            <input [formControl]="description" type="text" class="form-control" id="inputPassword3" placeholder="Description">
+                        </div>
+                      </div>
+                      <div class="form-group row" [ngClass]="{'has-error': (!specification.valid && specification.touched), 'has-success': (specification.valid && specification.touched)}">
+                        <div class="col-sm-12">
+                            <label>Specification</label>
+                            <textarea [formControl]="specification" class="form-control" id="inputPassword3" placeholder="Specification"></textarea>
+                        </div>
+                      </div>
+                      <div class="form-group row select-container">
+                         <div class="col-sm-12">
+                             <label>WO Category</label>
+                              <ng-select [allowClear]="true"
+                                          [items]="items_wocategory"
+                                          [disabled]="disabled"
+                                          (selected)="selectedWO($event)"
+                                          (removed)="removed($event)"
+                                          (typed)="typed($event)"
+                                          placeholder="No WO Category selected">
+                              </ng-select>
+                          </div>
+                      </div>
+                      <div class="form-group row select-container">
+                         <div class="col-sm-12">
+                             <label>Location</label>
+                              <ng-select [allowClear]="true"
+                                          [items]="items_location"
+                                          [disabled]="disabled"
+                                            (selected)="selectedLocation($event)"
+                                          (removed)="removed($event)"
+                                          (typed)="typed($event)"
+                                          placeholder="No Location selected">
+                              </ng-select>
+                          </div>
+                      </div>
+                      <div class="form-group row select-container">
+                         <div class="col-sm-12">
+                             <label>Parent Asset</label>
+                              <ng-select #addSelectBox
+                                         [allowClear]="true"
+                                          [items]="items_asset"
+                                          [disabled]="disabled"
+                                          (selected)="selectedAsset($event)"
+                                          placeholder="No Location selected">
+                              </ng-select>
+                          </div>
+                      </div>
+
+                  </p-tabPanel>
+                  <p-tabPanel header="Files">
+                      <div class="form-group row" [ngClass]="{'has-error': (!photo.valid && photo.touched), 'has-success': (photo.valid && photo.touched)}">
+                        <div class="col-sm-12">
+                            <label>Photo</label>
+                            <input type="file" (change)="addPhotoSelected($event)" placeholder="Upload file" accept=".jpg,.jpeg,.png">
+                          <!-- <input [formControl]="photo" type="text" class="form-control" id="inputPassword3" placeholder="Photo"> -->
+                        </div>
+                      </div>
+                  </p-tabPanel>
+              </p-tabView>
+              
+              
               <div class="form-group row">
-                <div class="col-sm-12 btn-submit-center">
-                  <button [disabled]="!form.valid" type="submit" class="btn btn-default btn-auth btn-custom">Submit</button>
-                </div>
-              </div>
+                  <div class="col-sm-3">
+                    <button type="button" class="btn btn-default btn-cancel" (click)="onCancel()">Cancel</button>
+                  </div>
+                  <div class="col-sm-6">
+                    &nbsp;
+                  </div>
+                  <div class="col-sm-3">
+                    <button [disabled]="!form.valid" type="submit" class="btn btn-default btn-save">Save</button>
+                  </div>
+            </div>
             </form>
             </ba-card>
           </div>

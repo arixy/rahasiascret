@@ -216,16 +216,21 @@ export class Preventatives {
       
       
       // NOTE Assets has problem from API
-    this.assets = assetService.getAssetsNormal();
-      
-      this.items_asset = this.assets.map(
-        (asset) => {
-            return Object.assign({}, {
-                id: asset.id,
-                text: asset.name
-            })
+    assetService.getAssets().subscribe(
+        (data) => {
+            this.assets = data.data;
+            this.items_asset = this.assets.map(
+                (asset) => {
+                    return Object.assign({}, {
+                        id: asset.id,
+                        text: asset.name
+                    })
+                }
+              );
         }
-      );
+    );
+      
+      
       
       // FORM CONTROLS MAPPING
       this.form = fb.group({

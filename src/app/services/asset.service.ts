@@ -3,52 +3,86 @@ import { Http, Response, Headers, RequestOptions } from '@angular/http';
 import { UUID } from 'angular2-uuid';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
+import 'rxjs/add/observable/of';
+import { GlobalConfigs } from './../global.state';
 
-import { GlobalConfigs } from '../global.state';
 @Injectable()
 export class AssetService{
   private asset_data: any;
 
   redirectUrl: string;
 
-  //private appUrl = 'http://ec2-52-40-147-30.us-west-2.compute.amazonaws.com/api/v1/master/';
-  private appUrl = GlobalConfigs.APP_BASE_URL + "/master/";
+    //private appUrl = 'http://ec2-52-40-147-30.us-west-2.compute.amazonaws.com/api/v1/master/';
+    private appUrl = GlobalConfigs.APP_MASTER_URL;
+    private woUrl = GlobalConfigs.APP_BASE_URL;
 
   constructor(private http: Http){
       var first_elevator_id = UUID.UUID();
-    this.asset_data = [
-        {
-            id: first_elevator_id,
-            name: 'Elevator',
-            description: 'Elevator Object use to up and down people',
-            photo: '',
-            specification: 'speed: 10m/s',
-            location_id: null,
-            wocategory_id: null,
-            parent_asset_id: null
-        },
-        {
-            id: UUID.UUID(),
-            name: 'Elevator MDX',
-            description: 'Elevator object type MDX specific',
-            photo: '',
-            specification: 'speed: 15m/s',
-            location_id: null,
-            wocategory_id: null,
-            parent_asset_id: first_elevator_id
-        },
-        {
-            id: UUID.UUID(),
-            name: 'Lamp',
-            description: 'Lamps Object around the mall',
-            photo: '',
-            specification: 'model: light model',
-            location_id: null,
-            wocategory_id: null,
-            parent_asset_id: null
-        }
-        
-    ];
+    this.asset_data = {
+          "data": [
+            {
+              "isActive": true,
+              "inactiveDate": null,
+              "createdBy": 1,
+              "dateCreated": "2017-05-05T01:43:51.000+0000",
+              "updatedBy": 1,
+              "dateUpdated": "2017-05-05T01:43:51.000+0000",
+              "assetId": 1,
+              "assetNumber": "ASSET-1",
+              "name": "name",
+              "description": "description",
+              "specification": "specification",
+              "relatedVendorId": 1,
+              "parentAssetId": null,
+              "locationId": 1,
+              "woCategoryId": 1,
+              "isRoot": true,
+              "haveChild": true
+            },
+            {
+              "isActive": true,
+              "inactiveDate": null,
+              "createdBy": 1,
+              "dateCreated": "2017-05-05T01:43:51.000+0000",
+              "updatedBy": 1,
+              "dateUpdated": "2017-05-05T01:43:51.000+0000",
+              "assetId": 2,
+              "assetNumber": "J12E",
+              "name": "J12E",
+              "description": "description",
+              "specification": "specification",
+              "relatedVendorId": 1,
+              "parentAssetId": 1,
+              "locationId": 1,
+              "woCategoryId": 1,
+              "isRoot": true,
+              "haveChild": false
+            },
+            {
+              "isActive": true,
+              "inactiveDate": null,
+              "createdBy": 1,
+              "dateCreated": "2017-05-05T01:43:51.000+0000",
+              "updatedBy": 1,
+              "dateUpdated": "2017-05-05T01:43:51.000+0000",
+              "assetId": 3,
+              "assetNumber": "ASSET-3",
+              "name": "2nd Floor",
+              "description": "description",
+              "specification": "specification",
+              "relatedVendorId": 1,
+              "parentAssetId": null,
+              "locationId": 1,
+              "woCategoryId": 1,
+              "isRoot": true,
+              "haveChild": false
+            }  
+          ],
+          "resultCode": {
+            "code": "0",
+            "message": ""
+          }
+        };
   }
 
   getAssets(): Observable<any> {
@@ -61,14 +95,31 @@ export class AssetService{
     headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
     
     var options = new RequestOptions({headers: headers});
-    var load_url = this.appUrl + 'asset/all';
+    var load_url = this.appUrl + '/asset/all';
       
     return this.http.get(load_url, options).map(this.extractData);
   }
 
-    getAssetsNormal(){
+  getAssetsNormal(){
       return this.asset_data;
   }
+    getAssetsFake(): Observable<any>{
+      return Observable.of(this.asset_data);
+    }
+    getWObyAsset(asset_id){
+        var headers = new Headers();
+        headers.append('Content-Type', 'application/json');
+        var bearer = "Bearer " + localStorage.getItem('bearer_token');
+
+        headers.append('Authorization', bearer);
+        headers.append('Access-Control-Allow-Origin', '*');
+        headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
+
+        var options = new RequestOptions({headers: headers});
+        var load_url = this.woUrl + '/work-order/get-by-asset/' + asset_id;
+
+        return this.http.get(load_url, options).map(this.extractData);    
+    }
   private extractData(res: Response){
     let body = res.json();
     console.debug(body);
@@ -88,7 +139,7 @@ export class AssetService{
             headers: headers
         });
 
-        var add_url = this.appUrl + 'asset/add';
+        var add_url = this.appUrl + '/asset/add';
         
         let asset_multipart = new FormData();
         let photo_file : File = null;
@@ -96,9 +147,7 @@ export class AssetService{
         if(asset.photo_file != null){
             photo_file = asset.photo_file[0];
         }
-        
-
-        asset_multipart.append('params', {
+        var formatted_object = {
             asset: {
                 name: asset.name,
                 assetNumber: "YOS1002",
@@ -112,8 +161,10 @@ export class AssetService{
             assetPhotos: [
             ]
         
-        });
-        asset_multipart.append('files', []);
+        }
+
+        asset_multipart.append('params', JSON.stringify(formatted_object));
+        //asset_multipart.append('files', []);
         /*
         asset_multipart.append('assetNumber', asset.assetNumber);
         asset_multipart.append('description',);
@@ -124,7 +175,7 @@ export class AssetService{
 
         return this.http.post(add_url, asset_multipart, options).map(this.extractData);
     }
-
+    
     updateAsset(updated_asset){
       this.asset_data = this.asset_data.map(
         (asset) => {

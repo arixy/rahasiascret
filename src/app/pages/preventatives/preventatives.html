@@ -17,7 +17,7 @@
     <ba-card title="Work Orders" baCardClass="with-scroll">
         
         <div style="width: 100%; overflow-x: auto; overflow-y: auto;">
-            <p-dataTable #dt [value]="myTasks" [lazy]="true" (onLazyLoad)="refresh($event, dt)" [rows]="2" [paginator]="true" [totalRecords]="totalRecords" sortField="dateUpdated" sortOrder="-1">
+            <p-dataTable #dt [value]="myTasks" [lazy]="true" (onLazyLoad)="refresh($event, dt)" [rows]="4" [paginator]="true" [totalRecords]="totalRecords" sortField="dateUpdated" sortOrder="-1">
                 <p-header>
                     <div class="ui-helper-clearfix">
                     <button type="button" iconPos="left" label="CSV" (click)="dt.exportCSV()" style="float:left" class="btn-export__csv">
@@ -123,14 +123,18 @@
                                 </div>
                         </template>
                 </p-column>
-                <p-column [style]="{'width':'100px'}" field="woNumber" header="WO #" [sortable]="true" [filter]="true"></p-column>
+                <p-column [style]="{'width':'120px'}" field="woNumber" header="WO #" [sortable]="true" [filter]="true"></p-column>
                 <p-column field="woCategoryName" [style]="{'width':'110px'}" header="Category" [sortable]="true" [filter]="true"></p-column>
                 <p-column field="woPriorityName" header="Priority" [sortable]="true" [style]="{'width':'90px'}" [filter]="true"></p-column>
                 <p-column field="taskName" [style]="{'width':'120px'}" header="Task" [sortable]="true" [filter]="true" filterPlaceholder="Search"></p-column>
                 <p-column field="assetName" [style]="{'width':'110px'}" header="Asset" [sortable]="true" [filter]="true"></p-column>
                 <p-column field="locationName" header="Location" [sortable]="true" [style]="{'width':'120px'}" [filter]="true" filterPlaceholder="Search"></p-column>
                 <p-column field="start" header="Start" [sortable]="true" styleClass="top-aligned-table"></p-column>
-                 <p-column [filter]="false" [style]="{'width':'110px'}" styleClass="top-aligned-table" field="dueDate" header="Due" [sortable]="true"></p-column>
+                 <p-column [filter]="true" [style]="{'width':'110px'}" field="dueDate" header="Due" [sortable]="true">
+                   <template pTemplate="body" let-update="rowData">
+                     {{update.dueDate | date: 'shortDate'}}
+                   </template>
+                 </p-column>
                 <p-column field="currentStatusName" [style]="{'width':'110px'}" header="Status" [sortable]="true" [filter]="true"></p-column>
                 <p-column field="assignee" [style]="{'width':'100px'}" header="Assignee" [sortable]="true" [filter]="true"></p-column>
                 <p-column [field]="true" [style]="{'width':'140px'}" field="dateUpdated" header="Last Updated" styleClass="top-aligned-table" [sortable]="true">
