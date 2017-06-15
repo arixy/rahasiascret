@@ -1,7 +1,6 @@
-import { Component, ViewChild, Input, ViewEncapsulation } from '@angular/core';
+import { Component, ViewChild, ViewContainerRef, ChangeDetectorRef, ComponentFactoryResolver, ComponentRef, OnDestroy, Input, ViewEncapsulation } from '@angular/core';
 import { LocalDataSource } from 'ng2-smart-table';
 import { ModalDirective } from 'ng2-bootstrap';
-import { Observable } from 'rxjs/Observable';
 import { FormGroup, AbstractControl, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { DatePickerOptions, DateModel } from 'ng2-datepicker';
 import { DataTable, TabViewModule } from "primeng/primeng";
@@ -13,11 +12,33 @@ import { TaskService } from './../task/task.service';
 
 import { ExpensesComponent } from './component/expenses/expenses.component';
 
+// services related
+import { Observable } from 'rxjs/Observable';
+import { Subscription }   from 'rxjs/Subscription';
+import 'rxjs/add/operator/map';
+
+// custom components
+//import { AddNewWorkOrderComponent } from './add-wo.component';
+import { SingleRequestComponent } from './../task/forms/singlerequest.component';
+import { TenantRequestComponent } from './../task/forms/tenantrequest.component';
+import { OwnerRequestComponent } from './../task/forms/ownerrequest.component';
+import { GuestRequestComponent } from './../task/forms/guestrequest.component';
+import { RecurringRequestComponent } from './../task/forms/recurringrequest.component';
+import { PreventiveRequestComponent } from './../task/forms/preventiverequest.component';
+
+import { GlobalState, WorkOrderStatuses, WorkflowActions } from '../../global.state';
+
 @Component({
   selector: 'preventatives',
   styleUrls: ['./modals.scss', './tablestyle.scss', './purple-green.scss'],
   templateUrl: 'preventatives.html',
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
+  entryComponents: [SingleRequestComponent, 
+                   TenantRequestComponent,
+                   OwnerRequestComponent,
+                   GuestRequestComponent,
+                   RecurringRequestComponent,
+                   PreventiveRequestComponent]
 })
 export class Preventatives {
 
@@ -25,8 +46,6 @@ export class Preventatives {
     date: DateModel;
     options: DatePickerOptions;
     
-    @ViewChild('addNewModal') addNewModal: ModalDirective;
-    @ViewChild('editModal') editModal: ModalDirective;
     @ViewChild('completeJobModal') completeJobModal: ModalDirective;
     public work_order_categories;
     public work_order_categories$: Observable<any>;
@@ -52,6 +71,17 @@ export class Preventatives {
 
     // selected wo type
     public selectedWoType: {id, label};
+
+    // forms
+    public formGroupAdd;
+    public taskName;
+    public taskDesc;
+    public selectedCategory;
+    public selectedProperty;
+    public selectedLocation;
+    public selectedStatus;
+    public selectedDueDate;
+    public selectedPriority;
 
     // static
     private readonly DEFAULT_ITEM_PER_PAGE : number = 10;
@@ -109,53 +139,30 @@ export class Preventatives {
 
     public show_new_complete = true;
     public submitted;
-    public table_settings = {
-        mode: 'external',
-        add: {
-          addButtonContent: '<i class="ion-ios-plus-outline"></i>',
-          createButtonContent: '<i class="ion-checkmark"></i>',
-          cancelButtonContent: '<i class="ion-close"></i>',
-        },
-        edit: {
-          editButtonContent: '<i class="ion-edit"></i>',
-          saveButtonContent: '<i class="ion-checkmark"></i>',
-          cancelButtonContent: '<i class="ion-close"></i>',
-        },
-        delete: {
-          deleteButtonContent: '<i class="ion-trash-a"></i>',
-          confirmDelete: true
-        },
-        columns: {
-          priority: {
-            title: 'Priority',
-            type: 'string'
-          },
-          task: {
-              title: 'Task',
-              type: 'string'
-          },
-          start_date: {
-              title: 'Start',
-              type: 'string'
-          },
-          location_name: {
-              title: 'Location',
-              type: 'string'
-          },
-          status: {
-              title: 'Status',
-              type: 'string'
-          }
-        }
-      };
+
+    @ViewChild('addNewModal') addNewModal: ModalDirective;
+    @ViewChild('editModal') editModal: ModalDirective;
+    @ViewChild('deleteModal') deleteModal: ModalDirective;
+    @ViewChild('dt') taskListsTable: DataTable;
+    //@Input() public source: LocalDataSource = new LocalDataSource();
+
+    //@ViewChild('dynamicModalContent', {read: ViewContainerRef}) viewAddNewModal: ViewContainerRef;
+    @ViewChild('dynamicModalBody', {read: ViewContainerRef}) viewModalBody: ViewContainerRef;
 
   @Input() public source: LocalDataSource = new LocalDataSource();
 
   // MISCELLANEOUS
   public repeat_every = false;
+
+    private currentOpenModal: any;
+    private modalTitle: string;
+    
+    private subscription: Subscription;
      
   constructor(
     public woService: WorkOrderService,
+    public cdr: ChangeDetectorRef,
+    private componentFactoryResolver: ComponentFactoryResolver,
     public assetService: AssetService,
     public locationService: LocationService,
     public maintenanceService: MaintenanceService,
@@ -171,13 +178,29 @@ export class Preventatives {
                         {id: 5, label: "Guest Request"},
                         {id: 6, label: "Owner Request"},
                        ];
+      
+      this.subscription = this._taskService.eventEmitted$.subscribe(event => {
+          console.log("event: " + event);
+
+          // separate action between events
+          if (event == "addNewModal_btnCancelOnClick") {
+            this.addNewModal.hide();
+          } else if (event == "addNewModal_btnSaveOnClick_createSuccess") {
+              this.addNewModal.hide();
+              this.getAllMyTasks(this.buildFilter(this.taskListsTable));
+          } else if (event == "addNewModal_btnSaveOnClick_updateSuccess") {
+              this.addNewModal.hide();
+              this.getAllMyTasks(this.buildFilter(this.taskListsTable));
+          }
+        });
+      
       // DATA MAPPING
       
       this.initial_wo_number = Math.floor(Math.random() * 100) + 1;
-      this.maintenances$ = maintenanceService.getMaintenances();
+      this.maintenances$ = maintenanceService.getScheduledWOs(null);
       this.maintenances$.subscribe(
         (data) => {
-            this.maintenances = data;
+            this.maintenances = data.data;
             console.log('Maintenances Data:', this.maintenances);
             this.source.load(this.maintenances);
         }
@@ -286,6 +309,152 @@ export class Preventatives {
        );
   }
      
+    createNewWorkOrder(selectedType){
+        console.log(selectedType);
+        this.selectedWoType = selectedType;
+        
+        //================================
+        // START CREATE MODAL BODY
+        //================================
+        // clear modal body
+        this.viewModalBody.clear();
+        
+        
+        // change modal title
+        this.modalTitle = "Create " + selectedType.label;
+
+        if (this.selectedWoType.id == this.SINGLE_TIME_REQUEST) {
+            this.currentOpenModal = this.createNewSingleRequestComponent(this.viewModalBody, SingleRequestComponent);
+            // send specific parameters if needed
+            //this.currentOpenModal.instance.variable_name = value
+        } else if (this.selectedWoType.id == this.TENANT_REQUEST) {
+            this.currentOpenModal = this.createNewTenantRequestComponent(this.viewModalBody, TenantRequestComponent);
+        } else if (this.selectedWoType.id == this.GUEST_REQUEST) {
+            this.currentOpenModal = this.createNewGuestRequestComponent(this.viewModalBody, GuestRequestComponent);
+        } else if (this.selectedWoType.id == this.OWNER_REQUEST) {
+            this.currentOpenModal = this.createNewOwnerRequestComponent(this.viewModalBody, OwnerRequestComponent);
+        } else if (this.selectedWoType.id == this.RECURRING_REQUEST) {
+            this.currentOpenModal = this.createNewRecurringRequestComponent(this.viewModalBody, RecurringRequestComponent);
+        } else if (this.selectedWoType.id == this.PREVENTIVE_REQUEST) {
+            this.currentOpenModal = this.createNewPreventiveRequestComponent(this.viewModalBody, PreventiveRequestComponent);
+        }
+        
+        this.currentOpenModal.instance.selectedWoType = selectedType;
+        this.currentOpenModal.instance.actionType = { workflowActionId: -1, name: "Create" };
+
+
+        this.addNewModal.show();
+        console.log(this.addNewModal);
+    }
+
+    // Dynamic Form Components
+    createNewSingleRequestComponent(view: ViewContainerRef, componentBody: { new (fb, cdr, _locationService, _taskService, _userService, _assetService, _roleService, _workOrderService, _expenseTypeService, _priorityService, _entityService): SingleRequestComponent }): ComponentRef<SingleRequestComponent>{
+        // create content component
+        let addNewContent = this.componentFactoryResolver.resolveComponentFactory(componentBody);
+        
+        // create actual component
+        let modalContentRef = view.createComponent(addNewContent);
+        
+        return modalContentRef;
+    }
+
+    createNewTenantRequestComponent(view: ViewContainerRef, componentBody: { new (fb, cdr, _locationService, _taskService, _userService, _assetService, _roleService, _workOrderService, _expenseTypeService, _priorityService, _entityService): TenantRequestComponent }): ComponentRef<TenantRequestComponent> {
+        // create content component
+        let addNewContent = this.componentFactoryResolver.resolveComponentFactory(componentBody);
+
+        // create actual component
+        let modalContentRef = view.createComponent(addNewContent);
+
+        return modalContentRef;
+    }
+
+    createNewOwnerRequestComponent(view: ViewContainerRef, componentBody: { new (fb, cdr, _locationService, _taskService, _userService, _assetService, _roleService, _workOrderService, _expenseTypeService, _priorityService, _entityService): OwnerRequestComponent }): ComponentRef<OwnerRequestComponent> {
+        // create content component
+        let addNewContent = this.componentFactoryResolver.resolveComponentFactory(componentBody);
+
+        // create actual component
+        let modalContentRef = view.createComponent(addNewContent);
+
+        return modalContentRef;
+    }
+
+    createNewGuestRequestComponent(view: ViewContainerRef, componentBody: { new (fb, cdr, _locationService, _taskService, _userService, _assetService, _roleService, _workOrderService, _expenseTypeService, _priorityService, _entityService): GuestRequestComponent }): ComponentRef<GuestRequestComponent> {
+        // create content component
+        let addNewContent = this.componentFactoryResolver.resolveComponentFactory(componentBody);
+
+        // create actual component
+        let modalContentRef = view.createComponent(addNewContent);
+
+        return modalContentRef;
+    }
+
+    createNewRecurringRequestComponent(view: ViewContainerRef, componentBody: { new (fb, cdr, _locationService, _taskService, _userService, _assetService, _roleService, _workOrderService, _expenseTypeService, _priorityService, _entityService, _periodService): RecurringRequestComponent }): ComponentRef<RecurringRequestComponent> {
+        // create content component
+        let addNewContent = this.componentFactoryResolver.resolveComponentFactory(componentBody);
+
+        // create actual component
+        let modalContentRef = view.createComponent(addNewContent);
+
+        return modalContentRef;
+    }
+
+    createNewPreventiveRequestComponent(view: ViewContainerRef, componentBody: { new (fb, cdr, _locationService, _taskService, _userService, _assetService, _roleService, _workOrderService, _expenseTypeService, _priorityService, _entityService, _periodService): PreventiveRequestComponent }): ComponentRef<PreventiveRequestComponent> {
+        // create content component
+        let addNewContent = this.componentFactoryResolver.resolveComponentFactory(componentBody);
+
+        // create actual component
+        let modalContentRef = view.createComponent(addNewContent);
+
+        return modalContentRef;
+    }
+    doAction(modelData, selectedAction){
+        console.log("doAction", modelData, selectedAction);
+
+        this.viewModalBody.clear();
+        if (modelData.woTypeId == this.SINGLE_TIME_REQUEST) {
+            this.currentOpenModal = this.createNewSingleRequestComponent(this.viewModalBody, SingleRequestComponent);
+            //this.modalTitle = "Work Order - Single Request (" + selectedAction.name + ")";
+            this.currentOpenModal.instance.selectedWoType = this.woTypes[2];
+        } else if (modelData.woTypeId == this.GUEST_REQUEST) {
+            this.currentOpenModal = this.createNewGuestRequestComponent(this.viewModalBody, GuestRequestComponent);
+            //this.modalTitle = "Work Order - Guest Request (" + selectedAction.name + ")";
+            this.currentOpenModal.instance.selectedWoType = this.woTypes[2];
+        } else if (modelData.woTypeId == this.TENANT_REQUEST) {
+            this.currentOpenModal = this.createNewTenantRequestComponent(this.viewModalBody, TenantRequestComponent);
+            //this.modalTitle = "Work Order - Tenant Request (" + selectedAction.name + ")";
+            this.currentOpenModal.instance.selectedWoType = this.woTypes[2];
+        } else if (modelData.woTypeId == this.OWNER_REQUEST) {
+            this.currentOpenModal = this.createNewOwnerRequestComponent(this.viewModalBody, OwnerRequestComponent);
+            //this.modalTitle = "Work Order - Owner Request (" + selectedAction.name + ")";
+            this.currentOpenModal.instance.selectedWoType = this.woTypes[2];
+        } else if (modelData.woTypeId == this.RECURRING_REQUEST) {
+            this.currentOpenModal = this.createNewRecurringRequestComponent(this.viewModalBody, RecurringRequestComponent);
+            //this.modalTitle = "Work Order - Recurring Request (" + selectedAction.name + ")";
+            this.currentOpenModal.instance.selectedWoType = this.woTypes[1];
+        } else if (modelData.woTypeId == this.PREVENTIVE_REQUEST) {
+            this.currentOpenModal = this.createNewPreventiveRequestComponent(this.viewModalBody, PreventiveRequestComponent);
+            //this.modalTitle = "Work Order - Preventative Request (" + selectedAction.name + ")";
+            this.currentOpenModal.instance.selectedWoType = this.woTypes[1];
+        }
+        // set modal title
+        if(selectedAction.workflowActionId == WorkflowActions.IN_PROGRESS){
+            this.modalTitle = "Set " + selectedAction.name + " ";
+        }else{
+            this.modalTitle = selectedAction.name + " ";
+        }
+        for(var i=0; i < this.woTypes.length; i++){
+            if (this.woTypes[i].id == modelData.woTypeId){
+                this.modalTitle += this.woTypes[i].label;
+                break;
+            }
+        }
+        // end set modal title
+
+        this.currentOpenModal.instance.actionType = selectedAction;
+        this.currentOpenModal.instance.selectedWO = modelData;
+        this.addNewModal.show();
+    }
+    
      public addNewPreventative(){
          
          this.form.patchValue({ wo_number: this.initial_wo_number });
@@ -348,7 +517,7 @@ export class Preventatives {
         this.selected_due_period = event.text;
     }
 
-    public selectedPriority(event){
+    public selectPriority(event){
         this.selected_priority = event.text;
     } 
     
@@ -357,7 +526,7 @@ export class Preventatives {
         console.log('Select WO Category', this.selected_wo_category);
     }
 
-    public selectedLocation(event){
+    public selectLocation(event){
         this.selected_location = event;
     }
 
@@ -488,6 +657,7 @@ export class Preventatives {
 
                     this.myTasks[i].actions.unshift({ workflowActionId: -2, name: "View" });
                     //this.myTasks[i].actions.push({ workflowActionId: 4, name: "Assign/Reassign" });
+                    this.myTasks[i].dueDate = new Date(this.myTasks[i].dueDate);
                     this.myTasks[i].dateUpdated = new Date(this.myTasks[i].dateUpdated);
                 }
 
@@ -497,5 +667,12 @@ export class Preventatives {
                     this.totalRecords = 0;
             }
         );
+    }
+
+    onCancel(){
+        this.addNewModal.hide();
+    }
+    ngOnDestroy(){
+        this.subscription.unsubscribe();
     }
 }

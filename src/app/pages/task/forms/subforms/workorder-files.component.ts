@@ -65,6 +65,16 @@ export class WorkOrderFilesComponent {
         return !file.isActive;
     }
 
+    getFilesFiltered() {
+        if (this.existingFiles == null) this.existingFiles = [];
+        return this.existingFiles.filter(this.filterActiveFiles);
+    }
+
+    getPhotosFiltered() {
+        if (this.existingPhotos == null) this.existingPhotos = [];
+        return this.existingPhotos.filter(this.filterActiveFiles);
+    }
+
     removeFile(file) {
         file.isActive = false;
     }
@@ -119,5 +129,12 @@ export class WorkOrderFilesComponent {
             //reader.readAsDataURL(blobData);
             saveAs(blobData, file.name);
         });
+    }
+
+    markAsTouched(marker, field: string) {
+        console.log("markAsTouched", marker, field);
+        switch (field) {
+            case 'noteTouched': marker.noteTouched = true; break;
+        }
     }
 }

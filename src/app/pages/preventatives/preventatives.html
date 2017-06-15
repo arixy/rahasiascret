@@ -117,7 +117,7 @@
                                   </button>
                                   <ul dropdownMenu role="menu" aria-labelledby="single-button">
                                     <li role="menuitem" *ngFor="let action of mytask.actions">
-                                        <a  class="dropdown-item" (click)="doAction(mytask, action)">{{action.label}}</a>
+                                        <a  class="dropdown-item" (click)="doAction(mytask, action)">{{action.name}}</a>
                                     </li>
                                   </ul>
                                 </div>
@@ -251,10 +251,18 @@
                             </div>
                     </template>
             </p-column>
-           <p-column field="id" header="WO ID"></p-column>
-           <p-column field="task" header="Task"></p-column>
-            <p-column field="wo_number" header="WO Number"></p-column>
-            <p-column field="description" header="Description"></p-column>
+           <p-column field="woCategoryName" header="Category"></p-column>
+           <p-column field="woPriorityName" header="Priority"></p-column>
+           <p-column field="taskName" header="Task"></p-column>
+            <p-column field="assetName" header="Asset"></p-column>
+            <p-column field="locationName" header="Location"></p-column>
+            <p-column field="start" header="Start"></p-column>
+            <p-column field="due" header="Due"></p-column>
+            <p-column field="lastWo" header="Last WO"></p-column>
+            
+            <p-column field="nextWo" header="Next WO"></p-column>
+            
+            <p-column field="dateUpdated" header="Last Updated"></p-column>
             
         </p-dataTable>
     </ba-card>
@@ -313,7 +321,7 @@
                           <ng-select [allowClear]="true"
                                       [items]="items_location"
                                       [disabled]="disabled"
-                                      (selected)="selectedLocation($event)"
+                                      (selected)="selectLocation($event)"
                                       placeholder="No Location selected">
                           </ng-select>
                       </div>
@@ -344,7 +352,7 @@
                       <label for="selectlocation" class="control-label">Priority</label>
                           <ng-select [allowClear]="true"
                                       [items]="items_priority"
-                                      (selected)="selectedPriority($event)"
+                                      (selected)="selectPriority($event)"
                                       placeholder="No Priority selected">
                           </ng-select>
                     </div>

@@ -1,7 +1,7 @@
 ﻿import { Component, Input, ChangeDetectorRef, ViewChild, ViewEncapsulation } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
-import { FormGroup, AbstractControl, FormBuilder, Validators, ValidatorFn } from '@angular/forms';
+import { FormGroup, AbstractControl, FormBuilder, Validators, ValidatorFn, FormControl } from '@angular/forms';
 //import { EntityService } from './entity.service';
 import { ModalDirective } from 'ng2-bootstrap';
 import { DatePickerOptions } from 'ng2-datepicker';
@@ -19,6 +19,8 @@ import { PriorityService } from '../../priorities/priority.service';
 
 import { WorkflowActions, WorkOrderStatuses } from '../../../global.state';
 
+import { CustomValidators } from './custom-validators';
+
 @Component({
     selector: 'form-tenant-request',
     templateUrl: './tenantrequest.component.html',
@@ -26,7 +28,7 @@ import { WorkflowActions, WorkOrderStatuses } from '../../../global.state';
 })
 export class TenantRequestComponent {
     public selectedWoType: { id, label };
-    public actionType: { workflowActionId, name }; // JSON of Action
+    public actionType: { workflowActionId, name, toRoleId, toRoleTypeId, toUserId }; // JSON of Action
     public selectedWO = null;
 
     // flag to disable almost all form
@@ -79,6 +81,8 @@ export class TenantRequestComponent {
         { text: 'Complete', id: 5 },
         { text: 'Cancel', id: 6 },
         { text: 'Pending', id: 7 },
+        { text: 'Escalated', id: 8 },
+        { text: 'Return', id: 9 },
     ];
     public items_vendors: any = [];
     public items_expenses_types: any = [];
@@ -94,7 +98,7 @@ export class TenantRequestComponent {
         btn_submit: 'show'
     }
 
-
+    @ViewChild("addStatusSelectBox") _addStatusSelectBox: SelectComponent;
     @ViewChild("addLocationSelectBox") _addLocationSelectBox: SelectComponent;
     @ViewChild("addAssetSelectBox") _addAssetSelectBox: SelectComponent;
     @ViewChild("addCategorySelectBox") _addCategorySelectBox: SelectComponent;
@@ -124,18 +128,18 @@ export class TenantRequestComponent {
         this.formGroupAdd = this.fb.group({
             'wo_number': ['', null],
             'task_name': ['', Validators.compose([Validators.required, Validators.minLength(2)])],
-            'task_desc': ['', null],
-            'selected_category': ['', null],
+            'task_desc': ['', Validators.compose([Validators.required, Validators.minLength(2)])],
+            'selected_category': ['', Validators.compose([Validators.required])],
             'selected_asset': ['', null],
-            'selected_location': ['', null],
+            'selected_location': ['', Validators.compose([Validators.required])],
             'location_info': ['', null],
-            'selected_entity': ['', null],
+            'selected_entity': ['', Validators.compose([Validators.required])],
             'selected_assignee': ['', null],
             'selected_status': ['', null],
-            'selected_priority': ['', null],
+            'selected_priority': ['', Validators.compose([Validators.required])],
             'selected_vendor': ['', null],
             'contact_person': ['', null],
-            'contact_number': ['', null],
+            'contact_number': ['', Validators.compose([CustomValidators.numberOnly])],
             'solution': ['', null],
 
             'selected_startdate': ['', null],
@@ -236,7 +240,7 @@ export class TenantRequestComponent {
 
             // load all users as assignee
             // clear assignee list
-            this._userService.getUsers().subscribe((users) => {
+            this._userService.getAssigneeByTypeId("User", 1).subscribe((users) => {
                 var lstUsers = users.data;
 
                 this.items_assignees = [];
@@ -277,10 +281,11 @@ export class TenantRequestComponent {
                 "location_info": this.selectedWO.locationInfo,
                 "contact_person": this.selectedWO.contactPerson,
                 "contact_number": this.selectedWO.contactNumber,
+                "solution": this.selectedWO.solution,
 
                 //"selected_startdate": new Date(this.selectedWO.startDate),
                 //"selected_starttime": new Date(this.selectedWO.startDate + " " + this.selectedWO.startTime),
-                "selected_startdate": new Date(this.selectedWO.startDate + " " + this.selectedWO.startTime),
+                "selected_startdate": new Date(this.selectedWO.startDate + "T" + this.selectedWO.startTime + "Z"),
                 "selected_duedate": new Date(this.selectedWO.dueDate)
             });
 
@@ -288,6 +293,14 @@ export class TenantRequestComponent {
 
             // load all other required items
             // then set default value for select box
+
+            // statuses
+            for (var i = 0; i < this.items_statuses.length; i++) {
+                if (this.items_statuses[i].id == this.selectedWO.currentStatusId) {
+                    this.selected_status.setValue(this.items_statuses[i]);
+                    this._addStatusSelectBox.active = [this.items_statuses[i]];
+                }
+            }
 
             // get vendors
             this._entityService.getEntitiesByType(1).subscribe((response) => {
@@ -398,24 +411,60 @@ export class TenantRequestComponent {
 
             // TODO: update this part
             // load all users as assignee
-            if (this.selectedWO.currentAssigneeId != null) {
-                this._userService.getUsers().subscribe((users) => {
+            if (this.actionType.toRoleId != null) {
+                console.log("get assignee by type: Role", this.actionType);
+                this._userService.getAssigneeByTypeId("Role", this.actionType.toRoleId).subscribe((users) => {
                     var lstUsers = users.data;
                     console.log(lstUsers);
 
                     // clear assignee list
                     this.items_assignees = [];
                     for (var i = 0; i < lstUsers.length; i++) {
-                        this.items_assignees.push({ text: lstUsers[i].fullname, id: lstUsers[i].userId });
+                        var currentItem = { text: lstUsers[i].fullname, id: lstUsers[i].userId };
+                        this.items_assignees.push(currentItem);
 
-                        if (lstUsers[i].userId == this.selectedWO.currentAssigneeId) {
-                            //this.selected_
-                            this._addAssigneeSelectBox.active = [{ text: lstUsers[i].fullname, id: lstUsers[i].userId }];
+                        if (currentItem.id == this.selectedWO.currentAssigneeId) {
+                            this.selected_assignee.setValue(currentItem);
+                            this._addAssigneeSelectBox.active = [currentItem];
                         }
                     }
                 });
-            } else if (this.selectedWO.currentAssigneeId != null) {
+            } else if (this.actionType.toRoleTypeId != null) {
+                console.log("get assignee by type: RoleType", this.actionType);
+                this._userService.getAssigneeByTypeId("RoleType", this.actionType.toRoleTypeId).subscribe((users) => {
+                    var lstUsers = users.data;
+                    console.log(lstUsers);
 
+                    // clear assignee list
+                    this.items_assignees = [];
+                    for (var i = 0; i < lstUsers.length; i++) {
+                        var currentItem = { text: lstUsers[i].fullname, id: lstUsers[i].userId };
+                        this.items_assignees.push(currentItem);
+
+                        if (currentItem.id == this.selectedWO.currentAssigneeId) {
+                            this.selected_assignee.setValue(currentItem);
+                            this._addAssigneeSelectBox.active = [currentItem];
+                        }
+                    }
+                });
+            } else {
+                console.log("get assignee by type: user");
+                this._userService.getAssigneeByTypeId("User", 1).subscribe((users) => {
+                    var lstUsers = users.data;
+                    console.log(lstUsers);
+
+                    // clear assignee list
+                    this.items_assignees = [];
+                    for (var i = 0; i < lstUsers.length; i++) {
+                        var currentItem = { text: lstUsers[i].fullname, id: lstUsers[i].userId };
+                        this.items_assignees.push(currentItem);
+
+                        if (currentItem.id == this.selectedWO.currentAssigneeId) {
+                            this.selected_assignee.setValue(currentItem);
+                            this._addAssigneeSelectBox.active = [currentItem];
+                        }
+                    }
+                });
             }
 
             // PERMISSION SHOULD BE HERE
@@ -435,6 +484,7 @@ export class TenantRequestComponent {
                 //this.formGroupAdd.disable();
                 this.disabled = true;
                 this.isCanEditExpenses = false;
+                this.isCanEditFiles = false;
 
                 this.wo_number.disable();
                 this.task_name.disable();
@@ -448,7 +498,6 @@ export class TenantRequestComponent {
                 this.contact_person.disable();
                 this.contact_number.disable();
                 this.solution.disable();
-                this.selected_assignee.disable();
 
                 this.selected_startdate.disable();
                 //this.selected_starttime.disable();
@@ -465,6 +514,7 @@ export class TenantRequestComponent {
                 // disable all
                 this.disabled = true;
                 this.isCanEditExpenses = false;
+                this.isCanEditFiles = false;
 
                 this.wo_number.disable();
                 this.task_name.disable();
@@ -490,34 +540,29 @@ export class TenantRequestComponent {
                 this.selected_duedate.disable();
             } else if (this.actionType.workflowActionId == WorkflowActions.COMPLETE
                 || this.actionType.workflowActionId == WorkflowActions.CLOSE_FOR_CONFIRMATION) {
-                try {
-                    this.wo_number.disable();
-                    this.task_name.disable();
-                    this.task_desc.disable();
-                    this.selected_category.disable();
-                    this.selected_asset.disable();
-                    this.selected_priority.disable();
-                    this.selected_status.disable();
-                    this.selected_location.disable();
-                    this.location_info.disable();
-                    this.contact_number.disable();
-                    this.contact_person.disable();
-                    this.selected_assignee.disable();
+                //this.isCanEditExpenses = false;
+                this.isCanEditFiles = false;
 
-                    this.selected_startdate.disable();
-                    //this.selected_starttime.disable();
-                    this.selected_duedate.disable();
+                this.wo_number.disable();
+                this.task_name.disable();
+                this.task_desc.disable();
+                this.selected_category.disable();
+                this.selected_asset.disable();
+                this.selected_priority.disable();
+                this.selected_status.disable();
+                this.selected_location.disable();
+                this.location_info.disable();
+                this.contact_number.disable();
+                this.contact_person.disable();
+                this.selected_assignee.disable();
 
-                    //this._defFieldPermissions.selected_assignee = "disabled";
-                } catch (e) {
-                    console.log("ERROR", e);
-                }
+                this.selected_startdate.disable();
+                //this.selected_starttime.disable();
+                this.selected_duedate.disable();
             } else if (this.actionType.workflowActionId == WorkflowActions.EDIT) {
                 this.wo_number.disable();
                 this.selected_assignee.disable();
                 this.selected_status.disable();
-                //this._defFieldPermissions.selected_assignee = "disabled";
-                //this._defFieldPermissions.selected_status = "disabled";
 
                 // filter by status
                 //if (this.selectedWO.currentStatusId == )
@@ -525,10 +570,8 @@ export class TenantRequestComponent {
                 // unknown mode, disable all
                 this.disabled = true;
                 this.isCanEditExpenses = false;
+                this.isCanEditFiles = false;
                 this.formGroupAdd.disable();
-
-                //this._defFieldPermissions.selected_assignee = "disabled";
-                //this._defFieldPermissions.selected_status = "disabled";
             }
         });
     }
@@ -546,7 +589,7 @@ export class TenantRequestComponent {
                 // manual validation VALID
 
                 var workorder_object = Object.assign({}, {
-                    workOrderId: this.selectedWO == null ? null : this.selectedWO.workOderId,
+                    workOrderId: this.selectedWO == null ? null : this.selectedWO.workOrderId,
                     woNumber: this.wo_number.value,
                     woTypeId: this.selectedWoType.id,
                     taskName: this.task_name.value,
@@ -578,7 +621,7 @@ export class TenantRequestComponent {
                     completionHours: null,
                     pendingHours: null,
                     isComplete: false,
-                    workflowId: null,
+                    workflowId: this.selectedWO == null ? null : this.selectedWO.workflowId,
                     contactPerson: this.contact_person.value,
                     contactNumber: this.contact_number.value,
                     solution: this.solution.value,
@@ -616,7 +659,7 @@ export class TenantRequestComponent {
 
                 for (var i = 0; i < this.existingPhotos.length; i++) {
                     if (this.existingPhotos[i].isActive == false) continue;
-                    if (this.existingPhotos[i].isActive && this.existingPhotos[i].workOrderFileId == null) {
+                    if (this.existingPhotos[i].isActive && this.existingPhotos[i].workOrderPhotoId == null) {
                         let actualFile: File = this.existingPhotos[i].actualFile;
                         formData.append("photos", actualFile);
                     }
@@ -628,12 +671,20 @@ export class TenantRequestComponent {
                 if (this.actionType.workflowActionId == WorkflowActions.CREATE) {
                     this._taskService.addNewWorkOrder(formData).subscribe((response) => {
                         console.log("save response", response);
-                        this.onCancel();
+                        if (response.resultCode.code == 0) {
+                            this._taskService.announceEvent("addNewModal_btnSaveOnClick_createSuccess");
+                        } else {
+                            // an error occured
+                        }
                     });
                 } else {
                     this._taskService.updateWorkOrder(formData).subscribe((response) => {
-                        console.log("save response", response);
-                        this.onCancel();
+                        console.log("update response", response);
+                        if (response.resultCode.code == 0) {
+                            this._taskService.announceEvent("addNewModal_btnSaveOnClick_updateSuccess");
+                        } else {
+                            // an error occured
+                        }
                     });
                 }
             }
@@ -679,6 +730,16 @@ export class TenantRequestComponent {
             case 'selected_status': this.selected_status.setValue(event); break;
             case 'selected_asset': this.selected_asset.setValue(event); break;
             case 'selected_category': this.selected_category.setValue(event); break;
+        }
+    }
+
+    touchSelectBox(field, event) {
+        console.log("touchSelectBox", field, event);
+        switch (field.toLowerCase()) {
+            case 'selected_priority': this.selected_priority.markAsTouched(); break;
+            case 'selected_category': this.selected_category.markAsTouched(); break;
+            case 'selected_entity': this.selected_entity.markAsTouched(); break;
+            case 'selected_location': this.selected_location.markAsTouched(); break;
         }
     }
 
@@ -757,5 +818,82 @@ export class TenantRequestComponent {
         }
 
         return deletedExpenses;
+    }
+
+    validateSelectedCategory(input: FormControl) {
+        console.log("validateSelectedCategory", input, this.actionType);
+        if (this.actionType.workflowActionId == WorkflowActions.CREATE
+            || this.actionType.workflowActionId == WorkflowActions.EDIT) {
+            if (input.value == null || input.value == "" || input.value.id == null) {
+                return { required: true };
+            }
+        }
+
+        return null;
+    }
+
+    validateSelectedPriority(input: FormControl) {
+        console.log("validateSelectedPriority", input, this.actionType);
+        if (this.actionType.workflowActionId == WorkflowActions.CREATE
+            || this.actionType.workflowActionId == WorkflowActions.EDIT) {
+            if (input.value == null || input.value == "" || input.value.id == null) {
+                return { required: true };
+            }
+        }
+
+        return null;
+    }
+
+    isExpensesFormValid() {
+        //console.log("validateExpenses", this.wo_expenses);
+
+        if (this.wo_expenses != null) {
+            for (var i = 0; i < this.wo_expenses.length; i++) {
+                let tmpExpense = this.wo_expenses[i];
+                if (tmpExpense.isActive) {
+                    if (tmpExpense.expenseTypeId == null) {
+                        return false;
+                    } else {
+                        if (tmpExpense.amount == null || tmpExpense.amount == "") {
+                            return false;
+                        } else {
+                            let amountControl = new FormControl();
+                            amountControl.setValue(tmpExpense.amount);
+                            if (CustomValidators.numberOnly(amountControl) != null) {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    isFilesFormValid() {
+        //console.log("validateFiles", this.existingFiles, this.existingPhotos);
+
+        if (this.existingFiles != null) {
+            for (var i = 0; i < this.existingFiles.length; i++) {
+                if (this.existingFiles[i].isActive && this.existingFiles[i].workOrderFileId == null) {
+                    if (this.existingFiles[i].notes == "") {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        if (this.existingPhotos != null) {
+            for (var i = 0; i < this.existingPhotos.length; i++) {
+                if (this.existingPhotos[i].isActive && this.existingPhotos[i].workOrderPhotoId == null) {
+                    if (this.existingPhotos[i].notes == "") {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 }

@@ -1,7 +1,7 @@
 ﻿import { Component, Input, Output, ChangeDetectorRef, ViewChild, ViewEncapsulation } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
-import { FormGroup, AbstractControl, FormBuilder, Validators, ValidatorFn } from '@angular/forms';
+import { FormGroup, AbstractControl, FormBuilder, Validators, ValidatorFn, FormControl } from '@angular/forms';
 //import { EntityService } from './entity.service';
 import { ModalDirective } from 'ng2-bootstrap';
 import { DatePickerOptions } from 'ng2-datepicker';
@@ -16,6 +16,8 @@ import { ExpenseTypeService } from '../../../expense-type/expense-type.service';
 //import { RoleService } from '../../role/role.service';
 
 import { WorkflowActions, WorkOrderStatuses } from '../../../../global.state';
+
+import { CustomValidators } from '../custom-validators';
 
 @Component({
     selector: 'wo-expenses',
@@ -41,8 +43,6 @@ export class WorkOrderExpensesComponent {
     }
 
     ngOnInit() {
-        this.setFieldPermission();
-
         this._expenseTypeService.getExpenses().subscribe((response) => {
             console.log("expenses response", response.data);
 
@@ -56,10 +56,6 @@ export class WorkOrderExpensesComponent {
         
     }
 
-    private setFieldPermission() {
-
-    }
-
     public addExpenses() {
         if (this.expenses == null) this.expenses = [];
         this.expenses.push({
@@ -70,6 +66,7 @@ export class WorkOrderExpensesComponent {
             referenceNumber: "",
             referenceDate: null,
             isActive: true,
+            touched: false,
             active: []
         });
     }
@@ -101,15 +98,72 @@ export class WorkOrderExpensesComponent {
         return this.expenses.filter(this.filterExpense);
     }
 
-    //public getInitialSelectedExpenseType(expense) {
-    //    console.log("getInitialSelectedExpenseType");
-    //    for (var i = 0; i < this.items_expenses_types.length; i++) {
-    //        if (this.items_expenses_types[i].id == expense.woExpenseTypeId) {
-    //            console.log([{ id: this.items_expenses_types[i].id, text: this.items_expenses_types[i].text }]);
-    //            return [{ id: this.items_expenses_types[i].id, text: this.items_expenses_types[i].text }];
-    //        }
+    markAsTouched(marker, field: string) {
+        console.log("markAsTouched", marker, field);
+        switch (field) {
+            case 'expenseTypeTouched': marker.expenseTypeTouched = true; break;
+            case 'amountTouched': marker.amountTouched = true; break;
+            case 'descTouched': marker.descTouched = true; break;
+            case 'refNumberTouched': marker.refNumberTouched = true; break;
+            case 'refDateTouched': marker.refDateTouched = true; break;
+        }
+    }
+
+    //isAmountValid(expense) {
+    //    let amountControl = new FormControl();
+    //    amountControl.setValue(expense.amount);
+
+    //    let validationResult = CustomValidators.numberOnly(amountControl);
+
+    //    if (validationResult != null) {
+    //        return false;
     //    }
 
-    //    return [];
+    //    return true;
     //}
+
+    hasErrorExpenseType(expense) {
+        if (expense.expenseTypeId == null || expense.expenseTypeId == "") {
+            return { required: true };
+        }
+
+        return {};
+    }
+
+    hasErrorExpenseAmount(expense) {
+        if (expense.amount == null || expense.amount == "") {
+            return { required: true };
+        } else {
+            let amountControl = new FormControl();
+            amountControl.setValue(expense.amount);
+
+            let validationResult = CustomValidators.numberOnly(amountControl);
+            if (validationResult != null) return validationResult;
+            else return {};
+        }
+    }
+
+    hasErrorExpenseDescription(expense) {
+        if (expense.description == null || expense.description.trim() == "") {
+            return { required: true };
+        }
+
+        return {};
+    }
+
+    hasErrorRefNumber(expense) {
+        if (expense.referenceNumber == null || expense.referenceNumber.trim() == "") {
+            return { required: true };
+        }
+
+        return {};
+    }
+
+    hasErrorRefDate(expense) {
+        if (expense.referenceDate == null) {
+            return { required: true };
+        }
+
+        return {};
+    }
 }

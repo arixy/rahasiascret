@@ -288,3 +288,13 @@ body .ui-tabview.ui-tabview-top .ui-tabview-nav li{
 .link:hover{
   color: mediumblue;
 }
+
+input[disabled], textarea[disabled] {
+  border: 1px solid gray;
+  color: gray !important;
+}
+
+.ui-fileupload-choose[disabled]{
+  display: none !important;
+}
+/* End Added by Mike */

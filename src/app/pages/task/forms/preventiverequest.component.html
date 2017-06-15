@@ -1,4 +1,4 @@
-﻿<form [formGroup]="formGroupAdd" onsubmit="return false" class="form-horizontal" id="single-request-form">
+﻿<form [formGroup]="formGroupAdd" onsubmit="return false;" class="form-horizontal" id="single-request-form">
   <p-tabView>
     <!-- General Tab -->
     <p-tabPanel header="General">
@@ -32,7 +32,7 @@
       <!-- Task Name -->
       <div class="form-group row" [ngClass]="{'has-error': (!task_name.valid && task_name.touched), 'has-success': (task_name.valid && task_name.touched)}">
         <label for="inputEmail3" class="control-label">Task</label><br />
-        <input [formControl]="task_name" type="text" class="form-control" id="inputEmail3" placeholder="Task">
+        <input [formControl]="task_name" type="text" class="form-control" id="inputEmail3" [placeholder]="task_name.disabled ? '' : 'Task'">
       </div>
       <div class="row error-row">
         <div class="col-xg-2 line-height-zero">&nbsp;</div>
@@ -49,7 +49,7 @@
       <!-- Task Desc -->
       <div class="form-group row" [ngClass]="{'has-error': (!task_desc.valid && task_desc.touched), 'has-success': (task_desc.valid && task_desc.touched)}">
         <label for="inputEmail3" class="col-xg-2 control-label">Description</label><br />
-        <textarea [formControl]="task_desc" class="form-control" id="inputEmail3" placeholder="Description" pInputTextArea></textarea>
+        <textarea [formControl]="task_desc" class="form-control" id="inputEmail3" [placeholder]="task_desc.disabled ? '' : 'Description'" pInputTextArea></textarea>
       </div>
       <div class="row error-row">
         <div class="col-xg-2 line-height-zero">&nbsp;</div>
@@ -117,6 +117,7 @@
                      [disabled]="disabled || selected_location.disabled"
                      (removed)="removeSelectBoxValue('selected_location', $event)"
                      (selected)="selectedSelectBoxValue('selected_location', $event)"
+                     (mousedown)="touchSelectBox('selected_location', $event)"
                      placeholder="No Location selected">
           </ng-select>
         </div>
@@ -124,21 +125,21 @@
       </div>
       <div class="row error-row">
         <div class="col-xg-2 line-height-zero">&nbsp;</div>
-        <div class="error-message col-xg-10" *ngIf="error_msg.location != null">
-          {{error_msg.location}}
+        <div class="error-message col-xg-10" *ngIf="formGroupAdd.get('selected_location').hasError('required') && formGroupAdd.get('selected_location').touched">
+          Location is required
         </div>
       </div>
 
       <!-- Location Info -->
       <div class="form-group row">
         <label for="inputEmail3" class="col-xg-2 control-label">Location Info</label><br />
-        <textarea [formControl]="location_info" class="form-control" id="inputEmail3" placeholder="Location Info" pInputTextArea></textarea>
+        <textarea [formControl]="location_info" class="form-control" id="inputEmail3" [placeholder]="location_info.disabled ? '' : 'Location Info'" pInputTextArea></textarea>
       </div>
 
       <!-- Contact Person -->
       <div class="form-group row" [ngClass]="{'has-error': (!contact_person.valid && contact_person.touched), 'has-success': (contact_person.valid && contact_person.touched)}">
         <label for="inputEmail3" class="control-label">Contact Person</label><br />
-        <input [formControl]="contact_person" type="text" class="form-control" id="inputEmail3" placeholder="Contact Person">
+        <input [formControl]="contact_person" type="text" class="form-control" id="inputEmail3" [placeholder]="contact_person.disabled ? '' : 'Contact Person'">
       </div>
       <div class="row error-row">
         <div class="col-xg-2 line-height-zero">&nbsp;</div>
@@ -155,7 +156,7 @@
       <!-- Contact Person Number -->
       <div class="form-group row" [ngClass]="{'has-error': (!contact_number.valid && contact_number.touched), 'has-success': (contact_number.valid && contact_number.touched)}">
         <label for="inputEmail3" class="control-label">Contact Number</label><br />
-        <input [formControl]="contact_number" type="text" class="form-control" id="inputEmail3" placeholder="Contact Number">
+        <input [formControl]="contact_number" type="text" class="form-control" id="inputEmail3" [placeholder]="contact_number.disabled ? '' : 'Contact Number'">
       </div>
       <div class="row error-row">
         <div class="col-xg-2 line-height-zero">&nbsp;</div>
@@ -166,6 +167,10 @@
         <div class="error-message col-xg-10"
              *ngIf="formGroupAdd.get('contact_number').hasError('minlength') && formGroupAdd.get('contact_number').touched">
           Minimum of 2 characters
+        </div>
+        <div class="error-message col-xg-10"
+             *ngIf="formGroupAdd.get('contact_number').hasError('nonnumber') && formGroupAdd.get('contact_number').touched">
+          Contact Number must be number only
         </div>
       </div>
 
@@ -185,19 +190,20 @@
       </div>
       <div class="row error-row">
         <div class="col-xg-2 line-height-zero">&nbsp;</div>
-        <div class="error-message col-xg-10" *ngIf="error_msg.asset != null">
-          {{error_msg.asset}}
+        <div class="error-message col-xg-10" 
+             *ngIf="formGroupAdd.get('selected_asset').hasError('required') && formGroupAdd.get('selected_asset').touched">
+          Asset is required
         </div>
       </div>
 
       <!-- Assignee -->
-      <div class="form-group row">
+      <div class="form-group row" *ngIf="!isSchedule">
         <label for="selected_location" class="control-label">Assignee</label>
 
         <div class="col-xg-10">
           <ng-select #addAssigneeSelectBox
                      [items]="items_assignees"
-                     [disabled]="disabled || selected_assignee.disabled"
+                     [disabled]="selected_assignee.disabled"
                      (removed)="removeSelectBoxValue('selected_assignee', $event)"
                      (selected)="selectedSelectBoxValue('selected_assignee', $event)"
                      placeholder="No Assignee selected">
@@ -246,7 +252,7 @@
       <!-- Solution -->
       <div class="form-group row" *ngIf="!isSchedule">
         <label for="solution" class="col-xg-2 control-label">Solution</label><br />
-        <textarea [formControl]="solution" class="form-control" id="solution" placeholder="Solution" pInputTextArea></textarea>
+        <textarea [formControl]="solution" class="form-control" id="solution" [placeholder]="solution.disabled ? '' : 'Solution'" pInputTextArea></textarea>
       </div>
 
       <!-- Vendor -->
@@ -277,47 +283,59 @@
                      [disabled]="disabled"
                      (removed)="removeSelectBoxValue('selected_repeat', $event)"
                      (selected)="selectedSelectBoxValue('selected_repeat', $event)"
+                     (mousedown)="touchSelectBox('selected_repeat', $event)"
                      placeholder="No Repeat selected">
           </ng-select>
         </div>
-        <div class="row error-row">
-          <div class="col-xg-2 line-height-zero">&nbsp;</div>
-          <div class="error-message col-xg-10" *ngIf="error_msg.repeat != null">
-            {{error_msg.repeat}}
-          </div>
-        </div>
-      </div>
-
-      <!-- Repeat Every -->
-      <div class="form-group row" [ngClass]="{'has-error': (!repeat_every.valid && repeat_every.touched), 'has-success': (repeat_every.valid && repeat_every.touched)}" *ngIf="selected_repeat.value != null && selected_repeat.value.id == 6">
-        <label for="inputEmail3" class="control-label">Every</label><br />
-        <input [formControl]="repeat_every" type="text" class="form-control" id="inputEmail3" placeholder="">
       </div>
       <div class="row error-row">
         <div class="col-xg-2 line-height-zero">&nbsp;</div>
         <div class="error-message col-xg-10"
-             *ngIf="formGroupAdd.get('repeat_every').hasError('required') && formGroupAdd.get('repeat_every').touched">
-          Every is required
+             *ngIf="formGroupAdd.get('selected_repeat').hasError('required') && formGroupAdd.get('selected_repeat').touched">
+          Repeat is required
+        </div>
+      </div>
+
+      <!-- Repeat Every -->
+      <div [ngStyle]="{'display': (selected_repeat.value != null && selected_repeat.value.id == 6) ? 'block' : 'none' }">
+        <div class="form-group row" [ngClass]="{'has-error': (!repeat_every.valid && repeat_every.touched), 'has-success': (repeat_every.valid && repeat_every.touched)}">
+          <label for="inputEmail3" class="control-label">Every</label><br />
+          <input [formControl]="repeat_every" type="text" class="form-control" id="inputEmail3" placeholder="">
+        </div>
+        <div class="row error-row">
+          <div class="col-xg-2 line-height-zero">&nbsp;</div>
+          <div class="error-message col-xg-10"
+               *ngIf="formGroupAdd.get('repeat_every').hasError('required') && formGroupAdd.get('repeat_every').touched">
+            Every is required
+          </div>
+          <div class="error-message col-xg-10"
+               *ngIf="formGroupAdd.get('repeat_every').hasError('nonnumber') && formGroupAdd.get('repeat_every').touched">
+            Every must be number only
+          </div>
         </div>
       </div>
 
       <!-- Repeat Every Period -->
-      <div class="form-group row" *ngIf="selected_repeat.value != null && selected_repeat.value.id == 6">
-        <label for="selected_repeat" class="col-xg-2 control-label">Every Period</label>
+      <div [ngStyle]="{'display': (selected_repeat.value != null && selected_repeat.value.id == 6) ? 'block' : 'none' }">
+        <div class="form-group row">
+          <label for="selected_repeat" class="col-xg-2 control-label">Every Period</label>
 
-        <div class="col-xg-10">
-          <ng-select #addRepeatPeriodSelectBox
-                     [items]="items_period_duration"
-                     [disabled]="disabled"
-                     (removed)="removeSelectBoxValue('selected_every_period', $event)"
-                     (selected)="selectedSelectBoxValue('selected_every_period', $event)"
-                     placeholder="No Period selected">
-          </ng-select>
+          <div class="col-xg-10">
+            <ng-select #addRepeatPeriodSelectBox
+                       [items]="items_period_duration"
+                       [disabled]="disabled"
+                       (removed)="removeSelectBoxValue('selected_every_period', $event)"
+                       (selected)="selectedSelectBoxValue('selected_every_period', $event)"
+                       (mousedown)="touchSelectBox('selected_every_period', $event)"
+                       placeholder="No Period selected">
+            </ng-select>
+          </div>
         </div>
         <div class="row error-row">
           <div class="col-xg-2 line-height-zero">&nbsp;</div>
-          <div class="error-message col-xg-10" *ngIf="error_msg.repeat != null">
-            {{error_msg.repeat}}
+          <div class="error-message col-xg-10"
+               *ngIf="formGroupAdd.get('selected_every_period').hasError('required') && formGroupAdd.get('selected_every_period').touched">
+            Repeat Period is required
           </div>
         </div>
       </div>
@@ -349,6 +367,10 @@
         <div class="error-message col-xg-10"
              *ngIf="formGroupAdd.get('due_after').hasError('required') && formGroupAdd.get('due_after').touched">
           Due After is required
+        </div>
+        <div class="error-message col-xg-10"
+             *ngIf="formGroupAdd.get('due_after').hasError('nonnumber') && formGroupAdd.get('due_after').touched">
+          Due After must be number only
         </div>
       </div>
 
@@ -393,7 +415,7 @@
       &nbsp;
     </div>
     <div class="col-sm-3" *ngIf="actionType != null && actionType.workflowActionId != -2">
-      <button [disabled]="!formGroupAdd.valid" type="submit" class="btn btn-default btn-save" (click)="onSubmit(formGroupAdd.value)">Save</button>
+      <button [disabled]="!formGroupAdd.valid || !isFilesFormValid() || !isExpensesFormValid()" type="button" class="btn btn-default btn-save" (click)="onSubmit(formGroupAdd.value)">Save</button>
     </div>
   </div>
 </form>

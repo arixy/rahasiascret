@@ -63,6 +63,32 @@ export class MaintenanceService{
     
     return Observable.of(this.maintenance_data);
   }
+  getScheduledWOs(filters: any): Observable<any> {
+      var headers = new Headers();
+        headers.append('Content-Type', 'application/json');
+        var bearer = "Bearer " + localStorage.getItem('bearer_token');
+
+        headers.append('Authorization', bearer);
+        headers.append('Access-Control-Allow-Origin', '*');
+        headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
+
+        var options = new RequestOptions({headers: headers});
+        var load_url = this.appUrl + '/work-order/all-with-schedule';
+        
+        if(filters == null){
+            filters= {
+                "filters": {
+                }, 
+                "first": 0, 
+                "multiSortMeta": "undefined", 
+                "rows": 10, 
+                "sortField": "taskName", 
+                "sortOrder": -1
+            };
+        }
+
+        return this.http.post(load_url, filters, options).map(this.extractData);
+  }
 
   private extractData(res: Response){
     let body = res.json();

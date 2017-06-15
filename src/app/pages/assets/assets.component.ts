@@ -105,6 +105,7 @@ export class Assets {
   public locations$: Observable<any>;
   public form;
   public name;
+  public asset_number;
   public description;
   public photo;
   public add_photo_file : FileList = null;
@@ -144,6 +145,7 @@ export class Assets {
   @ViewChild('editChildModal') editChildModal: ModalDirective;
   @ViewChild('addSelectBox') addSelectBox: SelectComponent;
   @ViewChild('viewHistoryModal') viewHistoryModal: ModalDirective;
+  @ViewChild('viewAssetModal') viewAssetModal: ModalDirective;
   @ViewChild(TreeComponent)
   private assets_tree: TreeComponent;
 
@@ -156,6 +158,7 @@ export class Assets {
       this.assets = null;
         this.form = fb.group({
           'name': ['', Validators.compose([Validators.required, Validators.minLength(2)])],
+          'asset_number': ['', Validators.compose([Validators.required])],
           'description': ['', Validators.compose([Validators.required, Validators.minLength(2)])],
             'photo': [''],
             'specification': ['', Validators.compose([Validators.required, Validators.minLength(2)])]
@@ -165,6 +168,7 @@ export class Assets {
       this.description = this.form.controls['description'];
       this.photo = this.form.controls['photo'];
       this.specification = this.form.controls['specification'];
+      this.asset_number = this.form.controls['asset_number'];
       
       this.editForm = fb.group({
             'edit_name': ['', Validators.compose([Validators.required, Validators.minLength(2)])],
@@ -356,6 +360,10 @@ export class Assets {
     }
     public hideViewHistoryModal(){
         this.viewHistoryModal.hide();
+    }
+    public viewAsset(node){
+        this.asset_pointer = node;
+        this.viewAssetModal.show();
     }
     public editAsset(event){
         console.log('Editing:', event);
