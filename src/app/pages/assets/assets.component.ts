@@ -4,7 +4,7 @@ import { LocationService } from '../../services/location.service';
 import { WorkOrderService } from '../../services/work-order.service';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
-import { FormGroup, AbstractControl, FormBuilder, Validators} from '@angular/forms';
+import { FormGroup, FormControl, AbstractControl, FormBuilder, Validators} from '@angular/forms';
 import { LocalDataSource } from 'ng2-smart-table';
 import { ModalDirective } from 'ng2-bootstrap';
 import { TreeComponent } from 'angular2-tree-component';
@@ -129,8 +129,22 @@ export class Assets {
   public treeAssets;
   public treeAssetsWithData = null;
   public asset_edit;
-  public filterAssetName = null;
-  public filterAssetCode = null;
+
+  // Form Control
+  public filterAssetName = new FormControl();
+  public filterAssetCode = new FormControl();
+  public filter_master = {
+      name: {
+          matchMode: undefined,
+          value: ''
+      },
+      assetNumber: {
+          matchMode: undefined,
+          value: ''
+      }
+  };
+
+
   public wo_by_asset = null;
   public asset_pointer = null;
 
@@ -258,6 +272,64 @@ export class Assets {
       );
       
         
+        // Filter Form Control
+        this.filterAssetName.valueChanges.debounceTime(800).subscribe(
+            (filter_text) => {
+                console.log('Filter Text', filter_text);
+                this.filter_master.name = {
+                    matchMode: undefined,
+                    value: filter_text
+                }
+                this.refresh(this.filter_master);
+            }
+        );
+        
+        this.filterAssetCode.valueChanges.debounceTime(800).subscribe(
+            (filter_text) => {
+                console.log('Filter Text', filter_text);
+                this.filter_master.assetNumber = {
+                    matchMode: undefined,
+                    value: filter_text
+                }
+                this.refresh(this.filter_master);
+            }
+        );
+        
+    }
+    
+    public refresh(filter_master){
+        var formatted_object = {
+            filters : filter_master,
+            first: 0,
+            rows: 9999,
+            globalFilter: '',
+            multiSortMeta: null,
+            sortField: 'dateUpdated',
+            sortOrder: -1
+        }
+        
+        this.assetService.getAssetsFilter(formatted_object).subscribe(
+            (data) => {
+                this.assets = data.data;
+
+                var assets_with_data = this.assets.map(
+                    (asset) => {
+                        return Object.assign({}, {
+                           data: asset 
+                        });
+                    }
+                );
+                console.log('Asset with Data', assets_with_data);
+                this.treeAssetsWithData = convertToTreeData(assets_with_data);
+                console.log('Tree Asset with Data', this.treeAssetsWithData);
+
+                var temp_assets = JSON.parse(JSON.stringify(this.assets));
+                this.treeAssets = convertToTree(temp_assets);
+
+                this.treeAssets = transformAssetIdToId(this.treeAssets);
+                console.log('Assets Tree', this.treeAssets);
+            }
+        );
     }
 
     public selectedWO(value: any){
@@ -290,6 +362,7 @@ export class Assets {
             var formatted_object = Object.assign({}, {
                id: values.id,
                 name: values.name,
+                asset_number: values.asset_number,
                 description: values.description,
                 photo: values.photo,
                 specification: values.specification,
@@ -366,55 +439,84 @@ export class Assets {
         this.viewAssetModal.show();
     }
     public editAsset(event){
-        console.log('Editing:', event);
+        console.log('Editing Asset:', event);
         this.asset_edit = event;
         
         // Inject Initial Value to the Edit Form
-        this.editForm.patchValue({ edit_name: event.name });
-        this.editForm.patchValue({ edit_description: event.description });
-        this.editForm.patchValue({ edit_photo: event.photo });
-        this.editForm.patchValue({ edit_specification: event.specification});
-        
-        if(event.parent_asset_id != null){
-            if (this.editSelectBox) {
-              let asset_found = this.assetService.get(event.parent_asset_id);
-            console.log('Got Here Bro');  
-            this.asset_edit.selected_asset = {
-                    id: event.parent_asset_id,
-                    text: asset_found.name
-              };
-                
-              // Only Done because bug in ng2-select
-              this.editSelectBox.active = [this.asset_edit.selected_asset];
-              this.editSelectBox.ngOnInit();
+        this.editForm.patchValue(
+            {
+                edit_name: event.data.name,
+                edit_description: event.data.description,
+                edit_photo: event.data.photo,
+                edit_specification: event.data.specification
             }
+        );
+        
+        if(event.data.parentAssetId){
+            if (this.editSelectBox) {
+              let assets_data = this.assets;
+                console.log('Assets pas Editing', this.assets);
+              let asset_found = assets_data.filter(
+                (assets_object) => {
+                    return assets_object.assetId == event.data.parentAssetId;
+                }
+              );
+            console.log('Asset Found', asset_found);
+            if(asset_found.length > 0){
+                this.asset_edit.selected_asset = {
+                    id: event.parent_asset_id,
+                    text: asset_found[0].name
+                };
+
+                  // Only Done because bug in ng2-select
+                  this.editSelectBox.active = [this.asset_edit.selected_asset];
+                  this.editSelectBox.ngOnInit();
+                }    
+            }     
+            
         }
         console.log('Pass Parent');
-        if(event.wocategory_id != null){
+        if(event.data.woCategoryId != null){
             if (this.editWOSelectBox) {
-              let wocategory_found = this.woService.get(event.wocategory_id);
-              this.asset_edit.selected_wocategory = {
-                    id: event.wocategory_id,
-                    text: wocategory_found.name
-              };
                 
-              // Only Done because bug in ng2-select
-              this.editWOSelectBox.active = [this.asset_edit.selected_wocategory];
-              this.editWOSelectBox.ngOnInit();
+                console.log('Items WO Cat', this.items_wocategory);
+              let wocategory_found = this.items_wocategory.filter(
+                (wo_category_object) => {
+                    return wo_category_object.id == event.data.woCategoryId;
+                }
+              );
+                console.log('WOCategory Found', wocategory_found);  
+                if(wocategory_found.length > 0){
+                    this.asset_edit.selected_wocategory = {
+                        id: event.wocategory_id,
+                        text: wocategory_found[0].text
+                    };
+                
+                    // Only Done because bug in ng2-select
+                    this.editWOSelectBox.active = [this.asset_edit.selected_wocategory];
+                    this.editWOSelectBox.ngOnInit();
+                }  
             }
         }
         console.log('Pass WOCategory');
-        if(event.location_id != null){
+        if(event.data.locationId != null){
             if (this.editLocationSelectBox) {
-              let location_found = this.locationService.get(event.location_id);
-              this.asset_edit.selected_location = {
-                    id: event.location_id,
-                    text: location_found.name
-              };
-                
-              // Only Done because bug in ng2-select
-              this.editLocationSelectBox.active = [this.asset_edit.selected_location];
-              this.editLocationSelectBox.ngOnInit();
+              let location_found = this.items_location.filter(
+                    (location_object) => {
+                        return location_object.id == event.data.locationId;
+                    }
+              );
+              if(location_found.length > 0){
+                    this.asset_edit.selected_location = {
+                        id: event.location_id,
+                        text: location_found.name
+                  };
+
+                  // Only Done because bug in ng2-select
+                  this.editLocationSelectBox.active = [this.asset_edit.selected_location];
+                  this.editLocationSelectBox.ngOnInit();    
+              }
+              
             }
         }
         console.log('Location Edit Initial Select:', this.asset_edit.selected_location);

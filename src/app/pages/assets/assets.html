@@ -117,7 +117,7 @@
                 <p-column [style]="{'width':'200px'}" [sortable]="true" field="size">
                    <template pTemplate="header">
                        Asset Code
-                       <input class="ui-column-filter" type="text" [ngModel]="filterAssetCode" (ngModelChange)="changeFilterCode($event)" />
+                       <input class="ui-column-filter" type="text" [formControl]="filterAssetCode" />
                    </template>
                     <template let-node="rowData" pTemplate="body">
                         {{node.data.assetNumber}}
@@ -126,7 +126,7 @@
                 <p-column field="name" [filter]="true">
                    <template pTemplate="header">
                        Asset Name
-                       <input class="ui-column-filter" type="text" [ngModel]="filterAssetName" (ngModelChange)="changeFilterName($event)" />
+                       <input class="ui-column-filter" type="text" [formControl]="filterAssetName" />
                    </template>
                     <template let-node="rowData" pTemplate="body">
                         {{node.data.name}}
@@ -135,7 +135,7 @@
                 <p-column field="name" [filter]="true">
                    <template pTemplate="header">
                        Location
-                       <input class="ui-column-filter" type="text" [ngModel]="filterAssetName" (ngModelChange)="changeFilterName($event)" />
+                       <input class="ui-column-filter" type="text" />
                    </template>
                     <template let-node="rowData" pTemplate="body">
                         {{node.data.locationId}}
@@ -144,7 +144,6 @@
                 <p-column styleClass="top-aligned-table" field="name" [filter]="true">
                    <template pTemplate="header">
                        Date Updated
-                       <input class="ui-column-filter" type="text" [ngModel]="filterAssetName" (ngModelChange)="changeFilterName($event)" />
                    </template>
                     <template let-node="rowData" pTemplate="body">
                         {{node.data.dateUpdated | date: 'shortDate'}}
@@ -304,16 +303,28 @@
       <div class="modal-body">
         <div>
             <ba-card title="" baCardClass="with-scroll custom-card">
-                <div class="form-group row" [ngClass]="{'has-error': (!name.valid && name.touched), 'has-success': (name.valid && name.touched)}">
+                <div class="form-group row">
                         <div class="col-sm-12">
-                            <label>Name</label>
+                            <label>Name</label> <br />
                             {{asset_pointer.data.name}}
                         </div>
                       </div>
-                      <div class="form-group row" [ngClass]="{'has-error': (!name.valid && name.touched), 'has-success': (name.valid && name.touched)}">
+                      <div class="form-group row">
                         <div class="col-sm-12">
-                            <label>Asset Code</label>
+                            <label>Asset Code</label> <br />
                             {{asset_pointer.data.assetNumber}}
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <div class="col-sm-12">
+                            <label>Location</label> <br />
+                            {{asset_pointer.data.locationId}}
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <div class="col-sm-12">
+                            <label>Last Updated</label> <br />
+                            {{asset_pointer.data.dateUpdated}}
                         </div>
                       </div>
             </ba-card>

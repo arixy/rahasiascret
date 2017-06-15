@@ -103,6 +103,36 @@ export class AssetService{
   getAssetsNormal(){
       return this.asset_data;
   }
+
+    getAssetsFilter(filter_data){
+        
+        var headers = new Headers();
+        headers.append('Content-Type', 'application/json');
+        var bearer = "Bearer " + localStorage.getItem('bearer_token');
+
+        headers.append('Authorization', bearer);
+        headers.append('Access-Control-Allow-Origin', '*');
+        headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
+
+        var options = new RequestOptions({headers: headers});
+        var load_url = this.appUrl + '/asset/all';
+        
+        let formatted_object = {
+                filters: {},
+                first: 0,
+                rows: 9999,
+                globalFilter: '',
+                multiSortMeta: null,
+                sortField: 'dateUpdated',
+                sortOrder: -1
+        };
+        if(filter_data){
+           formatted_object = filter_data; 
+        }
+        
+        return this.http.post(load_url, formatted_object, options).map(this.extractData);
+    }
+
     getAssetsFake(): Observable<any>{
       return Observable.of(this.asset_data);
     }
@@ -150,7 +180,7 @@ export class AssetService{
         var formatted_object = {
             asset: {
                 name: asset.name,
-                assetNumber: "YOS1002",
+                assetNumber: asset.asset_number,
                 description: asset.description,
                 specification: asset.specification,
                 relatedVendorId: 1,
@@ -177,29 +207,25 @@ export class AssetService{
     }
     
     updateAsset(updated_asset){
-      this.asset_data = this.asset_data.map(
-        (asset) => {
-            if(asset.id == updated_asset.id){
-                console.log('Matching', asset.id);
-                console.log('Updated Location', updated_asset);
-                let updated_object = Object.assign({}, {
-                    id: updated_asset.id,
-                    name: updated_asset.name,
-                    description: updated_asset.description,
-                    photo: updated_asset.photo,
-                    specification: updated_asset.specification,
-                    parent_asset_id: updated_asset.parent_asset_id,
-                    location_id: updated_asset.location_id,
-                    wocategory_id: updated_asset.wocategory_id
-                });
-                console.log('Updated Object', updated_object);
-                return updated_object;
-            }
-            return asset;
-        }
-      );
-      console.log('Latest', this.asset_data);
-      return true;
+        
+        console.log('Update Asset in Service', updated_asset);
+        var update_url = this.appUrl + '/asset/update';
+        var formatted_object = {
+            asset: {
+                assetId: updated_asset.id,
+                assetNumber: 'TES',
+                name: updated_asset.name,
+                description: updated_asset.description,
+                specification: updated_asset.specification,
+                relatedVendorId: 1,
+                parentAssetId: updated_asset.parent_asset_id,
+                locationId: updated_asset.location_id,
+                woCategoryId: updated_asset.wocategory_id,
+                isActive: true
+            },
+            assetPhotos:[],
+            deletedPhotosId:[]
+        };
     }
     deleteAsset(asset_id): boolean {
         return false;

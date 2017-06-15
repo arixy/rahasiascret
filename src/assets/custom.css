@@ -267,6 +267,17 @@ body .ui-tabview.ui-tabview-top .ui-tabview-nav li{
     float: none !important;
 }
 
+.auth-block {
+    width: 540px;
+    margin: 0 auto;
+    border-radius: 5px;
+    background: #fff !important;
+    color: #00abff !important;
+    padding: 32px;
+}
+.auth-block .btn {
+    background: #00abff !important;
+}
 /* Added by Mike */
 .ui-fileupload-buttonbar button:not(.ui-fileupload-choose) {
   display: none !important;

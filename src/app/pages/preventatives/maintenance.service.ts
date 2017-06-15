@@ -43,7 +43,7 @@ export class MaintenanceService{
         headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
 
         var options = new RequestOptions({headers: headers});
-        var load_url = this.appUrl + '/work-order/all-my-task';
+        var load_url = this.appUrl + '/work-order/all';
         
         if(filters == null){
             filters= {
@@ -52,7 +52,7 @@ export class MaintenanceService{
                 "first": 0, 
                 "multiSortMeta": "undefined", 
                 "rows": 10, 
-                "sortField": "description", 
+                "sortField": "taskName", 
                 "sortOrder": -1
             };
         }

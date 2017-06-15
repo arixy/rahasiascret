@@ -271,139 +271,27 @@
 </div>
 <!-- control modal from parent component -->
 <div bsModal #addNewModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button class="close" aria-label="Close" (click)="hideChildModal()">
-          <span aria-hidden="true">&times;</span>
-        </button>
-        <h4 class="modal-title">ADD NEW WO</h4>
-      </div>
-      <div class="modal-body">
-        <div>
-            <ba-card title="" baCardClass="with-scroll">
-              <form [formGroup]="form" (ngSubmit)="onSubmit(form.value)" class="form-horizontal">
-                  <div class="form-group row" [ngClass]="{'has-error': (!wo_number.valid && wo_number.touched), 'has-success': (wo_number.valid && wo_number.touched)}">
-                    <label for="inputEmail3" class="col-sm-2 control-label">WO Number</label>
-
-                    <div class="col-sm-10">
-                      <input [formControl]="wo_number" type="text" value="{{ initial_wo_number }}" class="form-control" id="inputEmail3" placeholder="Name">
-                    </div>
-                  </div>
-                  <div class="form-group row" [ngClass]="{'has-error': (!task.valid && task.touched), 'has-success': (task.valid && task.touched)}">
-                    <label for="inputEmail3" class="col-sm-2 control-label">Task</label>
-
-                    <div class="col-sm-10">
-                      <input [formControl]="task" type="text" class="form-control" id="inputEmail3" placeholder="Name">
-                    </div>
-                  </div>
-                  <div class="form-group row" [ngClass]="{'has-error': (!description.valid && description.touched), 'has-success': (description.valid && description.touched)}">
-                    <label for="inputPassword3" class="col-sm-2 control-label">Description</label>
-
-                    <div class="col-sm-10">
-                      <input [formControl]="description" type="text" class="form-control" id="inputPassword3" placeholder="Description">
-                    </div>
-                  </div>
-                  <div class="form-group row select-container">
-                     <div class="col-sm-12">
-                         <label for="selectlocation" class="control-label">WO Category</label>
-                          <ng-select [allowClear]="true"
-                                      [items]="items_wocategory"
-                                      [disabled]="disabled"
-                                      (selected)="selectedWOCategory($event)"
-                                      placeholder="No WO Category selected">
-                          </ng-select>
-                      </div>
-                  </div>
-                  <div class="form-group row select-container">
-                     <div class="col-sm-6">
-                         <label for="selectlocation" class="control-label">Location</label>
-                          <ng-select [allowClear]="true"
-                                      [items]="items_location"
-                                      [disabled]="disabled"
-                                      (selected)="selectLocation($event)"
-                                      placeholder="No Location selected">
-                          </ng-select>
-                      </div>
-                      <div class="col-sm-6">
-                         <label for="selectlocation" class="control-label">Asset</label>
-                          <ng-select [allowClear]="true"
-                                      [items]="items_asset"
-                                      [disabled]="disabled"
-                                      (selected)="selectedAsset($event)"
-                                      placeholder="No Asset selected">
-                          </ng-select>
-                      </div>
-                  </div>
-                  <div class="form-group row select-container">
-                   <div class="col-sm-4">
-                     <label for="inputPassword3" class="control-label">Due After</label>
-                      <input [formControl]="due_after" type="text" class="form-control" id="inputPassword3" placeholder="Description">
-                    </div>
-                    <div class="col-sm-4">
-                      <label for="selectlocation" class="control-label">Due Period</label>
-                          <ng-select [allowClear]="true"
-                                      [items]="items_period"
-                                      (selected)="selectedDuePeriod($event)"
-                                      placeholder="No Period selected">
-                          </ng-select>
-                    </div>
-                    <div class="col-sm-4">
-                      <label for="selectlocation" class="control-label">Priority</label>
-                          <ng-select [allowClear]="true"
-                                      [items]="items_priority"
-                                      (selected)="selectPriority($event)"
-                                      placeholder="No Priority selected">
-                          </ng-select>
-                    </div>
-                  </div>
-                  <!-- <div class="form-group row">
-                    <label for="inputPassword3" class="col-sm-2 control-label">Priority</label>
-                  
-                    <div class="col-sm-10">
-                      <input [formControl]="priority" type="text" class="form-control" id="inputPassword3" placeholder="Description">
-                    </div>
-                  </div> -->
-                  <div class="form-group row">
-                    <label for="inputPassword3" class="col-sm-2 control-label">Start Date</label>
-
-                    <div class="col-sm-10">
-                      <ng2-datepicker [options]="options" [(ngModel)]="date" (outputEvents)="startDate($event)" [ngModelOptions]="{standalone: true}"></ng2-datepicker>
-                    </div>
-                  </div>
-                  <div class="form-group row select-container">
-                     <div class="col-sm-4">
-                         <label for="selectlocation" class="control-label">Repeat</label>
-                          <ng-select [allowClear]="true"
-                                      [items]="items_repeat"
-                                      (selected)="selectedRepeat($event)"
-                                      placeholder="No Repeat selected">
-                          </ng-select>
-                      </div>
-                      <div *ngIf="repeat_every" class="col-sm-2">
-                         <label for="inputPassword3" class="control-label">Every</label>
-                          <input [formControl]="every" type="text" class="form-control">
-                      </div>
-                      <div *ngIf="repeat_every" class="col-sm-4">
-                         <label for="selectlocation" class="control-label">Period</label>
-                          <ng-select [allowClear]="true"
-                                      [items]="items_period"
-                                      (selected)="selectedPeriod($event)"
-                                      placeholder="No Period selected">
-                          </ng-select>
-                      </div>
-                  </div>
-                  <div class="form-group row">
-                    <div class="col-sm-12">
-                      <button [disabled]="!form.valid" type="submit" class="btn btn-default btn-auth">Submit</button>
-                    </div>
-                  </div>
-                </form>
-            </ba-card>
-          </div>
-      </div>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close" aria-label="Close" (click)="hideChildModal(addNewModal)">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">{{modalTitle}}</h4>
+                <div *ngIf="error_from_server" class="error-from-server">
+                    <i class="fa fa-exclamation-circle"></i> {{error_from_server}}
+                </div>
+            </div>
+            
+            <div class="modal-body">
+                <div>
+                    <ba-card title="" baCardClass="with-scroll">
+                        <template #dynamicModalBody></template>
+                    </ba-card>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 
 <div bsModal #editModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
