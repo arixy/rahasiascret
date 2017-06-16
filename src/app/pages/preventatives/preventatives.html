@@ -129,7 +129,7 @@
                 <p-column field="taskName" [style]="{'width':'120px'}" header="Task" [sortable]="true" [filter]="true" filterPlaceholder="Search"></p-column>
                 <p-column field="assetName" [style]="{'width':'110px'}" header="Asset" [sortable]="true" [filter]="true"></p-column>
                 <p-column field="locationName" header="Location" [sortable]="true" [style]="{'width':'120px'}" [filter]="true" filterPlaceholder="Search"></p-column>
-                <p-column field="start" header="Start" [sortable]="true" styleClass="top-aligned-table"></p-column>
+                <p-column field="start" [style]="{'width':'110px'}" header="Start" [sortable]="true" styleClass="top-aligned-table"></p-column>
                  <p-column [filter]="true" [style]="{'width':'110px'}" field="dueDate" header="Due" [sortable]="true">
                    <template pTemplate="body" let-update="rowData">
                      {{update.dueDate | date: 'shortDate'}}

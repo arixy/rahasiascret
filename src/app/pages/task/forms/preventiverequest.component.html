@@ -226,7 +226,7 @@
           <p-calendar [formControl]="selected_startdate" [showIcon]="true" dateFormat="yy-mm-dd" [yearNavigator]="true" [yearRange]="'2017:2222'" [showTime]="true"></p-calendar>
         </div>
       </div>
-      <div class="row error-row">
+      <div class="row error-row" *ngIf="!isSchedule">
         <div class="col-xg-2 line-height-zero">&nbsp;</div>
         <div class="error-message col-xg-10" *ngIf="formGroupAdd.get('selected_startdate').hasError('required') && formGroupAdd.get('selected_startdate').touched">
           Start date is Required

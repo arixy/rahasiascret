@@ -356,6 +356,7 @@ export class RecurringRequestComponent {
                     this.items_period_duration = [];
                     for (var i = 0; i < tmpLstDurations.length; i++) {
                         var currentItem = { id: tmpLstDurations[i].periodDurationId, text: tmpLstDurations[i].name };
+                        console.log("Recurring Period duration", currentItem);
                         this.items_period_duration.push(currentItem);
 
                         // repeat every period
@@ -618,8 +619,8 @@ export class RecurringRequestComponent {
                     startDate: this.selected_startdate.value,
                     startTime: this.selected_startdate.value,
                     repeatOptionId: this.selected_repeat.value == null ? null : this.selected_repeat.value.id,
-                    every: this.selected_repeat.value != 6 ? null : this.repeat_every.value,
-                    everyPeriodId: this.selected_repeat.value != 6 ? null : this.selected_every_period.value.id,
+                    every: this.selected_repeat.value.id != 6 ? null : this.repeat_every.value,
+                    everyPeriodId: this.selected_repeat.value.id != 6 ? null : this.selected_every_period.value.id,
                     dueAfter: this.due_after.value,
                     duePeriodId: this.selected_due_period.value.id,
                     // TODO: need to change to UTC+0 first
