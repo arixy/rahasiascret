@@ -105,7 +105,7 @@ export class BaPageTop {
     }
   public logout(){
       this.authService.postLogout();
-      let redirect = this.authService.redirectUrl ? this.authService.redirectUrl : '/login';
+      let redirect = '/login';
         console.log('Redirect URL:', redirect);
         //alert('Wait!');
         this.router.navigate([redirect]);
