@@ -44,8 +44,8 @@ export const routes: Routes = [
       { path: 'ui', loadChildren: 'app/pages/ui/ui.module#UiModule' },
       { path: 'forms', loadChildren: 'app/pages/forms/forms.module#FormsModule' },
       { path: 'tables', loadChildren: 'app/pages/tables/tables.module#TablesModule' },
-      { path: 'maps', loadChildren: 'app/pages/maps/maps.module#MapsModule' },
       { path: 'setups', loadChildren: 'app/pages/setups/forms.module#FormsModule' },
+      { path: 'transactions/workorders/:request_type', component: Preventatives, pathMatch: 'prefix' },
       { path: 'preventatives', component: Preventatives },
       { path: 'assets', component: Assets},
       { path: 'reports', component: Reports },
@@ -62,7 +62,9 @@ export const routes: Routes = [
       { path: 'utility-consumptions', component: UtilityConsumptions },
       { path: 'tasks', component: TaskComponent },
       { path: 'schedules', component: ScheduleComponent },
-      { path: 'transactions/workorders', component: Preventatives },
+      { path: 'transactions/workorders', 
+        component: Preventatives
+      },
       { path: 'transactions/consumptions', component: UtilityConsumptions }
     ]
   }

@@ -1,4 +1,4 @@
-import { Component, ViewChild, NgZone, ApplicationRef } from '@angular/core';
+import { Component, ViewChild, NgZone, ApplicationRef, ViewEncapsulation } from '@angular/core';
 import { NgUploaderOptions } from 'ngx-uploader';
 import { LocationService } from '../../../../services/location.service';
 import { Observable } from 'rxjs/Observable';
@@ -38,7 +38,43 @@ function convertToTree(flat_data){
         //console.log('Tree Data inside convert:', treeData);
         return treeData;
 }
-
+function convertToTreeData(flat_data){
+        console.log('Flat Data:', flat_data);
+        var dataMap = flat_data.reduce(function(map, node) {
+            map[node.data.locationId] = node;
+            return map;
+        }, {});
+        console.log('Data Map', dataMap);
+        // create the tree array
+        var treeData = [];
+        
+        flat_data.forEach(function(node) {
+            // add to parent
+            
+            var parent = dataMap[node.data.parentLocationId];
+            
+            // Handle infinite loop case where parentId = assetId of itself
+            if(node.data.parentLocationId == node.data.locationId){
+                parent = null;
+                
+            }
+            console.log('node:',node);
+            if (parent) {
+                // must check first if children already exist?
+                // create child array if it doesn't exist
+                (parent.children || (parent.children = []))
+                    // add node to child array
+                    .push(node);
+                console.log('parent:', parent);
+            } else {
+                // parent is null or missing
+                treeData.push(node);
+                console.log('tree push:', treeData);
+            }
+        });
+        //console.log('Tree Data inside convert:', treeData);
+        return treeData;
+}
 function transformLocationIdToId(location_tree){
     var str = JSON.stringify(location_tree);
     str = str.replace(/locationId/g, 'id');
@@ -49,7 +85,9 @@ function transformLocationIdToId(location_tree){
 @Component({
   selector: 'layouts',
   styleUrls: ['./modals.scss'],
-  templateUrl: './locations.html' /*
+  templateUrl: './locations.html',
+  encapsulation: ViewEncapsulation.None
+    /*
   styles: [
             ".node-content-wrapper {\n      display: inline-block;\n      padding: 2px 5px;\n      border-radius: 2px;\n      transition: background-color .15s,box-shadow .15s;\n    }",
             '.node-wrapper {display: flex; align-items: flex-start;}',
@@ -86,6 +124,8 @@ export class Locations {
   public selected_location;
   public value;
   public treeLocations = null;
+  public treeLocationsWithData = null;
+
   public location_edit = {
     id: null,
     name: '',
@@ -137,6 +177,17 @@ export class Locations {
             this.items_location = data.data;
             
             console.log('Initial Locations Data:', this.locations);
+            
+            var locations_with_data = this.locations.map(
+                (location) => {
+                    return Object.assign({}, {
+                       data: location 
+                    });
+                }
+            
+            );
+            this.treeLocationsWithData = convertToTreeData(locations_with_data);
+            
             
             var temp_locations = JSON.parse(JSON.stringify(this.locations));
             this.treeLocations = convertToTree(temp_locations);

@@ -23,6 +23,7 @@ import { BasicForm } from './components/locations/components/basicForm';
 import { WithoutLabelsForm } from './components/locations/components/withoutLabelsForm';
 import { DataTableModule,SharedModule } from 'primeng/primeng';
 import { DropdownModule } from 'ng2-bootstrap';
+import { TreeTableModule,TreeNode } from 'primeng/primeng';
 
 @NgModule({
   imports: [
@@ -38,7 +39,8 @@ import { DropdownModule } from 'ng2-bootstrap';
     ModalModule.forRoot(),
     DataTableModule,
     SharedModule,
-    DropdownModule.forRoot()
+    DropdownModule.forRoot(),
+    TreeTableModule
   ],
   declarations: [
     Locations,

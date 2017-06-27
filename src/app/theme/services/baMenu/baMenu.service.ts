@@ -27,6 +27,7 @@ export class BaMenuService {
   }
 
   public getCurrentItem():any {
+      console.log('Current Menu Item', this._currentMenuItem);
     return this._currentMenuItem;
   }
 
@@ -44,6 +45,7 @@ export class BaMenuService {
       }
       items.push(item);
     });
+    console.log('Select Menu Item', items);
     return items;
   }
 
@@ -120,7 +122,9 @@ export class BaMenuService {
   }
 
   protected _selectItem(object:any):any {
-    object.selected = this._router.isActive(this._router.createUrlTree(object.route.paths), object.pathMatch === 'full');
+    //object.selected = this._router.isActive(this._router.createUrlTree(object.route.paths), object.pathMatch === 'full');
+    object.selected = this._router.isActive(this._router.createUrlTree(object.route.paths), false);
+    console.log('Selected ', object);
     return object;
   }
 }

@@ -49,23 +49,36 @@ export const PAGES_MENU = [
                 order: 176
             }
         },
+        pathMatch: 'prefix',
         children: [
+            /*{
+                path: 'workorders/single',
+                pathMatch: 'partial',
+                data: {
+                    menu: {
+                        title: 'Work Orders',
+                        hidden: true
+                    }
+                }
+            },*/
             {
-            path: 'workorders',
-            data: {
-              menu: {
-                title: 'Work Orders',
-              }
+                path: 'workorders',
+                pathMatch: 'partial',
+                data: {
+                    menu: {
+                    title: 'Work Orders',
+                    }
+                },
+            },
+            {
+                path: 'consumptions',
+                data: {
+                  menu: {
+                    title: 'Consumptions',
+                  }
+                }
             }
-          },
-          {
-            path: 'consumptions',
-            data: {
-              menu: {
-                title: 'Consumptions',
-              }
-            }
-          },
+          
         ]
     },
     {

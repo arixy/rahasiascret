@@ -206,9 +206,23 @@ export class AssetService{
         return this.http.post(add_url, asset_multipart, options).map(this.extractData);
     }
     
-    updateAsset(updated_asset){
+    updateAsset(updated_asset): Observable<any>{
         
         console.log('Update Asset in Service', updated_asset);
+        var headers = new Headers();
+        //headers.append('Content-Type', 'multipart/form-data');
+        headers.append('Authorization', 'Bearer ' + localStorage.getItem('bearer_token'));
+        headers.append('Access-Control-Allow-Origin', '*');
+        headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
+        
+        headers.delete('Content-Type');
+        
+        var options = new RequestOptions({
+            headers: headers
+        });
+
+        let asset_multipart = new FormData();
+        
         var update_url = this.appUrl + '/asset/update';
         var formatted_object = {
             asset: {
@@ -226,6 +240,18 @@ export class AssetService{
             assetPhotos:[],
             deletedPhotosId:[]
         };
+
+        asset_multipart.append('params', JSON.stringify(formatted_object));
+        //asset_multipart.append('files', []);
+        /*
+        asset_multipart.append('assetNumber', asset.assetNumber);
+        asset_multipart.append('description',);
+        asset_multipart.append('relatedVendorId', 1);
+        asset_multipart.append('parentAssetId', );
+        asset_multipart.append('locationId',);
+        asset_multipart.append('woCategoryId',);*/
+
+        return this.http.post(update_url, asset_multipart, options).map(this.extractData);
     }
     deleteAsset(asset_id): boolean {
         return false;

@@ -4,6 +4,8 @@ import { UUID } from 'angular2-uuid';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import { GlobalConfigs } from '../../global.state';
+import { Subject } from 'rxjs/Subject';
+import 'rxjs/add/operator/map';
 
 @Injectable()
 export class MaintenanceService{
@@ -12,6 +14,12 @@ export class MaintenanceService{
   redirectUrl: string;
     
     private appUrl = GlobalConfigs.APP_BASE_URL;
+
+    // Observable Sources
+    private eventEmitted = new Subject<string>();
+
+    // Observable Streams
+    public eventEmitted$ = this.eventEmitted.asObservable();
 
   constructor(private http: Http){
     this.maintenance_data = [
@@ -157,4 +165,35 @@ export class MaintenanceService{
     getMaintenancesNormal(){
         return this.maintenance_data;
     }
+    public announceEvent(eventName: string){
+        this.eventEmitted.next(eventName);
+    }
+    
+    public getAllWOs(filters : any){
+        var headers = new Headers();
+        headers.append('Content-Type', 'application/json');
+        var bearer = "Bearer " + localStorage.getItem('bearer_token');
+
+        headers.append('Authorization', bearer);
+        headers.append('Access-Control-Allow-Origin', '*');
+        headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
+
+        var options = new RequestOptions({headers: headers});
+        var load_url = this.appUrl + '/work-order/all-without-schedule';
+        
+        if(filters == null){
+            filters= {
+                "filters": {
+                }, 
+                "first": 0, 
+                "multiSortMeta": "undefined", 
+                "rows": 10, 
+                "sortField": "description", 
+                "sortOrder": -1
+            };
+        }
+
+        return this.http.post(load_url, filters, options).map(this.extractData);
+    }
+    
 }

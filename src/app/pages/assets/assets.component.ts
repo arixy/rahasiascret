@@ -95,6 +95,8 @@ function transformAssetIdToId(asset_tree){
 })
 export class Assets {
 
+  // Form Disabled for View
+  public disabled = false;
   public items_location;
   public items_wocategory;
   public items_asset;
@@ -187,13 +189,11 @@ export class Assets {
       this.editForm = fb.group({
             'edit_name': ['', Validators.compose([Validators.required, Validators.minLength(2)])],
             'edit_description': ['', Validators.compose([Validators.required, Validators.minLength(2)])],
-            'edit_photo': ['', Validators.required],
             'edit_specification': ['', Validators.compose([Validators.required, Validators.minLength(2)])]
         });
       
       this.edit_name = this.editForm.controls['edit_name'];
       this.edit_description = this.editForm.controls['edit_description'];
-      this.edit_photo = this.editForm.controls['edit_photo'];
       this.edit_specification = this.editForm.controls['edit_specification'];
       
       
@@ -434,10 +434,96 @@ export class Assets {
     public hideViewHistoryModal(){
         this.viewHistoryModal.hide();
     }
-    public viewAsset(node){
-        this.asset_pointer = node;
+    public viewAsset(event){
+        this.asset_pointer = event;
         this.viewAssetModal.show();
+        
+        /*this.asset_edit = event;
+        // Inject Initial Value to the Edit Form
+        this.editForm.patchValue(
+            {
+                edit_name: event.data.name,
+                edit_description: event.data.description,
+                edit_photo: event.data.photo,
+                edit_specification: event.data.specification
+            }
+        );
+        
+        if(event.data.parentAssetId){
+            if (this.editSelectBox) {
+              let assets_data = this.assets;
+                console.log('Assets pas Editing', this.assets);
+              let asset_found = assets_data.filter(
+                (assets_object) => {
+                    return assets_object.assetId == event.data.parentAssetId;
+                }
+              );
+            console.log('Asset Found', asset_found);
+            if(asset_found.length > 0){
+                this.asset_edit.selected_asset = {
+                    id: event.data.parentAssetId,
+                    text: asset_found[0].name
+                };
+
+                  // Only Done because bug in ng2-select
+                  this.editSelectBox.active = [this.asset_edit.selected_asset];
+                  this.editSelectBox.ngOnInit();
+                }    
+            }     
+            
+        }
+        console.log('Pass Parent');
+        if(event.data.woCategoryId != null){
+            if (this.editWOSelectBox) {
+                
+                console.log('Items WO Cat', this.items_wocategory);
+              let wocategory_found = this.items_wocategory.filter(
+                (wo_category_object) => {
+                    return wo_category_object.id == event.data.woCategoryId;
+                }
+              );
+                console.log('WOCategory Found', wocategory_found);  
+                if(wocategory_found.length > 0){
+                    this.asset_edit.selected_wocategory = {
+                        id: event.data.woCategoryId,
+                        text: wocategory_found[0].text
+                    };
+                
+                    // Only Done because bug in ng2-select
+                    this.editWOSelectBox.active = [this.asset_edit.selected_wocategory];
+                    this.editWOSelectBox.ngOnInit();
+                }  
+            }
+        }
+        console.log('Pass WOCategory');
+        if(event.data.locationId != null){
+            if (this.editLocationSelectBox) {
+              let location_found = this.items_location.filter(
+                    (location_object) => {
+                        return location_object.id == event.data.locationId;
+                    }
+              );
+              if(location_found.length > 0){
+                    this.asset_edit.selected_location = {
+                        id: event.data.locationId,
+                        text: location_found[0].text
+                  };
+
+                  // Only Done because bug in ng2-select
+                  this.editLocationSelectBox.active = [this.asset_edit.selected_location];
+                  this.editLocationSelectBox.ngOnInit();    
+              }
+              
+            }
+        }
+        console.log('Location Edit Initial Select:', this.asset_edit.selected_location);
+        
+        // Disable Stuff in Here
+        this.editForm.disable();
+        this.disabled = true;
+        this.editChildModal.show();*/
     }
+
     public editAsset(event){
         console.log('Editing Asset:', event);
         this.asset_edit = event;
@@ -464,7 +550,7 @@ export class Assets {
             console.log('Asset Found', asset_found);
             if(asset_found.length > 0){
                 this.asset_edit.selected_asset = {
-                    id: event.parent_asset_id,
+                    id: event.data.parentAssetId,
                     text: asset_found[0].name
                 };
 
@@ -488,7 +574,7 @@ export class Assets {
                 console.log('WOCategory Found', wocategory_found);  
                 if(wocategory_found.length > 0){
                     this.asset_edit.selected_wocategory = {
-                        id: event.wocategory_id,
+                        id: event.data.woCategoryId,
                         text: wocategory_found[0].text
                     };
                 
@@ -508,8 +594,8 @@ export class Assets {
               );
               if(location_found.length > 0){
                     this.asset_edit.selected_location = {
-                        id: event.location_id,
-                        text: location_found.name
+                        id: event.data.locationId,
+                        text: location_found[0].text
                   };
 
                   // Only Done because bug in ng2-select
@@ -545,7 +631,7 @@ export class Assets {
         if(this.editForm.valid){
             
             var formatted_object = Object.assign({}, {
-               id: this.asset_edit.id,
+               id: this.asset_edit.data.assetId,
                 name: values.edit_name,
                 description: values.edit_description,
                 photo: values.edit_photo,
@@ -554,6 +640,7 @@ export class Assets {
                 wocategory_id: null,
                 location_id: null
             });
+            console.log('Selected Asset Edit', this.asset_edit);
             if(this.asset_edit.selected_asset != null){
                 formatted_object.parent_asset_id = this.asset_edit.selected_asset.id;
             }
@@ -563,22 +650,19 @@ export class Assets {
             if(this.asset_edit.selected_wocategory != null){
                 formatted_object.wocategory_id = this.asset_edit.selected_wocategory.id;
             }
-            let response = this.assetService.updateAsset(formatted_object);
-            
-            // TODO: Change to NgOnInit perhaps
-            //this.assets = this.assetService.getAssetsNormal();
-                        
-            console.log('After Edit Locations', this.assets);
-            var temp_assets = JSON.parse(JSON.stringify(this.assets));
-            this.treeAssets = [].concat(convertToTree(temp_assets));
-            console.log('After Edit Tree:', this.treeAssets);
-            
-            
-            this.assets_tree.treeModel.update();
-            this.editChildModal.hide();
-            
+             
+            this.assetService.updateAsset(formatted_object).subscribe(
+                (data) => {
+                    console.log('Data after update', data);
+                    this.editChildModal.hide();
+                    this.ngOnInit();
+                }
+            );            
         }
         
         //event.preventDefault();
+    }
+    public hideEditModal(){
+        this.editChildModal.hide();
     }
 }

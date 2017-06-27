@@ -28,6 +28,8 @@ import { PreventiveRequestComponent } from './../task/forms/preventiverequest.co
 
 import { GlobalState, WorkOrderStatuses, WorkflowActions } from '../../global.state';
 
+import { ActivatedRoute, Router } from '@angular/router';
+
 @Component({
   selector: 'preventatives',
   styleUrls: ['./modals.scss', './tablestyle.scss', './purple-green.scss'],
@@ -58,6 +60,7 @@ export class Preventatives {
     
     private myTasks : any;
     private totalRecords;
+    private totalRecordsScheduled;
 
     readonly PREVENTIVE_REQUEST = 1;
     readonly RECURRING_REQUEST = 2;
@@ -167,7 +170,8 @@ export class Preventatives {
     public locationService: LocationService,
     public maintenanceService: MaintenanceService,
     private _taskService: TaskService,
-    public fb: FormBuilder
+    public fb: FormBuilder,
+    public activatedRoute: ActivatedRoute
   ) {
       
       // hardcoded wo type list
@@ -187,24 +191,24 @@ export class Preventatives {
             this.addNewModal.hide();
           } else if (event == "addNewModal_btnSaveOnClick_createSuccess") {
               this.addNewModal.hide();
-              this.getAllMyTasks(this.buildFilter(this.taskListsTable));
+              this.getAllWOs(this.buildFilter(this.taskListsTable));
           } else if (event == "addNewModal_btnSaveOnClick_updateSuccess") {
               this.addNewModal.hide();
-              this.getAllMyTasks(this.buildFilter(this.taskListsTable));
+              this.getAllWOs(this.buildFilter(this.taskListsTable));
           }
         });
       
       // DATA MAPPING
       
       this.initial_wo_number = Math.floor(Math.random() * 100) + 1;
-      this.maintenances$ = maintenanceService.getScheduledWOs(null);
+      /*this.maintenances$ = maintenanceService.getScheduledWOs(null);
       this.maintenances$.subscribe(
         (data) => {
             this.maintenances = data.data;
             console.log('Maintenances Data:', this.maintenances);
             this.source.load(this.maintenances);
         }
-      );
+      );*/
       
       this.work_order_categories$ = woService.getWOs();
       this.work_order_categories$.subscribe(
@@ -308,7 +312,41 @@ export class Preventatives {
             }
        );
   }
+
+    ngOnInit(){
+        
+    }
      
+    ngAfterViewInit(){
+        // See if there is any parameter
+        let request_type = this.activatedRoute.snapshot.params['request_type'];
+        
+        console.log('Activated Route', this.activatedRoute.snapshot);
+        if(request_type){
+            // Open Particular Modal Based on Selected Type
+            if(request_type == 'single'){
+                console.log('Single!!');
+                this.createNewWorkOrder({
+                    id: 3, label: 'Single Request'
+                });
+            } else if(request_type == 'recurring'){
+                console.log('Recurring!');
+                this.createNewWorkOrder({
+                   id: 2, label: 'Recurring Request' 
+                });
+            } else if(request_type == 'preventive'){
+                this.createNewWorkOrder({
+                    id: 1, label: 'Preventive Maintenance'   
+                });
+            } else if(request_type == 'tenant'){
+                this.createNewWorkOrder(this.woTypes[3]);
+            } else if(request_type == 'guest'){
+                this.createNewWorkOrder(this.woTypes[4]);
+            } else if(request_type == 'owner'){
+                this.createNewWorkOrder(this.woTypes[5]);
+            }
+        }
+    }
     createNewWorkOrder(selectedType){
         console.log(selectedType);
         this.selectedWoType = selectedType;
@@ -603,7 +641,11 @@ export class Preventatives {
         console.log($event);
         console.log(table);
 
-        this.getAllMyTasks(this.buildFilter(table));
+        this.getAllWOs(this.buildFilter(table));
+    }
+
+    refreshScheduled($event, table){
+        this.getAllScheduledWOs(this.buildFilter(table));
     }
 
     resetFilters(table : DataTable){
@@ -613,7 +655,7 @@ export class Preventatives {
         table.filters = {};
         table.globalFilter = "";
 
-        this.getAllMyTasks(this.buildFilter(table));
+        this.getAllWOs(this.buildFilter(table));
     }
 
 
@@ -642,8 +684,8 @@ export class Preventatives {
         }
     }
 
-    private getAllMyTasks(filters){
-        this._taskService.getAllMyTasks(filters).subscribe(
+    private getAllWOs(filters){
+        this.maintenanceService.getAllWOs(filters).subscribe(
             (response)=>{
                 console.log("Response Data");
                 console.log(response);
@@ -668,6 +710,35 @@ export class Preventatives {
             }
         );
     }
+
+    private getAllScheduledWOs(filters){
+        this.maintenanceService.getScheduledWOs(filters).subscribe(
+            (response)=>{
+                console.log("Response Data");
+                console.log(response);
+
+                this.maintenances = response.data;
+                console.log('Real Maintenances from Here', this.maintenances);
+            
+                for(var i = 0; i < this.maintenances.length; i++){
+                    if (this.maintenances[i].actions == null) {
+                        this.maintenances[i].actions = [];
+                    }
+
+                    this.maintenances[i].actions.unshift({ workflowActionId: -2, name: "View" });
+                    //this.myTasks[i].actions.push({ workflowActionId: 4, name: "Assign/Reassign" });
+                    this.maintenances[i].dueDate = new Date(this.maintenances[i].dueDate);
+                    this.maintenances[i].dateUpdated = new Date(this.maintenances[i].dateUpdated);
+                }
+
+                if(response.paging != null)
+                    this.totalRecordsScheduled = response.paging.total;
+                else
+                    this.totalRecordsScheduled = 0;
+            }
+        );
+    }
+
 
     onCancel(){
         this.addNewModal.hide();

@@ -129,7 +129,7 @@
                 <p-column field="taskName" [style]="{'width':'120px'}" header="Task" [sortable]="true" [filter]="true" filterPlaceholder="Search"></p-column>
                 <p-column field="assetName" [style]="{'width':'110px'}" header="Asset" [sortable]="true" [filter]="true"></p-column>
                 <p-column field="locationName" header="Location" [sortable]="true" [style]="{'width':'120px'}" [filter]="true" filterPlaceholder="Search"></p-column>
-                <p-column field="start" [style]="{'width':'110px'}" header="Start" [sortable]="true" styleClass="top-aligned-table"></p-column>
+                <p-column field="start" header="Start" [sortable]="true" styleClass="top-aligned-table"></p-column>
                  <p-column [filter]="true" [style]="{'width':'110px'}" field="dueDate" header="Due" [sortable]="true">
                    <template pTemplate="body" let-update="rowData">
                      {{update.dueDate | date: 'shortDate'}}
@@ -146,7 +146,8 @@
         </div>
     </ba-card>
     <ba-card title="Schedule" baCardClass="with-scroll">
-      <p-dataTable #dtschedule [value]="maintenances">
+     <div style="width: 100%; overflow-x: auto; overflow-y: auto;">
+      <p-dataTable #dtschedule [value]="maintenances" [lazy]="true" (onLazyLoad)="refreshScheduled($event, dtschedule)" [rows]="4" [paginator]="true" [totalRecords]="totalRecordsScheduled" sortField="dateUpdated" sortOrder="-1">
           <p-header>
             <div class="ui-helper-clearfix">
                 <button type="button" iconPos="left" label="CSV" (click)="dt.exportCSV()" style="float:left" class="btn-export__csv">
@@ -235,36 +236,38 @@
                         </div>
             </div>
         </p-header>
-          <p-column styleClass="col-button">
+          <p-column [style]="{'width':'110px'}" styleClass="col-button">
                     <template pTemplate="header">
                         Action
                     </template>
-                    <template let-preventative="rowData" pTemplate="body">
+                    <template let-scheduledtask="rowData" pTemplate="body">
                             <div class="btn-group" dropdown>
                               <button id="single-button" type="button" class="btn btn-primary" dropdownToggle>
                                 Action <span class="caret"></span>
                               </button>
                               <ul dropdownMenu role="menu" aria-labelledby="single-button">
-                                <li role="menuitem"><a class="dropdown-item" (click)="editPreventative(preventative)">Edit</a></li>
-                                <li role="menuitem"><a class="dropdown-item" (click)="deletePreventative(preventative)">Delete</a></li>
-                              </ul>
+                                    <li role="menuitem" *ngFor="let action of scheduledtask.actions">
+                                        <a  class="dropdown-item" (click)="doAction(scheduledtask, action)">{{action.name}}</a>
+                                    </li>
+                                </ul>
                             </div>
                     </template>
             </p-column>
-           <p-column field="woCategoryName" header="Category"></p-column>
-           <p-column field="woPriorityName" header="Priority"></p-column>
-           <p-column field="taskName" header="Task"></p-column>
-            <p-column field="assetName" header="Asset"></p-column>
-            <p-column field="locationName" header="Location"></p-column>
+           <p-column field="woCategoryName" header="Category" [sortable]="true" [filter]="true"></p-column>
+           <p-column field="woPriorityName" header="Priority" [sortable]="true" [filter]="true"></p-column>
+           <p-column field="taskName" header="Task" [sortable]="true" [filter]="true"></p-column>
+            <p-column field="assetName" header="Asset" [sortable]="true" [filter]="true"></p-column>
+            <p-column field="locationName" header="Location" [sortable]="true" [filter]="true"></p-column>
             <p-column field="start" header="Start"></p-column>
             <p-column field="due" header="Due"></p-column>
             <p-column field="lastWo" header="Last WO"></p-column>
             
             <p-column field="nextWo" header="Next WO"></p-column>
             
-            <p-column field="dateUpdated" header="Last Updated"></p-column>
+            <p-column styleClass="top-aligned-table" field="dateUpdated" header="Last Updated"></p-column>
             
         </p-dataTable>
+    </div>
     </ba-card>
 </div>
 
