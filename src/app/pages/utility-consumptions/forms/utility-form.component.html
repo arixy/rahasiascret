@@ -1,0 +1,153 @@
+﻿<form [formGroup]="formGroup" class="form-horizontal" id="single-request-form">
+  <p-tabView>
+    <!-- General Tab -->
+    <p-tabPanel header="General">
+      <!-- Utility ID -->
+      <div class="form-group row" *ngIf="formMode != 'NEW'">
+        <label for="inputEmail3" class="control-label">ID</label><br />
+        <input [formControl]="txtUtilityId" type="text" class="form-control">
+      </div>
+
+      <!-- Utility Type -->
+      <div class="form-group row" [ngClass]="{'has-error': (!lsbUtilityType.valid && lsbUtilityType.touched), 'has-success': (lsbUtilityType.valid && lsbUtilityType.touched)}">
+        <label for="selected_category" class="col-xg-2 control-label">Type</label>
+
+        <div class="col-xg-10">
+          <ng-select #utilityTypesSelectBox
+                     [items]="_itemsUtilityTypes"
+                     [disabled]="lsbUtilityType.disabled"
+                     (removed)="removeSelectBoxValue('lsbUtilityType', $event)"
+                     (selected)="selectedSelectBoxValue('lsbUtilityType', $event)"
+                     (mousedown)="touchSelectBox('lsbUtilityType', $event)"
+                     placeholder="No Type selected">
+          </ng-select>
+        </div>
+      </div>
+      <div class="row error-row">
+        <div class="col-xg-2 line-height-zero">&nbsp;</div>
+        <div class="error-message col-xg-10"
+             *ngIf="formGroup.get('lsbUtilityType').hasError('required') && formGroup.get('lsbUtilityType').touched">
+          Type is required
+        </div>
+      </div>
+
+      <!-- UOM -->
+      <div class="form-group row" [ngClass]="{'has-error': (!lsbUOM.valid && lsbUOM.touched), 'has-success': (lsbUOM.valid && lsbUOM.touched)}">
+        <label for="selected_category" class="col-xg-2 control-label">UOM</label>
+
+        <div class="col-xg-10">
+          <ng-select #uomSelectBox
+                     [items]="_itemsUOM"
+                     [disabled]="lsbUOM.disabled"
+                     (removed)="removeSelectBoxValue('lsbUOM', $event)"
+                     (selected)="selectedSelectBoxValue('lsbUOM', $event)"
+                     (mousedown)="touchSelectBox('lsbUOM', $event)"
+                     placeholder="No UOM selected">
+          </ng-select>
+        </div>
+      </div>
+      <div class="row error-row">
+        <div class="col-xg-2 line-height-zero">&nbsp;</div>
+        <div class="error-message col-xg-10"
+             *ngIf="formGroup.get('lsbUOM').hasError('required') && formGroup.get('lsbUOM').touched">
+          UOM is required
+        </div>
+      </div>
+
+      <!-- Date -->
+      <div class="form-group row">
+        <label for="date" class="control-label">Date</label><br />
+
+        <div class="col-xg-10">
+          <p-calendar [formControl]="dtbDate" [showIcon]="true" dateFormat="yy-mm-dd" [yearNavigator]="true" [yearRange]="_yearRange" [showTime]="false"></p-calendar>
+        </div>
+      </div>
+      <div class="row error-row">
+        <div class="col-xg-2 line-height-zero">&nbsp;</div>
+        <div class="error-message col-xg-10" *ngIf="formGroup.get('dtbDate').hasError('required') && formGroup.get('dtbDate').touched">
+          Date is Required
+        </div>
+      </div>
+
+      <!-- Value -->
+      <div class="form-group row">
+        <label for="inputEmail3" class="col-xg-2 control-label">Value</label><br />
+        <input #numberOnly type="text" class="form-control" [formControl]="txtValue" />
+      </div>
+      <div class="row error-row">
+        <div class="error-message col-xg-10" *ngIf="formGroup.get('txtValue').hasError('required') && formGroup.get('txtValue').touched">
+          Value is required
+        </div>
+        <div class="error-message col-xg-10" *ngIf="formGroup.get('txtValue').hasError('pattern') && formGroup.get('txtValue').touched">
+          Value must be number only
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="form-group row" [ngClass]="{'has-error': (!txtDescription.valid && txtDescription.touched), 'has-success': (txtDescription.valid && txtDescription.touched)}">
+        <label for="inputEmail3" class="col-xg-2 control-label">Description</label><br />
+        <textarea [formControl]="txtDescription" class="form-control" id="inputEmail3" [placeholder]="txtDescription.disabled ? '' : 'Description'" pInputTextArea></textarea>
+      </div>
+      <div class="row error-row">
+        <div class="col-xg-2 line-height-zero">&nbsp;</div>
+        <div class="error-message col-xg-10"
+              *ngIf="formGroup.get('txtDescription').hasError('required') && formGroup.get('txtDescription').touched">
+          Description is required
+        </div>
+        <div class="error-message col-xg-10"
+              *ngIf="formGroup.get('txtDescription').hasError('minlength') && formGroup.get('txtDescription').touched">
+          Minimum of 2 characters
+        </div>
+      </div>
+    </p-tabPanel>
+
+    <!-- Exclusion Tab -->
+    <p-tabPanel header="Exclusion">
+      <p-dataTable [value]="lstExclusions">
+        <p-header>
+          <div class="ui-helper-clearfix" style="text-align: left;">
+            <button type="button" class="btn btn-primary" (click)="addExclusion()" *ngIf="formMode != 'VIEW'">Add Exclusion</button>
+          </div>
+        </p-header>
+        <p-column header="Value">
+          <template let-exclusion="rowData" pTemplate="body">
+            <input #numberOnly type="text" class="form-control" [(ngModel)]="exclusion.value" [disabled]="formMode == 'VIEW'" (blur)="markAsTouched(exclusion, 'valueTouched')" [ngModelOptions]="{standalone: true}"/>
+            <div class="error-message col-xg-10" *ngIf="hasValueError(exclusion).required && exclusion.valueTouched">
+              Value is required
+            </div>
+            <div class="error-message col-xg-10" *ngIf="hasValueError(exclusion).nonnumber && exclusion.valueTouched">
+              Value must be number only
+            </div>
+          </template>
+        </p-column>
+        <p-column header="Description">
+          <template let-exclusion="rowData" pTemplate="body">
+            <input type="text" class="form-control" [(ngModel)]="exclusion.description" [ngModelOptions]="{standalone: true}" (blur)="markAsTouched(exclusion, 'descriptionTouched')"/>
+            <div class="error-message col-xg-10" *ngIf="hasDescriptionError(exclusion).required && exclusion.descriptionTouched">
+              Description is required
+            </div>
+          </template>
+        </p-column>
+        <p-column header="Action" [style]="{'width':'120px'}" *ngIf="formMode != 'VIEW'">
+          <template let-exclusion="rowData" pTemplate="body">
+            <button type="button" (click)="removeExclusion(exclusion)" class="btn btn-danger">Remove</button>
+          </template>
+        </p-column>
+      </p-dataTable>
+    </p-tabPanel>
+  </p-tabView>
+
+  <div class="ui-helper-clearfix"></div>
+
+  <div class="form-group row">
+    <div class="col-sm-3">
+      <button type="button" class="btn btn-default btn-cancel" (click)="onCancel()">Cancel</button>
+    </div>
+    <div class="col-sm-6">
+      &nbsp;
+    </div>
+    <div class="col-sm-3">
+      <button [disabled]="!formGroup.valid || !isExclusionValid()" type="button" class="btn btn-default btn-save" (click)="onSubmit(formGroup.value)" *ngIf="formMode != 'VIEW'">Save</button>
+    </div>
+  </div>
+</form>
