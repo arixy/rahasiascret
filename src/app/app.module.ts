@@ -26,6 +26,8 @@ import { UtilityUomService } from './pages/utilities-uom/utility-uom.service';
 import { ExpenseTypeService } from './pages/expense-type/expense-type.service';
 import { WeekendService } from './pages/weekends/weekend.service';
 import { EntityTypeService } from './services/entity-type.service';
+import { UOMService } from './services/uom.service';
+import { UtilityTypeService } from './services/utility-type.service';
 
 import { UsersService } from './pages/users/users.service';
 
@@ -107,7 +109,9 @@ export function httpFactory(backend: XHRBackend, options: RequestOptions) {
     },
     TaskService,
     LocationService,
-    PeriodService
+    PeriodService,
+      UOMService,
+      UtilityTypeService
   ]
 })
 
