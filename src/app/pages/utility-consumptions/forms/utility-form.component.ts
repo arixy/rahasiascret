@@ -3,6 +3,7 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import { FormGroup, AbstractControl, FormBuilder, Validators, ValidatorFn, FormControl } from '@angular/forms';
 //import { EntityService } from './entity.service';
+import * as moment from 'moment';
 import { ModalDirective } from 'ng2-bootstrap';
 import { DatePickerOptions } from 'ng2-datepicker';
 import { SelectComponent, SelectItem } from 'ng2-select';
@@ -54,6 +55,8 @@ export class UtilityFormComponent {
 
     // others
     private _yearRange = GlobalConfigs.yearRange;
+    private errMsgServer = "";
+    private isBtnSaveClicked = false;
 
     constructor(
         public fb: FormBuilder,
@@ -71,11 +74,8 @@ export class UtilityFormComponent {
             'lsbUtilityType': ['', Validators.compose([Validators.required])],
             'lsbUOM': ['', Validators.compose([Validators.required])],
             'dtbDate': ['', Validators.compose([Validators.required])],
-            'txtValue': ['', Validators.compose([Validators.required, Validators.pattern("[0-9]+\.[0-9]+")])],
+            'txtValue': ['', Validators.compose([Validators.required, Validators.pattern(/^[0-9]+(\.[0-9]+)?$/), this.validateConsumptionTotal.bind(this)])],
             'txtDescription': ['', null],
-            'exclusions': this.fb.group({
-
-            })
         });
 
         this.txtUtilityId = this.formGroup.controls['txtUtilityId'];
@@ -206,11 +206,36 @@ export class UtilityFormComponent {
         exclusion[field] = true;
     }
 
+    validateConsumptionTotal(input: FormControl) {
+        console.log("test", input);
+        if (this.lstExclusions != null) {
+            let _totalExclusion = 0;
+            for (var i = 0; i < this.lstExclusions.length; i++) {
+                _totalExclusion += this.lstExclusions[i].value;
+            }
+
+            if (parseInt(this.txtValue.value) < _totalExclusion) {
+                return { exceedTotal: true };
+            }
+        }
+
+        return null;
+    }
+
     hasValueError(exclusion) {
         if (exclusion.value == null || exclusion.value == "") {
             return { required: true };
-        } else if (!(/^[0-9]+(\.[0-9]+)?$/).test(exclusion.value)) {
+        } else if (!(/^[0-9]+(\.[0-9])?$/).test(exclusion.value)) {
             return { nonnumber: true };
+        } else {
+            let _totalExclusion = 0;
+            for (var i = 0; i < this.lstExclusions.length; i++) {
+                _totalExclusion += this.lstExclusions[i].value;
+            }
+
+            if (parseInt(this.txtValue.value) < _totalExclusion) {
+                return {exceedTotal: true};
+            }
         }
 
         return {};
@@ -245,15 +270,31 @@ export class UtilityFormComponent {
 
     isExclusionValid() {
         if (this.lstExclusions != null) {
+            let _totalExclusion = 0;
             for (var i = 0; i < this.lstExclusions.length; i++) {
-                if (this.hasValueError(this.lstExclusions[i])['required'] || this.hasValueError(this.lstExclusions[i])['nonnumber']) {
+                if (this.hasValueError(this.lstExclusions[i])['required'] || this.hasValueError(this.lstExclusions[i])['nonnumber'] || this.hasValueError(this.lstExclusions[i])['exceedTotal']) {
                     return false;
                 }
 
                 if (this.hasDescriptionError(this.lstExclusions[i])['required']) {
                     return false;
                 }
+
+                _totalExclusion += this.lstExclusions[i].value;
             }
+
+            //this.errMsgServer = "";
+            //if (this.txtValue.value != "" && this.txtValue.value < _totalExclusion) {
+            //    this.errMsgServer = "Consumption Total cannot be higher than Total Exclusion";
+
+            //    return false;
+            //}
+
+            //this.errMsgServer = "";
+            //if (parseInt(this.txtValue.value) < _totalExclusion) {
+            //    this.errMsgServer = "Consumption Total cannot be higher than Total Exclusion";
+            //    return false;
+            //}
         }
 
         return true;
@@ -261,13 +302,21 @@ export class UtilityFormComponent {
     // #EndRegion
 
     onSubmit(formValues) {
-        if (this.formGroup.valid) {
+        this.isBtnSaveClicked = true;
+        //this.txtValue.updateValueAndValidity();
+        //this.formGroup.updateValueAndValidity();
+
+        Object.keys(this.formGroup.controls).forEach(key => {
+            this.formGroup.get(key).updateValueAndValidity();
+        });
+
+        if (this.formGroup.valid && this.isExclusionValid()) {
             console.log("utility-form is valid");
 
             let utilityConsumptionObject = {
                 utilityConsumptionId: this.formMode == "NEW" ? null : this.utilityModel.utilityConsumptionId,
                 utilityTypeId: this.lsbUtilityType.value.id,
-                date: this.dtbDate.value,
+                date: moment(this.dtbDate.value).format("YYYY-MM-DD"),
                 description: this.txtDescription.value,
                 value: this.txtValue.value,
                 utilityUomId: this.lsbUOM.value.id,
@@ -283,6 +332,7 @@ export class UtilityFormComponent {
                         this._utilityConsumptionService.announceEvent("utilityConsumptions_btnSaveOnSuccess");
                     } else {
                         // show error message?
+                        this.errMsgServer = response.resultCode.message;
                     }
                 });
             } else {
@@ -293,9 +343,12 @@ export class UtilityFormComponent {
                     } else {
                         console.log("error?");
                         // show error message?
+                        this.errMsgServer = response.resultCode.message;
                     }
                 });
             }
+        } else {
+            
         }
 
         return false;

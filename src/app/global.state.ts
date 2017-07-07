@@ -70,4 +70,6 @@ export class WorkOrderStatuses {
     public static readonly COMPLETE = 5;
     public static readonly CANCEL = 6;
     public static readonly PENDING = 7;
+    public static readonly ESCALATE = 8;
+    public static readonly RETURN = 9;
 }

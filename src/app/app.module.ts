@@ -28,6 +28,7 @@ import { WeekendService } from './pages/weekends/weekend.service';
 import { EntityTypeService } from './services/entity-type.service';
 import { UOMService } from './services/uom.service';
 import { UtilityTypeService } from './services/utility-type.service';
+import { StatusService } from './services/status.service';
 
 import { UsersService } from './pages/users/users.service';
 
@@ -37,6 +38,7 @@ import { HolidayService } from './pages/holidays/holiday.service';
 import { UtilityConsumptionsService } from './pages/utility-consumptions/utility-consumptions.service';
 import { PaperHttp } from './services/paper-http.service';
 
+import { AccessRightsService } from './pages/access-rights/access-rights.service';
 // task services
 import { TaskService } from './pages/task/task.service';
 
@@ -111,7 +113,9 @@ export function httpFactory(backend: XHRBackend, options: RequestOptions) {
     LocationService,
     PeriodService,
       UOMService,
-      UtilityTypeService
+      UtilityTypeService,
+      AccessRightsService,
+      StatusService
   ]
 })
 

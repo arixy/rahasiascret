@@ -231,6 +231,26 @@ export const PAGES_MENU = [
           }
           
         ]
+      },
+      {
+          path: 'access-rights',
+          data: {
+              menu: {
+                  title: 'Access Rights',
+                  pathMatch: 'prefix',
+                  hidden: true
+              }
+          }
+      },
+      {
+          path: 'wo-report',
+          data: {
+              menu: {
+                  title: 'Reports - Work Order Report',
+                  pathMatch: 'prefix',
+                  hidden: true
+              }
+          }
       }
     ]
   }

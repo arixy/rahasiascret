@@ -5,9 +5,10 @@ import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/fo
 import { ModalDirective } from 'ng2-bootstrap';
 import * as moment from 'moment';
 import { DatePickerOptions, DateModel } from 'ng2-datepicker';
-import { GlobalState } from '../../global.state';
-
 import { DataTable, TabViewModule } from "primeng/primeng";
+import { saveAs } from 'file-saver';
+
+import { GlobalState } from '../../global.state';
 
 // supporting component
 import { UtilityFormComponent } from './forms/utility-form.component';
@@ -33,6 +34,9 @@ export class UtilityConsumptions implements OnDestroy {
 
     // used fields
     private lstUtilityConsumptions: Array<any>;
+
+    // total records
+    private totalRecords;
 
     // constants
     private readonly DEFAULT_ITEM_PER_PAGE = 10;
@@ -85,6 +89,7 @@ export class UtilityConsumptions implements OnDestroy {
         this._utilityConsumptionService.getUtilityConsumptions(filters).subscribe(response => {
             if (response.resultCode.code == "0") {
                 this.lstUtilityConsumptions = response.data;
+                this.totalRecords = response.paging.total;
             } else {
                 // show error message?
             }
@@ -96,6 +101,7 @@ export class UtilityConsumptions implements OnDestroy {
     }
 
     private buildFilter(table: DataTable) {
+        console.log("buildFilter");
         if (table == null) {
             return {
                 "filters": {},
@@ -168,6 +174,16 @@ export class UtilityConsumptions implements OnDestroy {
         this.utilityConsumptionToDelete = new Array(utility);
 
         this.deleteModal.show();
+    }
+
+    downloadCSV(dataTable: DataTable) {
+        console.log("export CSV");
+        this._utilityConsumptionService.exportAllUtilityConsumptions(this.buildFilter(dataTable)).subscribe(response => {
+            console.log("export CSV", response);
+            let blobData: Blob = new Blob([response.blob()], { type: response.headers.get('Content-Type') });
+            saveAs(blobData, "consumptions.csv");
+        });
+        console.log("end export csv");
     }
 
     cancelDelete() {

@@ -1,7 +1,10 @@
 ﻿<form [formGroup]="formGroup" class="form-horizontal" id="single-request-form">
+  <div class="alert alert-danger" *ngIf="errMsgServer != ''">
+    {{ errMsgServer }}
+  </div>
   <p-tabView>
     <!-- General Tab -->
-    <p-tabPanel header="General">
+    <p-tabPanel header="General" [style]="{'background-color': 'red'}">
       <!-- Utility ID -->
       <div class="form-group row" *ngIf="formMode != 'NEW'">
         <label for="inputEmail3" class="control-label">ID</label><br />
@@ -26,7 +29,7 @@
       <div class="row error-row">
         <div class="col-xg-2 line-height-zero">&nbsp;</div>
         <div class="error-message col-xg-10"
-             *ngIf="formGroup.get('lsbUtilityType').hasError('required') && formGroup.get('lsbUtilityType').touched">
+             *ngIf="formGroup.get('lsbUtilityType').hasError('required') && (formGroup.get('lsbUtilityType').touched || isBtnSaveClicked)">
           Type is required
         </div>
       </div>
@@ -49,7 +52,7 @@
       <div class="row error-row">
         <div class="col-xg-2 line-height-zero">&nbsp;</div>
         <div class="error-message col-xg-10"
-             *ngIf="formGroup.get('lsbUOM').hasError('required') && formGroup.get('lsbUOM').touched">
+             *ngIf="formGroup.get('lsbUOM').hasError('required') && (formGroup.get('lsbUOM').touched || isBtnSaveClicked)">
           UOM is required
         </div>
       </div>
@@ -64,7 +67,7 @@
       </div>
       <div class="row error-row">
         <div class="col-xg-2 line-height-zero">&nbsp;</div>
-        <div class="error-message col-xg-10" *ngIf="formGroup.get('dtbDate').hasError('required') && formGroup.get('dtbDate').touched">
+        <div class="error-message col-xg-10" *ngIf="formGroup.get('dtbDate').hasError('required') && (formGroup.get('dtbDate').touched || isBtnSaveClicked)">
           Date is Required
         </div>
       </div>
@@ -75,11 +78,14 @@
         <input #numberOnly type="text" class="form-control" [formControl]="txtValue" />
       </div>
       <div class="row error-row">
-        <div class="error-message col-xg-10" *ngIf="formGroup.get('txtValue').hasError('required') && formGroup.get('txtValue').touched">
+        <div class="error-message col-xg-10" *ngIf="formGroup.get('txtValue').hasError('required') && (formGroup.get('txtValue').touched || isBtnSaveClicked)">
           Value is required
         </div>
-        <div class="error-message col-xg-10" *ngIf="formGroup.get('txtValue').hasError('pattern') && formGroup.get('txtValue').touched">
+        <div class="error-message col-xg-10" *ngIf="formGroup.get('txtValue').hasError('pattern') && (formGroup.get('txtValue').touched || isBtnSaveClicked)">
           Value must be number only
+        </div>
+        <div class="error-message col-xg-10" *ngIf="formGroup.get('txtValue').hasError('exceedTotal') && (formGroup.get('txtValue').touched || isBtnSaveClicked)">
+          Total Consumption is lower than Total Exclusion
         </div>
       </div>
 
@@ -91,11 +97,11 @@
       <div class="row error-row">
         <div class="col-xg-2 line-height-zero">&nbsp;</div>
         <div class="error-message col-xg-10"
-              *ngIf="formGroup.get('txtDescription').hasError('required') && formGroup.get('txtDescription').touched">
+              *ngIf="formGroup.get('txtDescription').hasError('required') && (formGroup.get('txtDescription').touched || isBtnSaveClicked)">
           Description is required
         </div>
         <div class="error-message col-xg-10"
-              *ngIf="formGroup.get('txtDescription').hasError('minlength') && formGroup.get('txtDescription').touched">
+              *ngIf="formGroup.get('txtDescription').hasError('minlength') && (formGroup.get('txtDescription').touched || isBtnSaveClicked)">
           Minimum of 2 characters
         </div>
       </div>
@@ -112,18 +118,21 @@
         <p-column header="Value">
           <template let-exclusion="rowData" pTemplate="body">
             <input #numberOnly type="text" class="form-control" [(ngModel)]="exclusion.value" [disabled]="formMode == 'VIEW'" (blur)="markAsTouched(exclusion, 'valueTouched')" [ngModelOptions]="{standalone: true}"/>
-            <div class="error-message col-xg-10" *ngIf="hasValueError(exclusion).required && exclusion.valueTouched">
+            <div class="error-message col-xg-10" *ngIf="hasValueError(exclusion).required && (exclusion.valueTouched || isBtnSaveClicked)">
               Value is required
             </div>
-            <div class="error-message col-xg-10" *ngIf="hasValueError(exclusion).nonnumber && exclusion.valueTouched">
+            <div class="error-message col-xg-10" *ngIf="hasValueError(exclusion).nonnumber && (exclusion.valueTouched || isBtnSaveClicked)">
               Value must be number only
+            </div>
+            <div class="error-message col-xg-10" *ngIf="hasValueError(exclusion).exceedTotal && (exclusion.valueTouched || isBtnSaveClicked)">
+              Total Consumption is lower than Total Exclusion
             </div>
           </template>
         </p-column>
         <p-column header="Description">
           <template let-exclusion="rowData" pTemplate="body">
-            <input type="text" class="form-control" [(ngModel)]="exclusion.description" [ngModelOptions]="{standalone: true}" (blur)="markAsTouched(exclusion, 'descriptionTouched')"/>
-            <div class="error-message col-xg-10" *ngIf="hasDescriptionError(exclusion).required && exclusion.descriptionTouched">
+            <input type="text" class="form-control" [(ngModel)]="exclusion.description" [ngModelOptions]="{standalone: true}" [disabled]="formMode == 'VIEW'" (blur)="markAsTouched(exclusion, 'descriptionTouched')"/>
+            <div class="error-message col-xg-10" *ngIf="hasDescriptionError(exclusion).required && (exclusion.descriptionTouched || isBtnSaveClicked)">
               Description is required
             </div>
           </template>
@@ -147,7 +156,8 @@
       &nbsp;
     </div>
     <div class="col-sm-3">
-      <button [disabled]="!formGroup.valid || !isExclusionValid()" type="button" class="btn btn-default btn-save" (click)="onSubmit(formGroup.value)" *ngIf="formMode != 'VIEW'">Save</button>
+      <!--<button [disabled]="!formGroup.valid || !isExclusionValid()" type="button" class="btn btn-default btn-save" (click)="onSubmit(formGroup.value)" *ngIf="formMode != 'VIEW'">Save</button>-->
+      <button type="button" class="btn btn-default btn-save" (click)="onSubmit(formGroup.value)" *ngIf="formMode != 'VIEW'">Save</button>
     </div>
   </div>
 </form>

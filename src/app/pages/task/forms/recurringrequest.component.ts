@@ -6,6 +6,7 @@ import { FormGroup, AbstractControl, FormBuilder, Validators, ValidatorFn, FormC
 import { ModalDirective } from 'ng2-bootstrap';
 import { DatePickerOptions } from 'ng2-datepicker';
 import { SelectComponent, SelectItem } from 'ng2-select';
+import * as moment from 'moment';
 
 import { TaskService } from '../task.service';
 import { LocationService } from '../../../services/location.service';
@@ -160,12 +161,12 @@ export class RecurringRequestComponent {
             'wo_number': ['', null],
             'task_name': ['', Validators.compose([Validators.required, Validators.minLength(2)])],
             'task_desc': ['', Validators.compose([Validators.required, Validators.minLength(2)])],
-            'selected_category': ['', null],
+            'selected_category': ['', Validators.compose([Validators.required])],
             'selected_location': ['', Validators.compose([Validators.required])],
             'location_info': ['', null],
             'selected_assignee': ['', null],
             'selected_status': ['', null],
-            'selected_priority': ['', null],
+            'selected_priority': ['', Validators.compose([Validators.required])],
             'selected_vendor': ['', null],
             'contact_person': ['', null],
             'contact_number': ['', Validators.compose([CustomValidators.numberOnly])],
@@ -178,8 +179,8 @@ export class RecurringRequestComponent {
             'selected_repeat': ['', Validators.compose([this.validateRepeat.bind(this)])],
             'repeat_every': ['', Validators.compose([this.validateRepeatEvery.bind(this)])],
             'selected_every_period': ['', Validators.compose([this.validateRepeatEveryPeriod.bind(this)])],
-            'selected_due_period': ['', null],
-            'due_after': ['', Validators.compose([CustomValidators.numberOnly])]
+            'selected_due_period': ['', Validators.compose([Validators.required])],
+            'due_after': ['', Validators.compose([Validators.required, CustomValidators.numberOnly])]
         });
         this.wo_number = this.formGroupAdd.controls['wo_number'];
         this.task_name = this.formGroupAdd.controls['task_name'];
@@ -644,9 +645,7 @@ export class RecurringRequestComponent {
                         actionId: this.actionType.workflowActionId,
                         actionName: this.actionType.name
                     },
-                    expenses: this.wo_expenses.filter(function (expense) {
-                        return expense.isActive;
-                    }),
+                    expenses: this.readyExpenses(),
                     deletedExpenses: this.readyDeletedExpenses(),
                     files: this.readyFilesData(),
                     deletedFiles: this.readyDeletedFilesData(),
@@ -765,6 +764,9 @@ export class RecurringRequestComponent {
             }
             case 'selected_every_period': this.selected_every_period.markAsTouched(); break;
             case 'selected_location': this.selected_location.markAsTouched(); break;
+            case 'selected_category': this.selected_category.markAsTouched(); break;
+            case 'selected_priority': this.selected_priority.markAsTouched(); break;
+            case 'selected_due_period': this.selected_due_period.markAsTouched(); break;
         }
 
         this.formGroupAdd.markAsDirty();
@@ -774,6 +776,18 @@ export class RecurringRequestComponent {
     onCancel() {
         console.log("cancel");
         this._taskService.announceEvent("addNewModal_btnCancelOnClick");
+    }
+
+    readyExpenses() {
+        let _expenses = this.wo_expenses.filter(function (expense) {
+            return expense.isActive;
+        });
+
+        for (var i = 0; i < _expenses.length; i++) {
+            _expenses[i].referenceDate = moment(_expenses[i].referenceDate).format("YYYY-MM-DD");
+        }
+
+        return _expenses;
     }
 
     readyFilesData() {

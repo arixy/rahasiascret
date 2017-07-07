@@ -1,5 +1,5 @@
 ﻿import { Injectable } from '@angular/core';
-import { Http, Response, Headers, RequestOptions, URLSearchParams } from '@angular/http';
+import { Http, Response, Headers, RequestOptions, URLSearchParams, ResponseContentType } from '@angular/http';
 import { UUID } from 'angular2-uuid';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
@@ -212,5 +212,33 @@ export class UtilityConsumptionsService{
         console.log('expense Body URL encode', requestBody);
 
         return this.http.post(this.appUrl + '/delete', requestBody, options).map(this.extractData);
+    }
+
+    public exportAllUtilityConsumptions(filters: any) {
+        var bearer = "Bearer " + localStorage.getItem('bearer_token');
+
+        var headers = new Headers();
+        headers.append("Accept", "application/octet-stream");
+        headers.append('Authorization', bearer);
+        headers.append('Access-Control-Allow-Origin', '*');
+        headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
+
+        var options = new RequestOptions({ headers: headers, responseType: ResponseContentType.Blob });
+        var load_url = this.appUrl + '/all/export';
+        console.log('Options ', options);
+
+        if (filters == null) {
+            filters = {
+                "filters": {
+                },
+                "first": 0,
+                "multiSortMeta": "undefined",
+                "rows": 10,
+                "sortField": "id",
+                "sortOrder": -1
+            };
+        }
+
+        return this.http.post(load_url, filters, options);
     }
 }
