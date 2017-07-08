@@ -73,6 +73,7 @@
                      [disabled]="disabled || selected_category.disabled"
                      (removed)="removeSelectBoxValue('selected_category', $event)"
                      (selected)="selectedSelectBoxValue('selected_category', $event)"
+                     (mousedown)="touchSelectBox('selected_category', $event)"
                      placeholder="No Category selected">
           </ng-select>
         </div>
@@ -96,14 +97,16 @@
                      [disabled]="disabled || selected_priority.disabled"
                      (removed)="removeSelectBoxValue('selected_priority', $event)"
                      (selected)="selectedSelectBoxValue('selected_priority', $event)"
+                     (mousedown)="touchSelectBox('selected_priority', $event)"
                      placeholder="No Priority selected">
           </ng-select>
         </div>
       </div>
       <div class="row error-row">
         <div class="col-xg-2 line-height-zero">&nbsp;</div>
-        <div class="error-message col-xg-10" *ngIf="error_msg.priority != null">
-          {{error_msg.priority}}
+        <div class="error-message col-xg-10"
+             *ngIf="formGroupAdd.get('selected_priority').hasError('required') && formGroupAdd.get('selected_priority').touched">
+          Priority is required
         </div>
       </div>
 
@@ -384,14 +387,15 @@
                      [disabled]="disabled"
                      (removed)="removeSelectBoxValue('selected_due_period', $event)"
                      (selected)="selectedSelectBoxValue('selected_due_period', $event)"
+                     (mousedown)="touchSelectBox('selected_due_period', $event)"
                      placeholder="No Period selected">
           </ng-select>
         </div>
-        <div class="row error-row">
-          <div class="col-xg-2 line-height-zero">&nbsp;</div>
-          <div class="error-message col-xg-10" *ngIf="error_msg.repeat != null">
-            {{error_msg.repeat}}
-          </div>
+      </div>
+      <div class="row error-row">
+        <div class="col-xg-2 line-height-zero">&nbsp;</div>
+        <div class="error-message col-xg-10" *ngIf="formGroupAdd.get('selected_due_period').hasError('required') && formGroupAdd.get('selected_due_period').touched">
+          Due Period is required
         </div>
       </div>
     </p-tabPanel>

@@ -6,6 +6,7 @@ import { FormGroup, AbstractControl, FormBuilder, Validators, ValidatorFn, FormC
 import { ModalDirective } from 'ng2-bootstrap';
 import { DatePickerOptions } from 'ng2-datepicker';
 import { SelectComponent, SelectItem } from 'ng2-select';
+import * as moment from 'moment';
 
 import { TaskService } from '../task.service';
 import { LocationService } from '../../../services/location.service';
@@ -142,7 +143,7 @@ export class OwnerRequestComponent {
             'contact_number': ['', Validators.compose([CustomValidators.numberOnly])],
             'solution': ['', null],
 
-            'selected_startdate': ['', null],
+            'selected_startdate': ['', Validators.compose([Validators.required])],
             //'selected_starttime': ['', null],
             'selected_duedate': ['', null],
         });
@@ -635,9 +636,7 @@ export class OwnerRequestComponent {
                         actionId: this.actionType.workflowActionId,
                         actionName: this.actionType.name
                     },
-                    expenses: this.wo_expenses.filter(function (expense) {
-                        return expense.isActive;
-                    }),
+                    expenses: this.readyExpenses(),
                     deletedExpenses: this.readyDeletedExpenses(),
                     files: this.readyFilesData(),
                     deletedFiles: this.readyDeletedFilesData(),
@@ -741,6 +740,18 @@ export class OwnerRequestComponent {
             case 'selected_entity': this.selected_entity.markAsTouched(); break;
             case 'selected_location': this.selected_location.markAsTouched(); break;
         }
+    }
+
+    readyExpenses() {
+        let _expenses = this.wo_expenses.filter(function (expense) {
+            return expense.isActive;
+        });
+
+        for (var i = 0; i < _expenses.length; i++) {
+            _expenses[i].referenceDate = moment(_expenses[i].referenceDate).format("YYYY-MM-DD");
+        }
+
+        return _expenses;
     }
 
     readyFilesData() {
