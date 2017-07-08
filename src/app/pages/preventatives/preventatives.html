@@ -1,9 +1,13 @@
 <div class="widgets">
 <div class="row">
    <div class="ui-helper-clearfix">
-            <div class="btn-group" dropdown style="float: right">
+            <div class="btn-group add-new-dropdown" dropdown style="float: right">
                 <button id="addNewWorkOrder" type="button" class="btn btn-primary" dropdownToggle>
-                    Add New Work Order <span class="caret"></span>
+                    
+                    <i class="icon ion-plus-round"></i>
+                    
+                    
+                        Add New Work Order <span class="caret"></span>
                 </button>
                 <ul dropdownMenu role="menu" class="table-header-dropdown dropdown-menu" aria-labelledby="addNewWorkOrder">
                     <li role="menuitem" *ngFor="let type of woTypes">
@@ -16,7 +20,7 @@
     
     <ba-card title="Work Orders" baCardClass="with-scroll">
         
-        <div style="width: 100%; overflow-x: auto; overflow-y: auto;">
+        
             <p-dataTable #dt [value]="myTasks" [lazy]="true" (onLazyLoad)="refresh($event, dt)" [rows]="4" [paginator]="true" [totalRecords]="totalRecords" sortField="dateUpdated" sortOrder="-1">
                 <p-header>
                     <div class="ui-helper-clearfix">
@@ -51,11 +55,18 @@
                                     svg * {
                                         transition: all .2s ease-out;
                                         stroke-width: 1.5 !important;
+                                        stroke: #fff !important;
+                                    }
+                                    svg path {
+                                        stroke: #fff !important;
                                     }
                                     svg:hover path {
                                         stroke: #fff !important;
                                     }
                                     .btn-sets-right-filter:hover path {
+                                        stroke: #fff !important;
+                                    }
+                                    .btn-sets-right-filter path{
                                         stroke: #fff !important;
                                     }
                                 </style>
@@ -129,7 +140,7 @@
                 <p-column field="taskName" [style]="{'width':'120px'}" header="Task" [sortable]="true" [filter]="true" filterPlaceholder="Search"></p-column>
                 <p-column field="assetName" [style]="{'width':'110px'}" header="Asset" [sortable]="true" [filter]="true"></p-column>
                 <p-column field="locationName" header="Location" [sortable]="true" [style]="{'width':'120px'}" [filter]="true" filterPlaceholder="Search"></p-column>
-                <p-column field="start" header="Start" [sortable]="true" styleClass="top-aligned-table"></p-column>
+                <p-column field="start" [style]="{'width':'130px'}" header="Start" [sortable]="true" styleClass="top-aligned-table"></p-column>
                  <p-column [filter]="true" [style]="{'width':'110px'}" field="dueDate" header="Due" [sortable]="true">
                    <template pTemplate="body" let-update="rowData">
                      {{update.dueDate | date: 'shortDate'}}
@@ -143,10 +154,9 @@
                     </template>
                 </p-column>
             </p-dataTable>
-        </div>
+        
     </ba-card>
     <ba-card title="Schedule" baCardClass="with-scroll">
-     <div style="width: 100%; overflow-x: auto; overflow-y: auto;">
       <p-dataTable #dtschedule [value]="maintenances" [lazy]="true" (onLazyLoad)="refreshScheduled($event, dtschedule)" [rows]="4" [paginator]="true" [totalRecords]="totalRecordsScheduled" sortField="dateUpdated" sortOrder="-1">
           <p-header>
             <div class="ui-helper-clearfix">
@@ -267,7 +277,6 @@
             <p-column styleClass="top-aligned-table" field="dateUpdated" header="Last Updated"></p-column>
             
         </p-dataTable>
-    </div>
     </ba-card>
 </div>
 

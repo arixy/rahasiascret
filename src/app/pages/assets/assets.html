@@ -21,9 +21,20 @@
   <div class="row">
     <div class="col-md-12">
      <div class="ui-helper-clearfix add-new-button__container">
-               <button (click)="addRootNode()" class="btn btn-primary" style="float:right">Add New Asset</button>
+              <div class="btn-group add-new-dropdown" style="float: right">
+                <button (click)="addRootNode()" type="button" class="btn btn-primary">
+                    
+                    <i class="icon ion-plus-round"></i>
+                    
+                    
+                        Add New Asset
+                </button>
+
+            </div>
+               <!-- <button (click)="addRootNode()" class="btn btn-primary" style="float:right">Add New Asset</button> -->
            </div>
       <ba-card title="" baCardClass="with-scroll">
+          <spinner *ngIf="dataLoading"></spinner>
            <p-treeTable class="ui-datatable" [value]="treeAssetsWithData">
                <p-header>
             <div class="ui-helper-clearfix">
@@ -58,11 +69,18 @@
                                     svg * {
                                         transition: all .2s ease-out;
                                         stroke-width: 1.5 !important;
+                                        stroke: #fff !important;
+                                    }
+                                    svg path {
+                                        stroke: #fff !important;
                                     }
                                     svg:hover path {
                                         stroke: #fff !important;
                                     }
                                     .btn-sets-right-filter:hover path {
+                                        stroke: #fff !important;
+                                    }
+                                    .btn-sets-right-filter path{
                                         stroke: #fff !important;
                                     }
                                 </style>
@@ -114,7 +132,7 @@
             </div>
         </p-header>
                 <!-- TODO: Add Location (Filter) & Date Updated Column --> 
-                <p-column [style]="{'width':'200px'}" [sortable]="true" field="size">
+                <p-column [sortable]="true" [style]="{'width':'230px'}" field="size">
                    <template pTemplate="header">
                        Asset Code
                        <input class="ui-column-filter" type="text" [formControl]="filterAssetCode" />
@@ -123,7 +141,7 @@
                         {{node.data.assetNumber}}
                     </template>
                 </p-column>
-                <p-column field="name" [filter]="true">
+                <p-column field="name" [style]="{'width':'230px'}" [filter]="true">
                    <template pTemplate="header">
                        Asset Name
                        <input class="ui-column-filter" type="text" [formControl]="filterAssetName" />
@@ -132,7 +150,7 @@
                         {{node.data.name}}
                     </template>
                 </p-column>
-                <p-column field="name" [filter]="true">
+                <p-column field="name" [style]="{'width':'230px'}" [filter]="true">
                    <template pTemplate="header">
                        Location
                        <input class="ui-column-filter" type="text" />
@@ -141,7 +159,7 @@
                         {{node.data.locationId}}
                     </template>
                 </p-column>
-                <p-column styleClass="top-aligned-table" field="name" [filter]="true">
+                <p-column [style]="{'width':'200px'}" styleClass="top-aligned-table" field="name" [filter]="true">
                    <template pTemplate="header">
                        Date Updated
                    </template>
@@ -149,7 +167,7 @@
                         {{node.data.dateUpdated | date: 'shortDate'}}
                     </template>
                 </p-column>
-                <p-column styleClass="col-button">
+                <p-column [style]="{'width':'180px'}" styleClass="col-button">
                    <template pTemplate="header">
                         Action
                     </template>
@@ -424,17 +442,25 @@
                       </div>
                   </p-tabPanel>
               </p-tabView>
-              
-              
-              <div class="form-group row">
-                  <div class="col-sm-3">
-                    <button type="button" class="btn btn-default btn-cancel" (click)="onCancel()">Cancel</button>
+              <div class="form-group modal-action-row row">
+                  <div class="col-sm-3 btn-with-icon">
+                    <button type="button" class="btn btn-default btn-cancel" (click)="onCancel()">
+                    <i class="icon ion-close"></i>
+                    Cancel</button>
                   </div>
-                  <div class="col-sm-6">
-                    &nbsp;
-                  </div>
-                  <div class="col-sm-3">
-                    <button [disabled]="!form.valid" type="submit" class="btn btn-default btn-save">Save</button>
+                  <div class="col-sm-5">
+                       &nbsp;
+                   </div>
+                   <div class="col-sm-1 no-padding">
+                       <span *ngIf="submitLoading" class="loading-container">
+                            <loading-small></loading-small>
+                        </span>
+                   </div>
+                  <div class="col-sm-3 btn-with-icon">
+                    <button [disabled]="!form.valid" type="submit" class="btn btn-default btn-save">
+                    <i class="icon ion-checkmark"></i>
+                        Save
+                    </button>
                   </div>
             </div>
             </form>
@@ -451,17 +477,30 @@
         <button class="close" aria-label="Close" (click)="hideEditModal()">
           <span aria-hidden="true">&times;</span>
         </button>
-        <h4 class="modal-title">Edit Asset</h4>
+        <span *ngIf="!disabled">
+            <h4 class="modal-title">Edit Asset</h4>
+        </span>
+        
+        <span *ngIf="disabled">
+            <h4 class="modal-title">View Asset</h4>
+        </span>
 		  <hr/>
       </div>
       <div class="modal-body">
         <div>
             <ba-card title="" baCardClass="with-scroll custom-card">
               <form [formGroup]="editForm" (ngSubmit)="onSubmitEdit(editForm.value, $event)" class="form-horizontal">
-              <div class="form-group row" [ngClass]="{'has-error': (!name.valid && name.touched), 'has-success': (name.valid && name.touched)}">
+                  <div class="modal-form-container">
+                      <div class="form-group row" [ngClass]="{'has-error': (!name.valid && name.touched), 'has-success': (name.valid && name.touched)}">
                <div class="col-sm-12">
 				   	<label>Name</label>
 					<input [formControl]="edit_name" type="text" class="form-control" id="inputEmail3" placeholder="Name">
+                </div>
+              </div>
+              <div class="form-group row" [ngClass]="{'has-error': (!description.valid && description.touched), 'has-success': (description.valid && description.touched)}">
+               <div class="col-sm-12">
+				   <label>Asset Code</label>
+				   <input [formControl]="edit_asset_number" type="text" class="form-control" id="inputPassword3" placeholder="Asset Code">
                 </div>
               </div>
               <div class="form-group row" [ngClass]="{'has-error': (!description.valid && description.touched), 'has-success': (description.valid && description.touched)}">
@@ -474,7 +513,7 @@
 				  
 				  <div class="col-sm-12">
 					  <label>Specifications</label>
-                    <textarea [formControl]="edit_specification" class="form-control" id="inputPassword3" placeholder="Description"></textarea>
+                    <textarea [formControl]="edit_specification" class="form-control" id="inputPassword3" [placeholder]="edit_specification.disabled ? '' : 'Specifications'"></textarea>
                 </div>
               </div>
               <div class="form-group row select-container">
@@ -516,19 +555,47 @@
                       </ng-select>
                   </div>
               </div>
-              <div class="form-group row">
-               <div class="col-sm-3">
-                  <button type="button" (click)="hideEditModal()" class="btn btn-default btn-cancel">Cancel</button> 
-               </div>
-               <div class="col-sm-6">
-                   &nbsp;
-               </div>
-                <div class="col-sm-3">
-                  <button [disabled]="!editForm.valid" type="submit" class="btn btn-default btn-save">Save</button>
-                </div>
-              </div>
+                  </div>
+              <div class="form-group modal-action-row row">
+                  <div class="col-sm-3">
+                    <button type="button" class="btn btn-default btn-cancel" (click)="hideEditModal()">Cancel</button>
+                  </div>
+                  <div class="col-sm-5">
+                       &nbsp;
+                   </div>
+                   <div class="col-sm-1 no-padding">
+                       <span *ngIf="submitLoading" class="loading-container">
+                            <loading-small></loading-small>
+                        </span>
+                   </div>
+                  <div class="col-sm-3">
+                    <button [disabled]="!editForm.valid" type="submit" class="btn btn-default btn-save">Save</button>
+                  </div>
+            </div>
             </form>
             </ba-card>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div bsModal #deleteModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+     
+      </div>
+      <div class="modal-body">
+		  <div class="content_confirm">
+				<h3>Delete {{delete_name}}?</h3>
+		  </div>
+		  <div class="delete-btn_confirm">
+			  <button (click)="saveDelete()" class="btn-yes">
+				  Yes
+			  </button>
+			  <button (click)="deleteClose()" class="btn-no">
+				  No
+			  </button>
           </div>
       </div>
     </div>

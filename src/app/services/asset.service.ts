@@ -227,7 +227,7 @@ export class AssetService{
         var formatted_object = {
             asset: {
                 assetId: updated_asset.id,
-                assetNumber: 'TES',
+                assetNumber: updated_asset.asset_number,
                 name: updated_asset.name,
                 description: updated_asset.description,
                 specification: updated_asset.specification,
@@ -253,8 +253,22 @@ export class AssetService{
 
         return this.http.post(update_url, asset_multipart, options).map(this.extractData);
     }
-    deleteAsset(asset_id): boolean {
-        return false;
+    deleteAsset(asset_id): Observable<any> {
+        var headers = new Headers();
+		headers.append('Content-Type', 'application/x-www-form-urlencoded');
+		headers.append('Authorization', 'Bearer ' + localStorage.getItem('bearer_token'));
+		headers.append('Access-Control-Allow-Origin', '*');
+		headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
+
+		var options = new RequestOptions({
+			headers: headers
+		});
+
+		var delete_url = this.appUrl + '/asset/delete';
+
+		var delete_body = "assetId=" + asset_id;
+		console.log('test service delete', delete_body);
+		return this.http.post(delete_url, delete_body, options).map(this.extractData);
     }
     
     get(asset_id){

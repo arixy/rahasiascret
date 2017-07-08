@@ -14,7 +14,7 @@ export const PAGES_MENU = [
           }
         }
       },
-    {
+    /* {
         path: 'schedules',
         data: {
             menu: {
@@ -25,7 +25,7 @@ export const PAGES_MENU = [
                 order: 176
             }
         }
-    },
+    }, */
     {
         path: 'tasks',
         data: {

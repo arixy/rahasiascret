@@ -2,7 +2,7 @@
 
 .ng2-smart-table-container table.ng2-smart-table {
   th, td {
-    border: 1px solid $border-light !important;
+    border: 1px solid #dee5e7 !important;
     line-height: 35px;
     vertical-align: middle;
   }
@@ -56,4 +56,11 @@
 nav.ng2-smart-pagination-nav {
   display: flex;
   justify-content: center;
+}
+
+.loading-container {
+    
+    float: right;
+    padding-top: 2px;
+   
 }

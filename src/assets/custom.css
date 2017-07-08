@@ -12,6 +12,24 @@
 .modal-body{
 	padding: 0;
 }
+.modal-body .card > .card-body {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-bottom: 0 !important;
+}
+.modal-action-row {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    margin-bottom: 0 !important;
+    padding: 2em 10px;
+    background: #f1f1f3;
+    margin-top: 1em;
+    border-top: solid 1px #d7d7d7;
+}
+.modal-body .ui-tabview {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+}
 .modal .modal-content {
     background: #fff !important; 
 }
@@ -21,8 +39,8 @@
 }
 input.form-control, textarea.form-control{
     background: transparent !important;
-    border-radius: 0;
-    border: 1px solid #6b6b6b;
+    border-radius: 2px !important;
+    border: 1px solid #cfdadd;
 }
 
 button.btn-custom{
@@ -80,24 +98,25 @@ body .ui-datatable thead th.ui-state-active {
     border-color: #52b1e0;
 }
 .btn-export__csv{
-    background: transparent;
+    background: #6d29ca;
     font-size: 24px !important;
-    color: #01ABFF;
+    color: #fff;
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    border: solid 1px #a9bbc4;
+    /* border: solid 1px #a9bbc4; */
+    border: none;
     transition: all 0.3s;
 }
 .btn-export__csv:hover {
-    background: #01ABFF;
-    color: #fff;
+    background: #7836d1;
+    color: #f1f1f1;
 }
 .btn-sets-right {
-    background: transparent;
+    background: #72bd4c;
     font-size: 24px !important;
-    border: solid 1px #a9bbc4;
-    color: #01ABFF;
+    border: none;
+    color: #fff;
     border-radius: 50%;
     width: 40px;
     height: 40px;
@@ -107,20 +126,24 @@ body .ui-datatable thead th.ui-state-active {
     margin-left: 3px;
 }
 .btn-sets-right:hover {
-    background: #01ABFF;
-    color: #fff;
+    background: #86d160;
+    color: #efefef;
+}
+.btn-sets-right i {
+    position: relative;
+    left: 2px;
 }
 .btn-sets-right-filter {
-    background: transparent;
+    background: #3fac82;
     font-size: 24px !important;
-    border: solid 1px #a9bbc4;
+    border: none;
     border-radius: 50%;
     width: 40px;
     height: 40px;
     transition: all 0.3s;
 }
 .btn-sets-right-filter:hover {
-    background: #01ABFF;
+    background: #41bc8d;
 }
 .content_confirm h3{
 	text-align: center;
@@ -227,9 +250,14 @@ th.top-aligned-table {
 .ui-treetable tbody td {
     overflow: visible !important;
 }
-
+.ui-treetable .ui-treetable-row {
+    border-top: solid 1px #dee5e7;
+}
+.ui-treetable .ui-treetable-child-table-container tbody:last-child .ui-treetable-row {
+    /* border-top: 0 none; */
+}
 .ui-treetable tbody > .ui-treetable-row td {
-    border-left: solid 1px #c7c7c7;
+    /* border-left: solid 1px #c7c7c7; */
 }
 .ui-treetable tbody > .ui-treetable-row td:first-child {
     border-left: none;
@@ -278,6 +306,76 @@ body .ui-tabview.ui-tabview-top .ui-tabview-nav li{
 .auth-block .btn {
     background: #00abff !important;
 }
+.no-padding {
+    padding: 0;
+}
+.ui-treetable-tablewrapper{
+    overflow-x: auto;
+}
+.ui-datatable-tablewrapper {
+    overflow-x: auto;
+}
+
+.add-new-dropdown .dropdown-toggle {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 0;    
+}
+.add-new-dropdown i {
+    position: relative;
+    float: left;
+    width: 34px;
+    height: 34px;
+    display: inline-block;
+    line-height: 34px;
+    text-align: center;
+    background-color: rgba(0,0,0,0.1);
+    margin: -7px -12px;
+    margin-right: 12px;
+    
+}
+.btn-with-icon button {
+    padding: 8px 12px !important;
+    border: none !important;
+    border-radius: 0 !important;
+}
+.btn-with-icon i {
+    position: relative;
+    float: left;
+    width: 34px;
+    height: 34px;
+    display: inline-block;
+    line-height: 34px;
+    text-align: center;
+    background-color: rgba(0,0,0,0.1);
+    margin: -7px -12px;
+    margin-right: 12px;
+}
+td .dropdown-toggle {
+    background: #fff !important;
+    border: solid 1px #dee5e7 !important;
+    box-shadow: 1px 1px 1px 1px rgba(90,90,90, 0.1) !important;
+    color: #202020;
+}
+td .dropdown-toggle:hover, td .dropdown-toggle:focus {
+    color: #202020 !important;
+    background: #dee5e7 !important;
+}
+
+.modal-form-container {
+    padding-left: 22px;
+    padding-right: 22px;
+}
+.modal .ui-select-toggle{
+    border-radius: 2px !important;
+    border: solid 1px #cfdadd !important;
+}
+.add-new-button__container .btn {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 0;  
+}
+
 /* Added by Mike */
 .ui-fileupload-buttonbar button:not(.ui-fileupload-choose) {
   display: none !important;

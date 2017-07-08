@@ -95,6 +95,10 @@ function transformAssetIdToId(asset_tree){
 })
 export class Assets {
 
+  // Loading Component
+  public submitLoading = false;
+  public dataLoading = false;
+
   // Form Disabled for View
   public disabled = false;
   public items_location;
@@ -119,6 +123,7 @@ export class Assets {
   public edit_photo;
   public edit_photo_file : FileList;
   public edit_specification;
+  public edit_asset_number;
     
   public wocategory_id = null;
   public location_id = null;
@@ -131,6 +136,9 @@ export class Assets {
   public treeAssets;
   public treeAssetsWithData = null;
   public asset_edit;
+
+  deleteConfirm;
+  delete_name;
 
   // Form Control
   public filterAssetName = new FormControl();
@@ -164,6 +172,7 @@ export class Assets {
   @ViewChild('viewAssetModal') viewAssetModal: ModalDirective;
   @ViewChild(TreeComponent)
   private assets_tree: TreeComponent;
+  @ViewChild('deleteModal') deleteModal: ModalDirective;
 
   constructor(
     public assetService: AssetService,
@@ -189,19 +198,22 @@ export class Assets {
       this.editForm = fb.group({
             'edit_name': ['', Validators.compose([Validators.required, Validators.minLength(2)])],
             'edit_description': ['', Validators.compose([Validators.required, Validators.minLength(2)])],
-            'edit_specification': ['', Validators.compose([Validators.required, Validators.minLength(2)])]
+            'edit_specification': ['', Validators.compose([Validators.required, Validators.minLength(2)])],
+            'edit_asset_number': ['', Validators.compose([Validators.required, Validators.minLength(2)])]
         });
       
       this.edit_name = this.editForm.controls['edit_name'];
       this.edit_description = this.editForm.controls['edit_description'];
       this.edit_specification = this.editForm.controls['edit_specification'];
+      this.edit_asset_number = this.editForm.controls['edit_asset_number'];
       
       
       
   }
 
     public ngOnInit(){
-        
+        this.dataLoading = true;
+        //this.refresh(this.filter_master);
       this.assets$ = this.assetService.getAssets();
       this.assets$.subscribe(
         (data) => {
@@ -234,6 +246,8 @@ export class Assets {
                     });
                 }
             );
+            
+            this.dataLoading = false;
         }
       );
       this.locations$ = this.locationService.getLocations();
@@ -307,9 +321,11 @@ export class Assets {
             sortField: 'dateUpdated',
             sortOrder: -1
         }
-        
+        console.log('Shoot Refresh', formatted_object);
         this.assetService.getAssetsFilter(formatted_object).subscribe(
             (data) => {
+                this.dataLoading = false;
+                console.log('Refresh Data', data);
                 this.assets = data.data;
 
                 var assets_with_data = this.assets.map(
@@ -358,6 +374,7 @@ export class Assets {
         this.submitted = true;
         
         if (this.form.valid) {
+            this.submitLoading = true;
             console.log('Form Values:', values);
             var formatted_object = Object.assign({}, {
                id: values.id,
@@ -378,6 +395,7 @@ export class Assets {
             
             this.assetService.addAsset(formatted_object).subscribe(
                 (data) => {
+                    this.submitLoading = false;
                     console.log('Response Data', data);
                     this.ngOnInit();
                     
@@ -414,8 +432,25 @@ export class Assets {
         
         this.childModal.show();
     }
+
+    public deleteClose(){
+        this.deleteModal.hide();
+    }
     public deleteAsset(node){
+        this.deleteConfirm = node;
+        console.log('Delete Confirm', this.deleteConfirm);
+        this.delete_name = node.name;
+        this.deleteModal.show();
         
+    }
+    public saveDelete(){
+        this.assetService.deleteAsset(this.deleteConfirm.data.assetId).subscribe(
+            (data) => {
+                console.log('Return Data', data);
+                this.ngOnInit();
+            }
+        );
+        this.deleteModal.hide();
     }
     public viewAssetHistory(node){
         console.log('Node', node);
@@ -435,10 +470,10 @@ export class Assets {
         this.viewHistoryModal.hide();
     }
     public viewAsset(event){
-        this.asset_pointer = event;
-        this.viewAssetModal.show();
+        //this.asset_pointer = event;
+        //this.viewAssetModal.show();
         
-        /*this.asset_edit = event;
+        this.asset_edit = event;
         // Inject Initial Value to the Edit Form
         this.editForm.patchValue(
             {
@@ -521,12 +556,14 @@ export class Assets {
         // Disable Stuff in Here
         this.editForm.disable();
         this.disabled = true;
-        this.editChildModal.show();*/
+        this.editChildModal.show();
     }
 
     public editAsset(event){
         console.log('Editing Asset:', event);
         this.asset_edit = event;
+        this.disabled = false;
+        this.editForm.enable();
         
         // Inject Initial Value to the Edit Form
         this.editForm.patchValue(
@@ -534,7 +571,8 @@ export class Assets {
                 edit_name: event.data.name,
                 edit_description: event.data.description,
                 edit_photo: event.data.photo,
-                edit_specification: event.data.specification
+                edit_specification: event.data.specification,
+                edit_asset_number: event.data.assetNumber
             }
         );
         
@@ -629,13 +667,14 @@ export class Assets {
         //event.preventDefault();
         console.log('EditForm:', values);
         if(this.editForm.valid){
-            
+            this.submitLoading = true;
             var formatted_object = Object.assign({}, {
                id: this.asset_edit.data.assetId,
                 name: values.edit_name,
                 description: values.edit_description,
                 photo: values.edit_photo,
                 specification: values.edit_specification,
+                asset_number: values.edit_asset_number,
                 parent_asset_id: null,
                 wocategory_id: null,
                 location_id: null
@@ -653,11 +692,12 @@ export class Assets {
              
             this.assetService.updateAsset(formatted_object).subscribe(
                 (data) => {
+                    this.submitLoading = false;
                     console.log('Data after update', data);
                     this.editChildModal.hide();
                     this.ngOnInit();
                 }
-            );            
+            );         
         }
         
         //event.preventDefault();

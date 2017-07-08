@@ -54,6 +54,8 @@ import { TabViewModule, FileUploadModule, PanelModule, CalendarModule } from 'pr
 import { TreeTableModule,TreeNode } from 'primeng/primeng';
 
 import {MdTabsModule} from '@angular/material';
+import { LoadingSmallComponent } from './loading-small.component';
+import { SpinnerComponent } from './spinner.component';
 
 @NgModule({
   imports: [CommonModule, NgaModule, routing, SelectModule, Ng2SmartTableModule, ModalModule.forRoot(), ReactiveFormsModule,
@@ -96,7 +98,9 @@ import {MdTabsModule} from '@angular/material';
       RecurringRequestComponent,
       PreventiveRequestComponent,
       WorkOrderExpensesComponent,
-      WorkOrderFilesComponent
+      WorkOrderFilesComponent,
+      SpinnerComponent,
+      LoadingSmallComponent
       //AddNewWorkOrderComponent,
       //TabContentRecurringComponent
     ],
