@@ -251,6 +251,26 @@ export const PAGES_MENU = [
                   hidden: true
               }
           }
+      },
+      {
+          path: 'consumption-report',
+          data: {
+              menu: {
+                  title: 'Reports - Consumption Report',
+                  pathMatch: 'prefix',
+                  hidden: true
+              }
+          }
+      },
+      {
+          path: 'performance-report',
+          data: {
+              menu: {
+                  title: 'Reports - Performance Report',
+                  pathMatch: 'prefix',
+                  hidden: true
+              }
+          }
       }
     ]
   }

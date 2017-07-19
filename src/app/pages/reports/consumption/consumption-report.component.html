@@ -1,0 +1,92 @@
+﻿<div class="widgets">
+  <ba-card baCardClass="with-scroll">
+    <div class="ui-helper-clearfix">
+      <div class="alert alert-danger" *ngIf="errMsg.length > 0">
+        <ul style="margin-bottom: 0px;">
+          <li *ngFor="let err of errMsg">
+            {{err}}
+          </li>
+        </ul>
+      </div>
+      <p-panel [toggleable]="true" [collapsed]="false" #pnlFilter>
+        <p-header (click)="pnlFilter.toggle($event)">
+          <strong>Filters</strong>
+        </p-header>
+        <div class="row">
+          <div class="col-md-12">
+            <span><strong>Date</strong></span><br />
+            <div class="col-md-3 wo-report-filter">
+              <ng-select #selectDateType [items]="filterModel._itemsDateTypes" placeholder="No Date Type Selected" (removed)="removeFilterSelectBox('dateType', $event)" (selected)="selectFilterSelectBox('dateType', $event)" allowClear="false"></ng-select>
+            </div>
+            <div class="col-md-3 wo-report-filter">
+              <p-calendar [(ngModel)]="filterModel.dateFrom" [showIcon]="true" dateFormat="yy-mm-dd" [yearNavigator]="true" [yearRange]="_yearRange" [showTime]="false"></p-calendar>
+            </div>
+            <div class="col-md-1 wo-report-filter">
+              <!--<div style="padding: 4px">To</div>-->
+              <label class="form-control">To</label>
+            </div>
+            <div class="col-md-3 wo-report-filter">
+              <p-calendar [(ngModel)]="filterModel.dateTo" [showIcon]="true" dateFormat="yy-mm-dd" [yearNavigator]="true" [yearRange]="_yearRange" [showTime]="false"></p-calendar>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top: 12px"></div>
+        <div class="row">
+          <div class="col-md-12">
+            <span><strong>Utility Type</strong></span><br />
+            <div class="col-md-4 wo-report-filter">
+              <ng-select #selectUtilityType 
+                         [items]="filterModel._itemsUtilityTypes" 
+                         placeholder="No Utility Type Selected" 
+                         (removed)="removeFilterSelectBox('utilityType', $event)" 
+                         (selected)="selectFilterSelectBox('utilityType', $event)"></ng-select>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top: 12px"></div>
+        <div class="row">
+          <div class="col-md-12">
+            <div class="add-new-button__container">
+              <button type="button" class="btn btn-primary" (click)="refresh($event, dt)">View Report</button>
+            </div>
+            <!--&emsp;<button type="button" class="btn btn-danger">Clear</button>-->
+          </div>
+        </div>
+      </p-panel>
+    </div>
+    <!--<hr/>-->
+    <div class="ui-helper-clearfix">
+      <div style="margin-top: 12px"></div>
+      <p-panel [toggleable]="true" [collapsed]="true" #pnlChart>
+        <p-header (click)="pnlChart.toggle($event)"><strong>Trend</strong></p-header>
+        <div class="row">
+          <div class="col-md-12">
+            <p-chart type="line" [data]="chartData" #chart></p-chart>
+          </div>
+        </div>
+      </p-panel>
+    </div>
+    <div class="ui-helper-clearfix">
+      <div style="margin-top: 12px"></div>
+      <button type="button" iconPos="left" label="CSV" (click)="downloadCSV(dt)" style="float:left" class="btn-export__csv">
+        <i class="icon ion-ios-download-outline"></i>
+      </button>
+    </div>
+    <div style="width: 100%; overflow-y: auto">
+      <p-dataTable #dt [lazy]="true" (onPage)="refresh($event, dt)" [value]="lstConsumptions" [sortField]="DEFAULT_SORT_FIELD" [rows]="DEFAULT_ITEM_PER_PAGE" sortOrder="-1" [totalRecords]="totalRecords" [paginator]="true">
+        <p-header>
+        </p-header>
+        <p-column field="utilityType" header="Type" sortable="true"></p-column>
+        <p-column field="date" header="Date" sortable="true">
+          <template pTemplate="body" let-data="rowData">
+            {{data.date | date: 'y-MM-dd'}}
+          </template>
+        </p-column>
+        <p-column field="total" header="Total" sortable="true"></p-column>
+        <p-column field="exclusion" header="Total Exclusion" sortable="true"></p-column>
+        <p-column field="nettTotal" header="Nett Total" sortable="true"></p-column>
+        <p-column field="uom" header="UOM" sortable="true"></p-column>
+      </p-dataTable>
+    </div>
+  </ba-card>
+</div>

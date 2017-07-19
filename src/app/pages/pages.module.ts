@@ -51,10 +51,12 @@ import { PreventiveRequestComponent } from './task/forms/preventiverequest.compo
 import { WorkOrderExpensesComponent } from './task/forms/subforms/workorder-expenses.component';
 import { WorkOrderFilesComponent } from './task/forms/subforms/workorder-files.component';
 import { UtilityFormComponent } from './utility-consumptions/forms/utility-form.component';
-import { WorkOrderListReportComponent } from './reports/wo-report.component';
+import { WorkOrderListReportComponent } from './reports/workorder/wo-report.component';
+import { PerformanceReportComponent } from './reports/performance/performance-report.component';
+import { ConsumptionReportComponent } from './reports/consumption/consumption-report.component';
 // add primeng
 import { TabViewModule, FileUploadModule, PanelModule, CalendarModule, CheckboxModule, PaginatorModule } from 'primeng/primeng';
-import { TreeTableModule,TreeNode } from 'primeng/primeng';
+import { TreeTableModule, TreeNode, ChartModule } from 'primeng/primeng';
 
 import {MdTabsModule} from '@angular/material';
 import { LoadingSmallComponent } from './loading-small.component';
@@ -78,7 +80,8 @@ import { SpinnerComponent } from './spinner.component';
       CalendarModule,
       TreeTableModule,
       CheckboxModule,
-      PaginatorModule
+      PaginatorModule,
+      ChartModule
            ],
   declarations: [
       Pages, 
@@ -111,7 +114,9 @@ import { SpinnerComponent } from './spinner.component';
       //AddNewWorkOrderComponent,
       //TabContentRecurringComponent
       // reports
-      WorkOrderListReportComponent
+      WorkOrderListReportComponent,
+      ConsumptionReportComponent,
+      PerformanceReportComponent
     ],
 })
 export class PagesModule {

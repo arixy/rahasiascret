@@ -1,7 +1,12 @@
 ﻿<div class="widgets">
   <div class="ui-helper-clearfix">
-    <div class="btn-group" dropdown style="float: right">
-      <button (click)="addUtilityConsumption()" class="btn btn-primary" style="float:right">Add Consumption</button>
+    <div class="add-new-button__container">
+      <div class="btn-group add-new-dropdown" style="float: right">
+        <button (click)="addUtilityConsumption()" class="btn btn-primary" style="float:right">
+          <i class="icon ion-plus-round"></i>
+          Add Consumption
+        </button>
+      </div>
     </div>
   </div>
   <ba-card baCardClass="with-scroll">
@@ -115,7 +120,11 @@
       <p-column field="utilityTypeName" header="Type" filter="true" sortable="true"></p-column>
       <p-column field="date" header="Date" sortable="true"></p-column>
       <p-column field="total" header="Total" filter="true" sortable="true"></p-column>
-      <p-column field="totalExclusion" header="Total Exclusion" sortable="true"></p-column>
+      <p-column field="totalExclusion" header="Total Exclusion" sortable="true">
+        <template pTemplate="body" let-data="rowData">
+          {{ data.totalExclusion == null ? '' : data.totalExclusion }}
+        </template>
+      </p-column>
       <p-column field="nettTotal" header="Nett Total"></p-column>
       <p-column field="utilityUomName" header="UOM" filter="true" sortable="true"></p-column>
     </p-dataTable>

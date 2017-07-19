@@ -226,7 +226,7 @@
 
         <div class="col-xg-10">
           <!--<ng2-datepicker (outputEvents)="selectedDate('selected_startdate', $event)" [formControl]="selected_startdate"></ng2-datepicker>-->
-          <p-calendar [formControl]="selected_startdate" [showIcon]="true" dateFormat="yy-mm-dd" [yearNavigator]="true" [yearRange]="'2017:2222'" [showTime]="true"></p-calendar>
+          <p-calendar [formControl]="selected_startdate" [showIcon]="true" dateFormat="yy-mm-dd" [yearNavigator]="true" [yearRange]="_yearRange" [showTime]="true"></p-calendar>
         </div>
       </div>
       <div class="row error-row" *ngIf="!isSchedule">
@@ -242,7 +242,7 @@
 
         <div class="col-xg-10">
           <!--<ng2-datepicker (outputEvents)="selectedDate('selected_duedate', $event)" [formControl]="selected_duedate"></ng2-datepicker>-->
-          <p-calendar [formControl]="selected_duedate" [showIcon]="true" dateFormat="yy-mm-dd" [yearNavigator]="true" [yearRange]="'2017:2222'"></p-calendar>
+          <p-calendar [formControl]="selected_duedate" [showIcon]="true" dateFormat="yy-mm-dd" [yearNavigator]="true" [yearRange]="_yearRange"></p-calendar>
         </div>
       </div>
       <div class="row error-row">
@@ -349,7 +349,7 @@
           <label for="selected_duedate" class="control-label">Start Date</label><br />
 
           <div class="col-xg-10">
-            <p-calendar [formControl]="selected_startdate" [showIcon]="true" dateFormat="yy-mm-dd" [yearNavigator]="true" [yearRange]="'2017:2222'" [showTime]="true"></p-calendar>
+            <p-calendar [formControl]="selected_startdate" [showIcon]="true" dateFormat="yy-mm-dd" [yearNavigator]="true" [yearRange]="_yearRange" [showTime]="true"></p-calendar>
           </div>
         </div>
         <div class="row error-row">

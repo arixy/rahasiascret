@@ -658,6 +658,16 @@ export class Preventatives {
         this.getAllWOs(this.buildFilter(table));
     }
 
+    resetFiltersScheduled(table: DataTable) {
+        console.log("resetFilters");
+        console.log(table);
+
+        table.filters = {};
+        table.globalFilter = "";
+
+        this.getAllScheduledWOs(this.buildFilter(table));
+    }
+
 
     private buildFilter(table : DataTable){
         if(table == null){

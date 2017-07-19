@@ -29,6 +29,7 @@ import { EntityTypeService } from './services/entity-type.service';
 import { UOMService } from './services/uom.service';
 import { UtilityTypeService } from './services/utility-type.service';
 import { StatusService } from './services/status.service';
+import { WorkOrderTypeService } from './services/wo-type.service';
 
 import { UsersService } from './pages/users/users.service';
 
@@ -41,6 +42,9 @@ import { PaperHttp } from './services/paper-http.service';
 import { AccessRightsService } from './pages/access-rights/access-rights.service';
 // task services
 import { TaskService } from './pages/task/task.service';
+import { ConsumptionReportService } from './pages/reports/consumption/consumption-report.service';
+import { WorkOrderReportService } from './pages/reports/workorder/wo-report.service';
+import { PerformanceReportService } from './pages/reports/performance/performance-report.service';
 
 // App is our top level component
 import { App } from './app.component';
@@ -115,7 +119,11 @@ export function httpFactory(backend: XHRBackend, options: RequestOptions) {
       UOMService,
       UtilityTypeService,
       AccessRightsService,
-      StatusService
+      StatusService,
+      WorkOrderTypeService,
+      ConsumptionReportService,
+      WorkOrderReportService,
+      PerformanceReportService
   ]
 })
 
