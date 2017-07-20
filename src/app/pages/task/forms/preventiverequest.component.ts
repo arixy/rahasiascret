@@ -19,7 +19,7 @@ import { PeriodService } from '../../../services/period.service';
 import { ExpenseTypeService } from '../../expense-type/expense-type.service';
 import { PriorityService } from '../../priorities/priority.service';
 
-import { WorkflowActions, WorkOrderStatuses } from '../../../global.state';
+import { GlobalConfigs, WorkflowActions, WorkOrderStatuses } from '../../../global.state';
 
 import { CustomValidators } from './custom-validators';
 
@@ -32,6 +32,9 @@ export class PreventiveRequestComponent {
     public selectedWoType: { id, label };
     public actionType: { workflowActionId, name, toRoleId, toRoleTypeId, toUserId }; // JSON of Action
     public selectedWO;
+
+    // const
+    private _yearRange = GlobalConfigs.yearRange;
 
     // flag to disable almost all form
     public disabled = false;
@@ -628,7 +631,7 @@ export class PreventiveRequestComponent {
                 var workorder_object = Object.assign({}, {
                     workOrderId: this.selectedWO == null ? null : this.selectedWO.workOrderId,
                     woNumber: this.wo_number.value,
-                    woTypeId: this.selectedWoType.id,
+                    woTypeId: this.selectedWO == null ? this.selectedWoType.id : this.selectedWO.woTypeId,
                     taskName: this.task_name.value,
                     description: this.task_desc.value,
                     woCategoryId: this.selected_category.value == null ? null : this.selected_category.value.id,

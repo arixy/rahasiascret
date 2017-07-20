@@ -18,7 +18,7 @@ import { WorkOrderService } from '../../../services/work-order.service';
 import { ExpenseTypeService } from '../../expense-type/expense-type.service';
 import { PriorityService } from '../../priorities/priority.service';
 
-import { WorkflowActions, WorkOrderStatuses } from '../../../global.state';
+import { GlobalConfigs, WorkflowActions, WorkOrderStatuses } from '../../../global.state';
 
 import { CustomValidators } from './custom-validators';
 
@@ -31,6 +31,9 @@ export class GuestRequestComponent {
     public selectedWoType: { id, label };
     public actionType: { workflowActionId, name, toRoleId, toRoleTypeId, toUserId }; // JSON of Action
     public selectedWO = null;
+
+    // const
+    private _yearRange = GlobalConfigs.yearRange;
 
     // flag to disable almost all form
     public disabled = false;
@@ -497,6 +500,7 @@ export class GuestRequestComponent {
                 this.location_info.disable();
                 this.selected_status.disable();
                 this.selected_priority.disable();
+                this.selected_entity.disable();
                 this.selected_vendor.disable();
                 this.contact_person.disable();
                 this.contact_number.disable();
@@ -527,6 +531,7 @@ export class GuestRequestComponent {
                 this.location_info.disable();
                 this.selected_status.disable();
                 this.selected_priority.disable();
+                this.selected_entity.disable();
                 this.selected_vendor.disable();
                 this.contact_person.disable();
                 this.contact_number.disable();
@@ -554,6 +559,7 @@ export class GuestRequestComponent {
                 this.selected_priority.disable();
                 this.selected_status.disable();
                 this.selected_location.disable();
+                this.selected_entity.disable();
                 this.location_info.disable();
                 this.contact_number.disable();
                 this.contact_person.disable();
@@ -597,7 +603,7 @@ export class GuestRequestComponent {
                 var workorder_object = Object.assign({}, {
                     workOrderId: this.selectedWO == null ? null : this.selectedWO.workOrderId,
                     woNumber: this.wo_number.value,
-                    woTypeId: this.selectedWoType.id,
+                    woTypeId: this.selectedWO == null ? this.selectedWoType.id : this.selectedWO.woTypeId,
                     taskName: this.task_name.value,
                     description: this.task_desc.value,
                     woCategoryId: this.selected_category.value.id,

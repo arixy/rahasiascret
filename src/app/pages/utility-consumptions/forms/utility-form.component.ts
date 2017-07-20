@@ -7,6 +7,7 @@ import * as moment from 'moment';
 import { ModalDirective } from 'ng2-bootstrap';
 import { DatePickerOptions } from 'ng2-datepicker';
 import { SelectComponent, SelectItem } from 'ng2-select';
+import { TabPanel } from 'primeng/primeng';
 
 // global configs
 import { GlobalConfigs } from '../../../global.state';
@@ -22,6 +23,7 @@ import { UtilityTypeService } from '../../../services/utility-type.service';
 @Component({
     selector: 'utility-form',
     templateUrl: './utility-form.component.html',
+    styleUrls: ['./../utility-consumptions.css'],
     providers: [UOMService, UtilityTypeService]
 })
 export class UtilityFormComponent {
@@ -48,6 +50,8 @@ export class UtilityFormComponent {
     // select box by directives
     @ViewChild("utilityTypesSelectBox") utilityTypesSelectBox: SelectComponent;
     @ViewChild("uomSelectBox") uomSelectBox: SelectComponent;
+    @ViewChild("generalTab") generalTab: TabPanel;
+    @ViewChild("exclusionTab") exclusionTab: TabPanel;
 
     // dropdown items
     private _itemsUtilityTypes;
@@ -64,11 +68,10 @@ export class UtilityFormComponent {
         private _utilityConsumptionService: UtilityConsumptionsService,
         private _utilityTypeService: UtilityTypeService,
         private _uomService: UOMService) {
-
+        
     }
 
     ngOnInit() {
-
         this.formGroup = this.fb.group({
             'txtUtilityId': ['', null],
             'lsbUtilityType': ['', Validators.compose([Validators.required])],
@@ -211,7 +214,7 @@ export class UtilityFormComponent {
         if (this.lstExclusions != null) {
             let _totalExclusion = 0;
             for (var i = 0; i < this.lstExclusions.length; i++) {
-                _totalExclusion += this.lstExclusions[i].value;
+                _totalExclusion += parseInt(this.lstExclusions[i].value);
             }
 
             if (parseInt(this.txtValue.value) < _totalExclusion) {
@@ -230,7 +233,7 @@ export class UtilityFormComponent {
         } else {
             let _totalExclusion = 0;
             for (var i = 0; i < this.lstExclusions.length; i++) {
-                _totalExclusion += this.lstExclusions[i].value;
+                _totalExclusion += parseInt(this.lstExclusions[i].value);
             }
 
             if (parseInt(this.txtValue.value) < _totalExclusion) {
@@ -303,8 +306,10 @@ export class UtilityFormComponent {
 
     onSubmit(formValues) {
         this.isBtnSaveClicked = true;
-        //this.txtValue.updateValueAndValidity();
-        //this.formGroup.updateValueAndValidity();
+
+        // clear panel error class
+        this.generalTab.headerStyleClass = "";
+        this.exclusionTab.headerStyleClass = "";
 
         Object.keys(this.formGroup.controls).forEach(key => {
             this.formGroup.get(key).updateValueAndValidity();
@@ -348,7 +353,12 @@ export class UtilityFormComponent {
                 });
             }
         } else {
-            
+            if (!this.formGroup.valid) {
+                this.generalTab.headerStyleClass = "tabpanel-has-error";
+            }
+            if (!this.isExclusionValid()) {
+                this.exclusionTab.headerStyleClass = "tabpanel-has-error";
+            }
         }
 
         return false;

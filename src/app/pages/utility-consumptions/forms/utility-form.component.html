@@ -4,7 +4,7 @@
   </div>
   <p-tabView>
     <!-- General Tab -->
-    <p-tabPanel header="General" [style]="{'background-color': 'red'}">
+    <p-tabPanel header="General" #generalTab>
       <!-- Utility ID -->
       <div class="form-group row" *ngIf="formMode != 'NEW'">
         <label for="inputEmail3" class="control-label">ID</label><br />
@@ -68,7 +68,7 @@
       <div class="row error-row">
         <div class="col-xg-2 line-height-zero">&nbsp;</div>
         <div class="error-message col-xg-10" *ngIf="formGroup.get('dtbDate').hasError('required') && (formGroup.get('dtbDate').touched || isBtnSaveClicked)">
-          Date is Required
+          Date is required
         </div>
       </div>
 
@@ -108,7 +108,7 @@
     </p-tabPanel>
 
     <!-- Exclusion Tab -->
-    <p-tabPanel header="Exclusion">
+    <p-tabPanel header="Exclusion" #exclusionTab>
       <p-dataTable [value]="lstExclusions">
         <p-header>
           <div class="ui-helper-clearfix" style="text-align: left;">

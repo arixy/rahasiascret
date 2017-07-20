@@ -90,6 +90,8 @@ export class UtilityConsumptions implements OnDestroy {
             if (response.resultCode.code == "0") {
                 this.lstUtilityConsumptions = response.data;
                 this.totalRecords = response.paging.total;
+
+                console.log("util cons", this.lstUtilityConsumptions);
             } else {
                 // show error message?
             }
@@ -149,7 +151,7 @@ export class UtilityConsumptions implements OnDestroy {
     private viewUtilityConsumption(utility) {
         this.viewModalBody.clear();
 
-        this.modalTitle = "VIEW Consumption";
+        this.modalTitle = "View Consumption";
 
         this.currentModalContent = this.createUtilityFormComponent(this.viewModalBody, UtilityFormComponent);
         this.currentModalContent.instance.formMode = "VIEW";

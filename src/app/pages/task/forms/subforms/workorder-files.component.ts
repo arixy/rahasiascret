@@ -79,34 +79,66 @@ export class WorkOrderFilesComponent {
         file.isActive = false;
     }
 
+    onSelectPhoto(event) {
+        console.log(event);
+        for (var i = 0; i < event.files.length; i++) {
+            var file = event.files[i];
+            var tmpPhoto = {
+                workOrderPhotoId: null,
+                name: file.name,
+                path: "", // image blob url is stored in 'file.objectURL.changingThisBreaksApplicationSecurity'
+                notes: "",
+                isActive: true,
+                actualFile: file
+            };
+            this.existingPhotos.unshift(tmpPhoto);
+        }
+    }
+
     onSelectFile(event) {
         console.log(event);
         for (var i = 0; i < event.files.length; i++) {
             var file = event.files[i];
-            if (file.type.includes("image")) {
-                var tmpPhoto = {
-                    workOrderPhotoId: null,
-                    name: file.name,
-                    path: "", // image blob url is stored in 'file.objectURL.changingThisBreaksApplicationSecurity'
-                    notes: "",
-                    isActive: true,
-                    actualFile: file
-                };
-                this.existingPhotos.unshift(tmpPhoto);
-            } else {
-                var tmpFile = {
-                    workOrderFileId: null,
-                    name: file.name,
-                    path: "", // image blob url is stored in 'file.objectURL.changingThisBreaksApplicationSecurity'
-                    notes: "",
-                    isActive: true,
-                    actualFile: file
-                };
-                this.existingFiles.unshift(tmpFile);
-            }
-            //this.newlyAddedFiles.push(tmpFile);
+            var tmpFile = {
+                workOrderFileId: null,
+                name: file.name,
+                path: "",
+                notes: "",
+                isActive: true,
+                actualFile: file
+            };
+            this.existingFiles.unshift(tmpFile);
         }
     }
+
+    //onSelectFile(event) {
+    //    console.log(event);
+    //    for (var i = 0; i < event.files.length; i++) {
+    //        var file = event.files[i];
+    //        if (file.type.includes("image")) {
+    //            var tmpPhoto = {
+    //                workOrderPhotoId: null,
+    //                name: file.name,
+    //                path: "", // image blob url is stored in 'file.objectURL.changingThisBreaksApplicationSecurity'
+    //                notes: "",
+    //                isActive: true,
+    //                actualFile: file
+    //            };
+    //            this.existingPhotos.unshift(tmpPhoto);
+    //        } else {
+    //            var tmpFile = {
+    //                workOrderFileId: null,
+    //                name: file.name,
+    //                path: "", // image blob url is stored in 'file.objectURL.changingThisBreaksApplicationSecurity'
+    //                notes: "",
+    //                isActive: true,
+    //                actualFile: file
+    //            };
+    //            this.existingFiles.unshift(tmpFile);
+    //        }
+    //        //this.newlyAddedFiles.push(tmpFile);
+    //    }
+    //}
 
     downloadPhoto(file) {
         this._taskService.getImageById(file.workOrderPhotoId).subscribe((response) => {

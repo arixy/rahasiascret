@@ -1,0 +1,110 @@
+﻿<div class="widgets">
+  <ba-card baCardClass="with-scroll">
+    <div class="ui-helper-clearfix">
+      <div class="alert alert-danger" *ngIf="errMsg.length > 0">
+        <ul style="margin-bottom: 0px;">
+          <li *ngFor="let err of errMsg">
+            {{err}}
+          </li>
+        </ul>
+      </div>
+      <p-panel [toggleable]="true" [collapsed]="false" #pnlFilter>
+        <p-header (click)="pnlFilter.toggle($event)">
+          <strong>Filters</strong>
+        </p-header>
+        <div class="row">
+          <div class="col-md-12">
+            <span><strong>Date</strong></span><br />
+            <div class="col-md-3 wo-report-filter">
+              <ng-select #selectDateType [items]="filterModel._itemsDateTypes" placeholder="No Date Type Selected" (removed)="removeFilterSelectBox('dateType', $event)" (selected)="selectFilterSelectBox('dateType', $event)" allowClear="false"></ng-select>
+            </div>
+            <div class="col-md-3 wo-report-filter">
+              <p-calendar [(ngModel)]="filterModel.dateFrom" [showIcon]="true" dateFormat="yy-mm-dd" [yearNavigator]="true" [yearRange]="_yearRange" [showTime]="false"></p-calendar>
+            </div>
+            <div class="col-md-1 wo-report-filter">
+              <!--<div style="padding: 4px">To</div>-->
+              <label class="form-control">To</label>
+            </div>
+            <div class="col-md-3 wo-report-filter">
+              <p-calendar [(ngModel)]="filterModel.dateTo" [showIcon]="true" dateFormat="yy-mm-dd" [yearNavigator]="true" [yearRange]="_yearRange" [showTime]="false"></p-calendar>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top: 12px"></div>
+        <div class="row">
+          <div class="col-md-4">
+            <span><strong>Status</strong></span><br />
+            <div class="col-md-12 wo-report-filter">
+              <ng-select #selectStatus [items]="filterModel._itemsStatuses" placeholder="No Status selected" (removed)="removeFilterSelectBox('status', $event)" (selected)="selectFilterSelectBox('status', $event)"></ng-select>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <span><strong>WO Type</strong></span><br />
+            <div class="col-md-12 wo-report-filter">
+              <ng-select #selectWOType [items]="filterModel._itemsWOTypes" placeholder="No Type selected" (removed)="removeFilterSelectBox('woType', $event)" (selected)="selectFilterSelectBox('woType', $event)"></ng-select>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <span><strong>WO Category</strong></span><br />
+            <div class="col-md-12 wo-report-filter">
+              <ng-select #selectWOCategory [items]="filterModel._itemsWOCategories" placeholder="No Category selected" (removed)="removeFilterSelectBox('woCategory', $event)" (selected)="selectFilterSelectBox('woCategory', $event)"></ng-select>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top: 12px"></div>
+        <div class="row">
+          <div class="col-md-12">
+            <div class="add-new-button__container">
+              <button type="button" class="btn btn-primary" (click)="refresh($event, dt)">View Report</button>
+            </div>
+            <!--&emsp;<button type="button" class="btn btn-danger">Clear</button>-->
+          </div>
+        </div>
+      </p-panel>
+    </div>
+    <!--<hr/>-->
+    <div class="ui-helper-clearfix">
+      <div style="margin-top: 12px"></div>
+      <button type="button" iconPos="left" label="CSV" (click)="downloadCSV(dt)" style="float:left" class="btn-export__csv">
+        <i class="icon ion-ios-download-outline"></i>
+      </button>
+    </div>
+    <div style="width: 100%; overflow-y: auto">
+      <p-dataTable #dt [value]="lstWorkOrders" [lazy]="true" [sortField]="DEFAULT_SORT_FIELD" [rows]="DEFAULT_ITEM_PER_PAGE" sortOrder="-1" [totalRecords]="totalRecords" [paginator]="true" (onPage)="refresh($event, dt)">
+        <p-header>
+        </p-header>
+        <p-column field="woNumber" header="WO#" sortable="true" [style]="{'width':'120px'}"></p-column>
+        <p-column field="taskName" header="Task" sortable="true" [style]="{'width':'120px'}"></p-column>
+        <p-column field="woTypeName" header="WO Type" sortable="true" [style]="{'width':'120px'}"></p-column>
+        <p-column field="woCategoryName" header="Category" sortable="true" [style]="{'width':'160px'}"></p-column>
+        <p-column field="priorityName" header="Priority" sortable="true" [style]="{'width':'120px'}"></p-column>
+        <p-column field="assetName" header="Asset" sortable="true" [style]="{'width':'160px'}"></p-column>
+        <p-column field="locationName" header="Location" sortable="true" [style]="{'width':'160px'}"></p-column>
+        <p-column field="startDate" header="Start Date" [style]="{'width':'120px'}" sortable="true">
+          <template pTemplate="body" let-data="rowData">
+            {{data.startDate | date: 'y-MM-dd HH:mm'}}
+          </template>
+        </p-column>
+        <p-column field="dueDate" header="Due Date" sortable="true" [style]="{'width':'120px'}"></p-column>
+        <p-column field="status" header="Status" sortable="true" [style]="{'width':'120px'}"></p-column>
+        <p-column field="pic" header="PIC" sortable="true" [style]="{'width':'120px'}"></p-column>
+        <p-column field="assignee" header="Assignee" sortable="true" [style]="{'width':'120px'}"></p-column>
+        <p-column field="createdDate" header="Created Date" sortable="true" [style]="{'width':'160px'}">
+          <template pTemplate="body" let-data="rowData">
+            {{data.createdDate | date: 'y-MM-dd HH:mm:ss'}}
+          </template>
+        </p-column>
+        <p-column field="lastUpdated" header="Last Updated" sortable="true" [style]="{'width':'160px'}">
+          <template pTemplate="body" let-data="rowData">
+            {{data.lastUpdated | date: 'y-MM-dd HH:mm:ss'}}
+          </template>
+        </p-column>
+        <p-column field="completeDate" header="Completed Date" sortable="true" [style]="{'width':'160px'}"></p-column>
+        <!--<p-column field="onTime" header="On Time" sortable="true" [style]="{'width':'120px'}"></p-column>-->
+        <p-column field="completedTime" header="Total Time" sortable="true" [style]="{'width':'120px'}"></p-column>
+        <p-column field="pendingTime" header="Pending Time" sortable="true" [style]="{'width':'160px'}"></p-column>
+        <p-column field="totalExpenses" header="Total Expenses" sortable="true" [style]="{'width':'140px'}"></p-column>
+      </p-dataTable>
+    </div>
+</ba-card>
+</div>
