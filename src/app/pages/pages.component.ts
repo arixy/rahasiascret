@@ -11,8 +11,8 @@ import { MENU } from '../app.menu';
     <ba-sidebar></ba-sidebar>
     <ba-page-top></ba-page-top>
     <div class="al-main">
+    <ba-content-top></ba-content-top>
       <div class="al-content">
-        <ba-content-top></ba-content-top>
         <router-outlet></router-outlet>
       </div>
     </div>

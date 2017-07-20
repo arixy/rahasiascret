@@ -1,13 +1,21 @@
+.al-content {
+    padding-top: 16px !important; 
+}
+.card-title {
+    text-transform: none !important;
+}
 .modal-header h4{
-	font-size: 14px;
+	font-size: 18px;
 }
 
 .modal-header hr{
-	background: #fff;
+	background: #00ABFF;
     width: 28px;
     height: 2px;
     margin: 0;
-    margin-top: 4px;	
+    margin-top: 6px;
+    position: relative;
+    top: 4px;
 }
 .modal-body{
 	padding: 0;
@@ -36,6 +44,10 @@
 .custom-card{
 	background: transparent !important;
 	margin-bottom: 0;
+}
+.modal-body .role-card {
+    border: 1px solid #cfdadd;
+    margin-top: 18px;
 }
 input.form-control, textarea.form-control{
     background: transparent !important;
@@ -74,7 +86,7 @@ button.btn-custom:focus{
 }
 
 .custom-card .card-header{
-	background: #00ABFF;
+	/* background: #00ABFF; */
 	padding: 11px 16px !important;
 	height: 40px;
     margin-top: 10px;
@@ -266,10 +278,11 @@ th.top-aligned-table {
     border: 0 none;
 }
 
-body .ui-tabview.ui-tabview-top .ui-tabview-nav li.ui-state-active{
-	border-bottom: 2px solid #00abff !important;
-    background-color: #fff !important;
-    border: none;
+body .ui-tabview.ui-tabview-top .ui-tabview-nav li{
+	/* border-bottom: 2px solid #00abff !important; */
+    background-color: #efefef;
+    /* border: none; */
+    border-color: #a9abb4 !important;
 }
 body .ui-tabview.ui-tabview-top .ui-tabview-nav li.ui-state-active a{
 	color: #00abff !important;
@@ -277,9 +290,12 @@ body .ui-tabview.ui-tabview-top .ui-tabview-nav li.ui-state-active a{
 body .ui-tabview.ui-tabview-top .ui-tabview-nav li:hover{
 	background: #d7d7d7 !important;	
 }
+body .ui-tabview .ui-tabview-selected {
+    background: #fff !important;
+}
 body .ui-tabview.ui-tabview-top .ui-tabview-nav li{
 	line-height: 48px;
-    height: 48px;
+    height: 44px;
     padding: 0 35px;
     font-size: 14px;
     font-family: Roboto,"Helvetica Neue",sans-serif;
@@ -287,7 +303,7 @@ body .ui-tabview.ui-tabview-top .ui-tabview-nav li{
     cursor: pointer;
     box-sizing: border-box;
     opacity: .6;
-    min-width: 160px;
+    min-width: 120px;
     text-align: center;
     position: relative;
 }
@@ -334,6 +350,9 @@ body .ui-tabview.ui-tabview-top .ui-tabview-nav li{
     margin-right: 12px;
     
 }
+.add-new-dropdown .btn:hover {
+    background: #32bafd !important;
+}
 .btn-with-icon button {
     padding: 8px 12px !important;
     border: none !important;
@@ -361,10 +380,24 @@ td .dropdown-toggle:hover, td .dropdown-toggle:focus {
     color: #202020 !important;
     background: #dee5e7 !important;
 }
+td .dropdown li{
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
 
 .modal-form-container {
     padding-left: 22px;
     padding-right: 22px;
+}
+.btn-cancel:hover {
+    transform: initial !important;
+    background: #ed266b !important;
+    color: #fff !important;
+}
+.btn-save:hover {
+    transform: initial !important;
+    background: #29b2f5 !important;
+    color: #fff !important;
 }
 .modal .ui-select-toggle{
     border-radius: 2px !important;

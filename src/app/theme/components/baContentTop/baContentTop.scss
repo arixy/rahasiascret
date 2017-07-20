@@ -1,8 +1,12 @@
 @import '../../sass/conf/conf';
 
 .content-top {
-  padding-top: 13px;
+  padding-top: 24px;
   padding-bottom: 27px;
+  padding-right: 32px;
+  padding-left: 42px;
+    background: #fff;
+    border-bottom: solid 1px #cfdadd;
 }
 
 h1.al-title {
@@ -19,7 +23,7 @@ h1.al-title {
 .al-breadcrumb {
   background: none;
   color: $default-text;
-  padding: 0;
+  padding: 6px 0 0 0 !important;
   margin: 0;
   float: right;
   padding-top: 11px;

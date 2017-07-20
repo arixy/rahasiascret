@@ -55,7 +55,6 @@ export class UsersService{
 		url_search_params.append('email', new_user.email);
 		url_search_params.append('mobilePhoneNumber', new_user.mobile_phone_number);
 		url_search_params.append('password', new_user.password);
-		url_search_params.append('password', new_user.password);
 
 		let users_body = url_search_params.toString();
 		console.log('expense Body URL encode', new_user);

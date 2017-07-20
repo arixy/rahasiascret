@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Http, Response, Headers, RequestOptions } from '@angular/http';
+import { Http, Response, Headers, RequestOptions, ResponseContentType } from '@angular/http';
 import { UUID } from 'angular2-uuid';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
@@ -155,8 +155,8 @@ export class AssetService{
     console.debug(body);
     return body || { };
   }
-    addAsset(asset): Observable<any> {
-        console.log('Adding Asset', asset);
+    addAsset(formData: FormData): Observable<any> {
+        console.log('Adding Asset', formData);
         var headers = new Headers();
         //headers.append('Content-Type', 'multipart/form-data');
         headers.append('Authorization', 'Bearer ' + localStorage.getItem('bearer_token'));
@@ -171,7 +171,7 @@ export class AssetService{
 
         var add_url = this.appUrl + '/asset/add';
         
-        let asset_multipart = new FormData();
+        /*let asset_multipart = new FormData();
         let photo_file : File = null;
 
         if(asset.photo_file != null){
@@ -193,7 +193,7 @@ export class AssetService{
         
         }
 
-        asset_multipart.append('params', JSON.stringify(formatted_object));
+        asset_multipart.append('params', JSON.stringify(formatted_object));*/
         //asset_multipart.append('files', []);
         /*
         asset_multipart.append('assetNumber', asset.assetNumber);
@@ -203,7 +203,7 @@ export class AssetService{
         asset_multipart.append('locationId',);
         asset_multipart.append('woCategoryId',);*/
 
-        return this.http.post(add_url, asset_multipart, options).map(this.extractData);
+        return this.http.post(add_url, formData, options).map(this.extractData);
     }
     
     updateAsset(updated_asset): Observable<any>{
@@ -272,11 +272,51 @@ export class AssetService{
     }
     
     get(asset_id){
-        return this.asset_data.find(
+        
+        var bearer = "Bearer " + localStorage.getItem('bearer_token');
+
+        var headers = new Headers();
+        headers.append('Authorization', bearer);
+        headers.append("Accept", "application/octet-stream");
+        headers.append('Access-Control-Allow-Origin', '*');
+        headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
+
+        var options = new RequestOptions({
+            headers: headers
+        });
+        
+        return this.http.get(this.appUrl + '/asset/get/' + asset_id, options).map(this.extractData);
+        /* return this.asset_data.find(
             (asset_data) => {
                 return asset_data.id == asset_id;
             }
-        );
+        ); */
+    }
+
+    public getImageById(imageId: number) {
+        var bearer = "Bearer " + localStorage.getItem('bearer_token');
+
+        var headers = new Headers();
+        headers.append('Authorization', bearer);
+        headers.append("Accept", "application/octet-stream");
+        headers.append('Access-Control-Allow-Origin', '*');
+        headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
+
+        var options = new RequestOptions({ headers: headers, responseType: ResponseContentType.Blob });
+        return this.http.get(this.appUrl + '/images/asset/' + imageId, options);
+    }
+
+    public getFileById(imageId: number) {
+        var bearer = "Bearer " + localStorage.getItem('bearer_token');
+
+        var headers = new Headers();
+        headers.append('Authorization', bearer);
+        headers.append("Accept", "application/octet-stream");
+        headers.append('Access-Control-Allow-Origin', '*');
+        headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
+
+        var options = new RequestOptions({ headers: headers, responseType: ResponseContentType.Blob });
+        return this.http.get(this.appUrl + '/files/work-order/' + imageId, options);
     }
 
 }

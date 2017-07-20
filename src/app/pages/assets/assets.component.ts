@@ -140,17 +140,29 @@ export class Assets {
   deleteConfirm;
   delete_name;
 
+  public existingPhotos = [];
+
   // Form Control
   public filterAssetName = new FormControl();
   public filterAssetCode = new FormControl();
+  public filterLocationName = new FormControl();
+
   public filter_master = {
-      name: {
-          matchMode: undefined,
-          value: ''
-      },
-      assetNumber: {
-          matchMode: undefined,
-          value: ''
+      "name": {
+          "matchMode": "undefined", 
+          "value": ""
+      }, 
+      "assetNumber": {
+          "matchMode": "undefined", 
+          "value": ""
+      }, 
+      "locationName": {
+          "matchMode": "undefined", 
+          "value": ""
+      }, 
+      "dateUpdated": {
+          "matchMode": "undefined", 
+          "value": ""
       }
   };
 
@@ -168,6 +180,8 @@ export class Assets {
   @ViewChild('childModal') childModal: ModalDirective;
   @ViewChild('editChildModal') editChildModal: ModalDirective;
   @ViewChild('addSelectBox') addSelectBox: SelectComponent;
+  @ViewChild('addWOSelectBox') addWOSelectBox: SelectComponent;
+  @ViewChild('addLocationSelectBox') addLocationSelectBox: SelectComponent;
   @ViewChild('viewHistoryModal') viewHistoryModal: ModalDirective;
   @ViewChild('viewAssetModal') viewAssetModal: ModalDirective;
   @ViewChild(TreeComponent)
@@ -213,8 +227,9 @@ export class Assets {
 
     public ngOnInit(){
         this.dataLoading = true;
-        //this.refresh(this.filter_master);
-      this.assets$ = this.assetService.getAssets();
+        this.initialRefresh(this.filter_master);
+      
+      /*this.assets$ = this.assetService.getAssets();
       this.assets$.subscribe(
         (data) => {
             console.log('Data From Server', data);
@@ -250,6 +265,7 @@ export class Assets {
             this.dataLoading = false;
         }
       );
+      */
       this.locations$ = this.locationService.getLocations();
       this.work_orders$ = this.woService.getWOs();
       
@@ -309,9 +325,70 @@ export class Assets {
             }
         );
         
+        this.filterLocationName.valueChanges.debounceTime(800).subscribe(
+            (filter_text) => {
+                console.log('Filter Location', filter_text);
+                this.filter_master.locationName = {
+                    matchMode: undefined,
+                    value: filter_text
+                }
+                this.refresh(this.filter_master);
+            }
+        );
+        
     }
     
+    public initialRefresh(filter_master){
+        this.dataLoading = true;
+        var formatted_object = {
+            filters : filter_master,
+            first: 0,
+            rows: 9999,
+            globalFilter: '',
+            multiSortMeta: null,
+            sortField: 'dateUpdated',
+            sortOrder: -1
+        }
+        console.log('Shoot Refresh', formatted_object);
+        this.assetService.getAssetsFilter(formatted_object).subscribe(
+            (data) => {
+                this.dataLoading = false;
+                console.log('Refresh Data', data);
+                this.assets = data.data;
+
+                this.assets = data.data;
+                this.items_asset = data.data;
+
+                this.items_asset = this.items_asset.map(
+                    (asset_object) => {
+                        return Object.assign({}, {
+                           id: asset_object.assetId,
+                            text: asset_object.name
+                        });
+                    }
+                );
+                var assets_with_data = this.assets.map(
+                    (asset) => {
+                        return Object.assign({}, {
+                           data: asset 
+                        });
+                    }
+                );
+                console.log('Asset with Data', assets_with_data);
+                this.treeAssetsWithData = convertToTreeData(assets_with_data);
+                console.log('Tree Asset with Data', this.treeAssetsWithData);
+
+                var temp_assets = JSON.parse(JSON.stringify(this.assets));
+                this.treeAssets = convertToTree(temp_assets);
+
+                this.treeAssets = transformAssetIdToId(this.treeAssets);
+                console.log('Assets Tree', this.treeAssets);
+            }
+        );
+    }
+
     public refresh(filter_master){
+        this.dataLoading = true;
         var formatted_object = {
             filters : filter_master,
             first: 0,
@@ -386,17 +463,63 @@ export class Assets {
                 wocategory_id: this.selected_wo.id,
                 location_id: this.selected_location.id,
                 parent_asset_id: null,
-                photo_file: this.add_photo_file
+                photo_file: this.readyPhotosData()
             });
             
             if(this.selected_parent_asset != null){
                 formatted_object.parent_asset_id = this.selected_parent_asset.id;
             }
             
-            this.assetService.addAsset(formatted_object).subscribe(
+            // Moved from Service to here, to more easily accommodate files
+            var final_formatted_object = {
+                asset: {
+                    name: formatted_object.name,
+                    assetNumber: formatted_object.asset_number,
+                    description: formatted_object.description,
+                    specification: formatted_object.specification,
+                    relatedVendorId: 1,
+                    parentAssetId: formatted_object.parent_asset_id,
+                    locationId: formatted_object.location_id,
+                    woCategoryId: formatted_object.wocategory_id
+                },
+                assetPhotos: this.readyPhotosData()
+            }
+            
+            let formData: FormData = new FormData();
+            formData.append("params", JSON.stringify(final_formatted_object));
+            
+            console.log('final formatted object', final_formatted_object);
+            console.log('Existing Photos', this.existingPhotos);
+            // Loop through Photos
+            for (var i = 0; i < this.existingPhotos.length; i++) {
+                    if (this.existingPhotos[i].isActive == false) continue;
+
+                    if (this.existingPhotos[i].isActive && this.existingPhotos[i].workOrderPhotoId == null) {
+                        let actualFile: File = this.existingPhotos[i].actualFile;
+                        //formData.append("assetPhotos", actualFile);
+                        formData.append("assetPhotos", actualFile);
+                    }
+            }
+            
+            this.assetService.addAsset(formData).subscribe(
                 (data) => {
                     this.submitLoading = false;
                     console.log('Response Data', data);
+                    
+                    // Clear all input in the form
+                    this.clearFormInputs(this.form);
+                    
+                    // Specific clearing for add select boxes
+                    this.addSelectBox.active = [];
+                    this.addSelectBox.ngOnInit();
+                    
+                    this.addWOSelectBox.active = [];
+                    this.addWOSelectBox.ngOnInit();
+                    
+                    this.addLocationSelectBox.active = [];
+                    this.addLocationSelectBox.ngOnInit();
+                    
+                    
                     this.ngOnInit();
                     
                 }
@@ -405,12 +528,9 @@ export class Assets {
         
             this.childModal.hide();
             
-            // To Force Update of the Tree
-            /*var temp_assets = JSON.parse(JSON.stringify(this.assets));
-            this.treeAssets = [].concat(convertToTree(temp_assets));
-            this.assets_tree.treeModel.update();*/
         }
     }
+
     public addChildNode(event){
         var selected_asset = {
             id: event.id,
@@ -423,6 +543,7 @@ export class Assets {
         
         this.childModal.show();
     }
+
     public selectedAsset(event){
         console.log('Selected Asset', event);
         this.selected_parent_asset = event;
@@ -436,6 +557,7 @@ export class Assets {
     public deleteClose(){
         this.deleteModal.hide();
     }
+
     public deleteAsset(node){
         this.deleteConfirm = node;
         console.log('Delete Confirm', this.deleteConfirm);
@@ -443,6 +565,7 @@ export class Assets {
         this.deleteModal.show();
         
     }
+
     public saveDelete(){
         this.assetService.deleteAsset(this.deleteConfirm.data.assetId).subscribe(
             (data) => {
@@ -565,86 +688,94 @@ export class Assets {
         this.disabled = false;
         this.editForm.enable();
         
-        // Inject Initial Value to the Edit Form
-        this.editForm.patchValue(
-            {
-                edit_name: event.data.name,
-                edit_description: event.data.description,
-                edit_photo: event.data.photo,
-                edit_specification: event.data.specification,
-                edit_asset_number: event.data.assetNumber
+        // Request 'Get' Again from Server
+        this.assetService.get(event.data.assetId).subscribe(
+            (single_data) => {
+                console.log('Asset Single Data', single_data);
+                // Inject Initial Value to the Edit Form
+                this.editForm.patchValue(
+                    {
+                        edit_name: single_data.data.asset.name,
+                        edit_description: single_data.data.asset.description,
+                        edit_photo: single_data.data.assetPhoto,
+                        edit_specification: single_data.data.asset.specification,
+                        edit_asset_number: single_data.data.asset.assetNumber
+                    }
+                );
+
+                if(single_data.data.asset.parentAssetId){
+                    if (this.editSelectBox) {
+                      let assets_data = this.assets;
+                        console.log('Assets pas Editing', this.assets);
+                      let asset_found = assets_data.filter(
+                        (assets_object) => {
+                            return assets_object.assetId == single_data.data.asset.parentAssetId;
+                        }
+                      );
+                    console.log('Asset Found', asset_found);
+                    if(asset_found.length > 0){
+                        this.asset_edit.selected_asset = {
+                            id: single_data.data.asset.parentAssetId,
+                            text: asset_found[0].name
+                        };
+
+                          // Only Done because bug in ng2-select
+                          this.editSelectBox.active = [this.asset_edit.selected_asset];
+                          this.editSelectBox.ngOnInit();
+                        }    
+                    }     
+
+                }
+                console.log('Pass Parent');
+                if(single_data.data.asset.woCategoryId != null){
+                    if (this.editWOSelectBox) {
+
+                        console.log('Items WO Cat', this.items_wocategory);
+                      let wocategory_found = this.items_wocategory.filter(
+                        (wo_category_object) => {
+                            return wo_category_object.id == single_data.data.asset.woCategoryId;
+                        }
+                      );
+                        console.log('WOCategory Found', wocategory_found);  
+                        if(wocategory_found.length > 0){
+                            this.asset_edit.selected_wocategory = {
+                                id: single_data.data.asset.woCategoryId,
+                                text: wocategory_found[0].text
+                            };
+
+                            // Only Done because bug in ng2-select
+                            this.editWOSelectBox.active = [this.asset_edit.selected_wocategory];
+                            this.editWOSelectBox.ngOnInit();
+                        }  
+                    }
+                }
+                console.log('Pass WOCategory');
+                if(single_data.data.asset.locationId != null){
+                    if (this.editLocationSelectBox) {
+                      let location_found = this.items_location.filter(
+                            (location_object) => {
+                                return location_object.id == single_data.data.asset.locationId;
+                            }
+                      );
+                      if(location_found.length > 0){
+                            this.asset_edit.selected_location = {
+                                id: single_data.data.asset.locationId,
+                                text: location_found[0].text
+                          };
+
+                          // Only Done because bug in ng2-select
+                          this.editLocationSelectBox.active = [this.asset_edit.selected_location];
+                          this.editLocationSelectBox.ngOnInit();    
+                      }
+
+                    }
+                }
+                console.log('Location Edit Initial Select:', this.asset_edit.selected_location);
+                this.editChildModal.show();
             }
         );
         
-        if(event.data.parentAssetId){
-            if (this.editSelectBox) {
-              let assets_data = this.assets;
-                console.log('Assets pas Editing', this.assets);
-              let asset_found = assets_data.filter(
-                (assets_object) => {
-                    return assets_object.assetId == event.data.parentAssetId;
-                }
-              );
-            console.log('Asset Found', asset_found);
-            if(asset_found.length > 0){
-                this.asset_edit.selected_asset = {
-                    id: event.data.parentAssetId,
-                    text: asset_found[0].name
-                };
-
-                  // Only Done because bug in ng2-select
-                  this.editSelectBox.active = [this.asset_edit.selected_asset];
-                  this.editSelectBox.ngOnInit();
-                }    
-            }     
-            
-        }
-        console.log('Pass Parent');
-        if(event.data.woCategoryId != null){
-            if (this.editWOSelectBox) {
-                
-                console.log('Items WO Cat', this.items_wocategory);
-              let wocategory_found = this.items_wocategory.filter(
-                (wo_category_object) => {
-                    return wo_category_object.id == event.data.woCategoryId;
-                }
-              );
-                console.log('WOCategory Found', wocategory_found);  
-                if(wocategory_found.length > 0){
-                    this.asset_edit.selected_wocategory = {
-                        id: event.data.woCategoryId,
-                        text: wocategory_found[0].text
-                    };
-                
-                    // Only Done because bug in ng2-select
-                    this.editWOSelectBox.active = [this.asset_edit.selected_wocategory];
-                    this.editWOSelectBox.ngOnInit();
-                }  
-            }
-        }
-        console.log('Pass WOCategory');
-        if(event.data.locationId != null){
-            if (this.editLocationSelectBox) {
-              let location_found = this.items_location.filter(
-                    (location_object) => {
-                        return location_object.id == event.data.locationId;
-                    }
-              );
-              if(location_found.length > 0){
-                    this.asset_edit.selected_location = {
-                        id: event.data.locationId,
-                        text: location_found[0].text
-                  };
-
-                  // Only Done because bug in ng2-select
-                  this.editLocationSelectBox.active = [this.asset_edit.selected_location];
-                  this.editLocationSelectBox.ngOnInit();    
-              }
-              
-            }
-        }
-        console.log('Location Edit Initial Select:', this.asset_edit.selected_location);
-        this.editChildModal.show();
+        
     }
 
     public selectedLocationEdit(value){
@@ -702,7 +833,55 @@ export class Assets {
         
         //event.preventDefault();
     }
+
+    public clearFormInputs(form){
+        form.reset();
+    }
+
+    public resetFilters(table){
+        
+        // Clear all filter in filter master. Might be Redundant
+        this.filter_master.name.value = "";
+        this.filter_master.assetNumber.value = "";
+        this.filter_master.locationName.value = "";
+        this.filter_master.dateUpdated.value = "";
+        
+        // Actually changing the value on the input field. Auto Refresh
+        this.filterAssetCode.setValue("");
+        this.filterAssetName.setValue("");
+        this.filterLocationName.setValue("");
+        
+    }
+
     public hideEditModal(){
         this.editChildModal.hide();
+    }
+    
+    public hideModal(){
+        this.editChildModal.hide();
+        this.childModal.hide();
+        this.viewHistoryModal.hide();
+        this.viewAssetModal.hide();
+    }
+
+    public cancel(){
+        this.hideModal();
+        // Maybe some other logic to reset the form
+    }
+
+    readyPhotosData() {
+        var currentActivePhotos = [];
+
+        for (var i = 0; i < this.existingPhotos.length; i++) {
+            var tmpFile = this.existingPhotos[i];
+
+            if (tmpFile.isActive
+                //&& tmpFile.actualFile.type.includes("image")
+                && tmpFile.assetPhotoId == null) {
+                currentActivePhotos.push({ name: tmpFile.name, notes: tmpFile.notes });
+            }
+        }
+
+        return currentActivePhotos;
     }
 }

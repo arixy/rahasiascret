@@ -9,7 +9,7 @@ import { UsersRolesService } from './../users-role/users-roles.service';
 import { RoleService } from './../role/role.service';
 
 @Component({
-  selector: 'expense-types',
+  selector: 'users',
   templateUrl: './users.component.html',
   styleUrls: ['./../styles/basic-theme.scss', './../styles/primeng.min.css', './../styles/modals.scss'],
   encapsulation: ViewEncapsulation.None
@@ -129,13 +129,13 @@ export class UsersComponent {
 	}
     public addUsers(){
         
-//        this.roleService.getRole().subscribe(
-//            (role_data) => {
-//                this.loaded_roles = role_data.data;
-//                console.log('Loaded Roles', this.loaded_roles);
-//                
-//            }
-//        );
+        this.roleService.getRole().subscribe(
+            (role_data) => {
+                this.loaded_roles = role_data.data;
+                console.log('Loaded Roles', this.loaded_roles);
+                
+            }
+        );
         
         this.addNewModal.show();
     }
@@ -238,7 +238,7 @@ export class UsersComponent {
 		}
     }
     
-    public roles(users){
+    /*public roles(users){
         this.selected_user = users;
         this.rolesModal.show();
         this.roleService.getRole().subscribe(
@@ -251,7 +251,7 @@ export class UsersComponent {
             }
         );
         console.log('Users', users);
-    }
+    }*/
      
     public onRoleChange(user,role){
         console.log('Checked Role', role);

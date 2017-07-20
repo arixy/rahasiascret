@@ -40,6 +40,7 @@ import { TaskComponent } from './task/task.component';
 import { ScheduleComponent } from './schedule/schedule.component';
 import { AccessRightsComponent } from './access-rights/access-rights.component';
 
+
 import { SingleRequestComponent } from './task/forms/singlerequest.component';
 import { TenantRequestComponent } from './task/forms/tenantrequest.component';
 import { OwnerRequestComponent } from './task/forms/ownerrequest.component';
@@ -51,7 +52,10 @@ import { PreventiveRequestComponent } from './task/forms/preventiverequest.compo
 import { WorkOrderExpensesComponent } from './task/forms/subforms/workorder-expenses.component';
 import { WorkOrderFilesComponent } from './task/forms/subforms/workorder-files.component';
 import { UtilityFormComponent } from './utility-consumptions/forms/utility-form.component';
-import { WorkOrderListReportComponent } from './reports/wo-report.component';
+//import { WorkOrderListReportComponent } from './reports/woreports.component';
+
+import { AssetFilesComponent } from './assets/subforms/asset-files.component';
+
 // add primeng
 import { TabViewModule, FileUploadModule, PanelModule, CalendarModule, CheckboxModule, PaginatorModule } from 'primeng/primeng';
 import { TreeTableModule,TreeNode } from 'primeng/primeng';
@@ -75,10 +79,10 @@ import { SpinnerComponent } from './spinner.component';
 		   FileUploadModule,
 		   PanelModule,
 		   MdTabsModule,
-      CalendarModule,
-      TreeTableModule,
-      CheckboxModule,
-      PaginatorModule
+            CalendarModule,
+            TreeTableModule,
+            CheckboxModule,
+            PaginatorModule
            ],
   declarations: [
       Pages, 
@@ -105,13 +109,15 @@ import { SpinnerComponent } from './spinner.component';
       PreventiveRequestComponent,
       WorkOrderExpensesComponent,
       WorkOrderFilesComponent,
+      AssetFilesComponent,
       SpinnerComponent,
       LoadingSmallComponent,
       UtilityFormComponent,
+      // reports
+      //WorkOrderListReportComponent
+
       //AddNewWorkOrderComponent,
       //TabContentRecurringComponent
-      // reports
-      WorkOrderListReportComponent
     ],
 })
 export class PagesModule {

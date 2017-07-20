@@ -1,0 +1,132 @@
+<p-fileUpload (onSelect)="onSelectFile($event)" multiple="multiple" chooseLabel="Choose Photo" accept="image/*" [disabled]="false">
+  <template let-file pTemplate="file">
+  </template>
+  <template pTemplate="content">
+    <p-dataTable [value]="getPhotosFiltered()">
+      <p-header>
+        <div class="ui-helper-clearfix" style="text-align: left;">
+          <h4>Photos</h4>
+        </div>
+      </p-header>
+      <p-column field="name" header="Filename" [style]="{'width':'200px'}">
+        <template let-file="rowData" pTemplate="body">
+          <span *ngIf="file.workOrderPhotoId == null">{{file.name}}</span>
+          <span *ngIf="file.workOrderPhotoId != null" class="link" (click)="downloadPhoto(file)">{{file.name}}</span>
+        </template>
+      </p-column>
+      <p-column>
+        <template pTemplate="header">
+          Notes
+        </template>
+        <template let-file="rowData" pTemplate="body">
+          <input type="text" [(ngModel)]="file.notes" class="form-control" *ngIf="file.workOrderPhotoId == null" (blur)="markAsTouched(file, 'noteTouched')"/>
+          <span *ngIf="file.workOrderPhotoId != null">{{file.notes}}</span>
+          <div class="error-message col-xg-10"
+               *ngIf="file.notes.trim() == '' && file.noteTouched">
+            Notes is required
+          </div>
+        </template>
+      </p-column>
+      <p-column [style]="{'width':'100px'}" *ngIf="isCanEdit">
+        <template pTemplate="header">
+          Action
+        </template>
+        <template let-file="rowData" pTemplate="body">
+          <button type="button" (click)="removeFile(file)" class="btn btn-danger">Remove</button>
+        </template>
+      </p-column>
+    </p-dataTable>
+  </template>
+</p-fileUpload>
+
+<!-- <p-fileUpload (onSelect)="onSelectFile($event)" multiple="multiple" chooseLabel="Choose File" [disabled]="!isCanEdit">
+  <template let-file pTemplate="file">
+  </template>
+  <template pTemplate="content">
+    <p-dataTable [value]="getFilesFiltered()">
+      <p-header>
+        <div class="ui-helper-clearfix" style="text-align: left;">
+          <h4>Files</h4>
+        </div>
+      </p-header>
+      <p-column field="name" header="Filename" [style]="{'width':'200px'}">
+        <template let-file="rowData" pTemplate="body">
+          <span *ngIf="file.workOrderFileId == null">{{file.name}}</span>
+          <span *ngIf="file.workOrderFileId != null" class="link" (click)="downloadFile(file)">{{file.name}}</span>
+        </template>
+      </p-column>
+      <p-column>
+        <template pTemplate="header">
+          Notes
+        </template>
+        <template let-file="rowData" pTemplate="body">
+          <input type="text" [(ngModel)]="file.notes" class="form-control" *ngIf="file.workOrderFileId == null" (blur)="markAsTouched(file, 'noteTouched')"/>
+          <span *ngIf="file.workOrderFileId != null">{{file.notes}}</span>
+          <div class="error-message col-xg-10"
+               *ngIf="file.notes.trim() == '' && file.noteTouched">
+            Notes is required
+          </div>
+        </template>
+      </p-column>
+      <p-column [style]="{'width':'100px'}" *ngIf="isCanEdit">
+        <template pTemplate="header">
+          Action
+        </template>
+        <template let-file="rowData" pTemplate="body">
+          <button type="button" (click)="removeFile(file)" class="btn btn-danger">Remove</button>
+        </template>
+      </p-column>
+    </p-dataTable>
+  </template>
+</p-fileUpload> -->
+<!--<br />
+<p-dataTable [value]="existingFiles.filter(filterActiveFiles)">
+  <p-header>
+    <div class="ui-helper-clearfix" style="text-align: left;">
+      <h4>Files</h4>
+    </div>
+  </p-header>
+  <p-column field="name" header="Filename" [style]="{'width':'120px'}"></p-column>
+  <p-column>
+    <template pTemplate="header">
+      Notes
+    </template>
+    <template let-file="rowData" pTemplate="body">
+      <span>{{file.notes}}</span>
+    </template>
+  </p-column>
+  <p-column [style]="{'width':'100px'}">
+    <template pTemplate="header">
+      Action
+    </template>
+    <template let-file="rowData" pTemplate="body">
+      <button type="button" (click)="removeFile(file)" class="btn btn-primary">Remove</button>
+    </template>
+  </p-column>
+</p-dataTable>
+
+<br />
+<p-dataTable [value]="existingPhotos.filter(filterActiveFiles)">
+  <p-header>
+    <div style="text-align: left;" class="ui-helper-clearfix">
+      <h4>Photos</h4>
+    </div>
+  </p-header>
+  <p-column field="name" header="Filename" [style]="{'width':'120px'}"></p-column>
+  <p-column>
+    <template pTemplate="header">
+      Notes
+    </template>
+    <template let-file="rowData" pTemplate="body">
+      <span>{{file.notes}}</span>
+    </template>
+  </p-column>
+  <p-column [style]="{'width':'100px'}">
+    <template pTemplate="header">
+      Action
+    </template>
+    <template let-file="rowData" pTemplate="body">
+      <button type="button" (click)="removeFile(file)" class="btn btn-primary">Remove</button>
+    </template>
+  </p-column>
+</p-dataTable>-->

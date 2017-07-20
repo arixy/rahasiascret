@@ -19,7 +19,8 @@ import { UtilityConsumptions } from './utility-consumptions/utility-consumptions
 import { TaskComponent } from './task/task.component';
 import { ScheduleComponent } from './schedule/schedule.component';
 import { AccessRightsComponent } from './access-rights/access-rights.component';
-import { WorkOrderListReportComponent } from './reports/wo-report.component';
+//import { WorkOrderListReportComponent } from './reports/woreports.component';
+
 // noinspection TypeScriptValidateTypes
 
 // export function loadChildren(path) { return System.import(path); };
@@ -67,9 +68,10 @@ export const routes: Routes = [
       { path: 'transactions/workorders', 
         component: Preventatives
       },
-      { path: 'transactions/consumptions', component: UtilityConsumptions },
-      { path: 'access-rights', component: AccessRightsComponent },
-      { path: 'wo-report', component: WorkOrderListReportComponent }
+        { path: 'transactions/consumptions', component: UtilityConsumptions },
+        { path: 'access-rights', component: AccessRightsComponent },
+        //{ path: 'wo-report', component: WorkOrderListReportComponent }
+
     ]
   }
 ];
