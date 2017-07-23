@@ -1,4 +1,5 @@
 import { Component, ViewChild, ApplicationRef, Input, ViewEncapsulation } from '@angular/core';
+import { Response } from '@angular/http';
 import { AssetService } from '../../services/asset.service';
 import { LocationService } from '../../services/location.service';
 import { WorkOrderService } from '../../services/work-order.service';
@@ -9,6 +10,8 @@ import { LocalDataSource } from 'ng2-smart-table';
 import { ModalDirective } from 'ng2-bootstrap';
 import { TreeComponent } from 'angular2-tree-component';
 import { SelectComponent } from 'ng2-select';
+import { TabPanel } from 'primeng/primeng';
+import { saveAs } from 'file-saver';
 
 function convertToTree(flat_data){
         console.log('Flat Data:', flat_data);
@@ -116,6 +119,8 @@ export class Assets {
   public photo;
   public add_photo_file : FileList = null;
   public specification;
+  public wo_category_fc;
+  public location_fc;
 
   public editForm;
   public edit_name;
@@ -127,7 +132,8 @@ export class Assets {
     
   public wocategory_id = null;
   public location_id = null;
-  public submitted;
+  public add_form_submitted = false;
+  public edit_form_submitted = false;
   public value;
   public selected_wo = null;
   public selected_location = null;
@@ -141,6 +147,7 @@ export class Assets {
   delete_name;
 
   public existingPhotos = [];
+  public editExistingPhotos = [];
 
   // Form Control
   public filterAssetName = new FormControl();
@@ -170,6 +177,9 @@ export class Assets {
   public wo_by_asset = null;
   public asset_pointer = null;
 
+  // Testing custom class for tab
+  public test_tab = "";
+
     @Input() public source: LocalDataSource = new LocalDataSource();
 
     
@@ -187,6 +197,8 @@ export class Assets {
   @ViewChild(TreeComponent)
   private assets_tree: TreeComponent;
   @ViewChild('deleteModal') deleteModal: ModalDirective;
+  @ViewChild('addGeneralTab') addGeneralTab : TabPanel;
+  @ViewChild('editGeneralTab') editGeneralTab : TabPanel;
 
   constructor(
     public assetService: AssetService,
@@ -196,11 +208,13 @@ export class Assets {
     ) {
       this.assets = null;
         this.form = fb.group({
-          'name': ['', Validators.compose([Validators.required, Validators.minLength(2)])],
+          'name': ['', Validators.compose([Validators.required])],
           'asset_number': ['', Validators.compose([Validators.required])],
           'description': ['', Validators.compose([Validators.required, Validators.minLength(2)])],
             'photo': [''],
-            'specification': ['', Validators.compose([Validators.required, Validators.minLength(2)])]
+            'specification': ['', Validators.compose([Validators.required])],
+            'wo_category_fc': ['', Validators.compose([Validators.required])],
+            'location_fc': ['', Validators.compose([Validators.required])]
         });
 
       this.name = this.form.controls['name'];
@@ -208,12 +222,14 @@ export class Assets {
       this.photo = this.form.controls['photo'];
       this.specification = this.form.controls['specification'];
       this.asset_number = this.form.controls['asset_number'];
+      this.wo_category_fc = this.form.controls['wo_category_fc'];
+      this.location_fc = this.form.controls['location_fc'];
       
       this.editForm = fb.group({
-            'edit_name': ['', Validators.compose([Validators.required, Validators.minLength(2)])],
+            'edit_name': ['', Validators.compose([Validators.required])],
             'edit_description': ['', Validators.compose([Validators.required, Validators.minLength(2)])],
-            'edit_specification': ['', Validators.compose([Validators.required, Validators.minLength(2)])],
-            'edit_asset_number': ['', Validators.compose([Validators.required, Validators.minLength(2)])]
+            'edit_specification': ['', Validators.compose([Validators.required])],
+            'edit_asset_number': ['', Validators.compose([Validators.required])]
         });
       
       this.edit_name = this.editForm.controls['edit_name'];
@@ -221,8 +237,18 @@ export class Assets {
       this.edit_specification = this.editForm.controls['edit_specification'];
       this.edit_asset_number = this.editForm.controls['edit_asset_number'];
       
+      // Check for changes in form
+      this.form.valueChanges.subscribe(data => {
+         if(this.form.valid && this.add_form_submitted){
+             this.addGeneralTab.headerStyleClass = '';
+         }
+      });
       
-      
+      this.editForm.valueChanges.subscribe(data => {
+         if(this.editForm.valid && this.edit_form_submitted){
+             this.editGeneralTab.headerStyleClass = '';
+         } 
+      });
   }
 
     public ngOnInit(){
@@ -425,16 +451,35 @@ export class Assets {
         );
     }
 
-    public selectedWO(value: any){
+    public selectedWOCategory(value: any){
         console.log('Selected value:', value);
         this.selected_wo = value;
+        
+        // for error detection
+        this.wo_category_fc.setValue(value);
+    }
+    public removedWOCategory(value: any){
+        this.selected_wo = null;
+        
+        // for error detection
+        this.wo_category_fc.setValue(null);
     }
     public selectedLocation(value: any){
         console.log('Selected Value:', value);
         this.selected_location = value;
+        
+        // for error detection
+        this.location_fc.setValue(value);
     }
     public typed(value: any){
         console.log('New Search Input:', value);
+    }
+    public removedLocation(value: any){
+        console.log('Removed value is:', value);
+        this.selected_location = null;
+        
+        // for error detection
+        this.location_fc.setValue(null);
     }
 
     
@@ -448,7 +493,10 @@ export class Assets {
         console.log('add photo file', this.add_photo_file);
     }
     public onSubmit(values):void {
-        this.submitted = true;
+        
+        // To Trigger Error message only when form is submitted
+        this.add_form_submitted = true;
+        
         
         if (this.form.valid) {
             this.submitLoading = true;
@@ -463,7 +511,7 @@ export class Assets {
                 wocategory_id: this.selected_wo.id,
                 location_id: this.selected_location.id,
                 parent_asset_id: null,
-                photo_file: this.readyPhotosData()
+                photo_file: this.readyPhotosData(this.existingPhotos)
             });
             
             if(this.selected_parent_asset != null){
@@ -482,7 +530,7 @@ export class Assets {
                     locationId: formatted_object.location_id,
                     woCategoryId: formatted_object.wocategory_id
                 },
-                assetPhotos: this.readyPhotosData()
+                assetPhotos: this.readyPhotosData(this.existingPhotos)
             }
             
             let formData: FormData = new FormData();
@@ -528,6 +576,8 @@ export class Assets {
         
             this.childModal.hide();
             
+        } else {
+            this.addGeneralTab.headerStyleClass = "tabpanel-has-error";
         }
     }
 
@@ -550,7 +600,7 @@ export class Assets {
     }
 
     public addRootNode(){
-        
+        this.add_form_submitted = false;
         this.childModal.show();
     }
 
@@ -561,7 +611,7 @@ export class Assets {
     public deleteAsset(node){
         this.deleteConfirm = node;
         console.log('Delete Confirm', this.deleteConfirm);
-        this.delete_name = node.name;
+        this.delete_name = node.data.name;
         this.deleteModal.show();
         
     }
@@ -589,6 +639,19 @@ export class Assets {
         );
         
     }
+
+    public refreshAssetHistory(){
+        
+        if(this.asset_pointer){
+            this.assetService.getWObyAsset(this.asset_pointer.data.assetId).subscribe(
+                (data) => {
+                    console.log('Data Get WO by Asset', data);
+                    this.wo_by_asset = data.data;
+
+                }
+            );   
+        }
+    }
     public hideViewHistoryModal(){
         this.viewHistoryModal.hide();
     }
@@ -598,83 +661,99 @@ export class Assets {
         
         this.asset_edit = event;
         // Inject Initial Value to the Edit Form
-        this.editForm.patchValue(
-            {
-                edit_name: event.data.name,
-                edit_description: event.data.description,
-                edit_photo: event.data.photo,
-                edit_specification: event.data.specification
+        // Request 'Get' Again from Server
+        this.assetService.get(event.data.assetId).subscribe(
+            (single_data) => {
+                console.log('Asset Single Data', single_data);
+                // Inject Initial Value to the Edit Form
+                this.editForm.patchValue(
+                    {
+                        edit_name: single_data.data.asset.name,
+                        edit_description: single_data.data.asset.description,
+                        edit_photo: single_data.data.assetPhoto,
+                        edit_specification: single_data.data.asset.specification,
+                        edit_asset_number: single_data.data.asset.assetNumber
+                    }
+                );
+                
+                // Populate Photos
+                if(single_data.data.assetPhoto.length > 0){
+                    this.editExistingPhotos = single_data.data.assetPhoto;    
+                } else {
+                    this.editExistingPhotos = [];
+                }
+                
+                if(single_data.data.asset.parentAssetId){
+                    if (this.editSelectBox) {
+                      let assets_data = this.assets;
+                        console.log('Assets pas Editing', this.assets);
+                      let asset_found = assets_data.filter(
+                        (assets_object) => {
+                            return assets_object.assetId == single_data.data.asset.parentAssetId;
+                        }
+                      );
+                    console.log('Asset Found', asset_found);
+                    if(asset_found.length > 0){
+                        this.asset_edit.selected_asset = {
+                            id: single_data.data.asset.parentAssetId,
+                            text: asset_found[0].name
+                        };
+
+                          // Only Done because bug in ng2-select
+                          this.editSelectBox.active = [this.asset_edit.selected_asset];
+                          this.editSelectBox.ngOnInit();
+                        }    
+                    }     
+
+                }
+                console.log('Pass Parent');
+                if(single_data.data.asset.woCategoryId != null){
+                    if (this.editWOSelectBox) {
+
+                        console.log('Items WO Cat', this.items_wocategory);
+                      let wocategory_found = this.items_wocategory.filter(
+                        (wo_category_object) => {
+                            return wo_category_object.id == single_data.data.asset.woCategoryId;
+                        }
+                      );
+                        console.log('WOCategory Found', wocategory_found);  
+                        if(wocategory_found.length > 0){
+                            this.asset_edit.selected_wocategory = {
+                                id: single_data.data.asset.woCategoryId,
+                                text: wocategory_found[0].text
+                            };
+
+                            // Only Done because bug in ng2-select
+                            this.editWOSelectBox.active = [this.asset_edit.selected_wocategory];
+                            this.editWOSelectBox.ngOnInit();
+                        }  
+                    }
+                }
+                console.log('Pass WOCategory');
+                if(single_data.data.asset.locationId != null){
+                    if (this.editLocationSelectBox) {
+                      let location_found = this.items_location.filter(
+                            (location_object) => {
+                                return location_object.id == single_data.data.asset.locationId;
+                            }
+                      );
+                      if(location_found.length > 0){
+                            this.asset_edit.selected_location = {
+                                id: single_data.data.asset.locationId,
+                                text: location_found[0].text
+                          };
+
+                          // Only Done because bug in ng2-select
+                          this.editLocationSelectBox.active = [this.asset_edit.selected_location];
+                          this.editLocationSelectBox.ngOnInit();    
+                      }
+
+                    }
+                }
+                console.log('Location Edit Initial Select:', this.asset_edit.selected_location);
+                this.editChildModal.show();
             }
         );
-        
-        if(event.data.parentAssetId){
-            if (this.editSelectBox) {
-              let assets_data = this.assets;
-                console.log('Assets pas Editing', this.assets);
-              let asset_found = assets_data.filter(
-                (assets_object) => {
-                    return assets_object.assetId == event.data.parentAssetId;
-                }
-              );
-            console.log('Asset Found', asset_found);
-            if(asset_found.length > 0){
-                this.asset_edit.selected_asset = {
-                    id: event.data.parentAssetId,
-                    text: asset_found[0].name
-                };
-
-                  // Only Done because bug in ng2-select
-                  this.editSelectBox.active = [this.asset_edit.selected_asset];
-                  this.editSelectBox.ngOnInit();
-                }    
-            }     
-            
-        }
-        console.log('Pass Parent');
-        if(event.data.woCategoryId != null){
-            if (this.editWOSelectBox) {
-                
-                console.log('Items WO Cat', this.items_wocategory);
-              let wocategory_found = this.items_wocategory.filter(
-                (wo_category_object) => {
-                    return wo_category_object.id == event.data.woCategoryId;
-                }
-              );
-                console.log('WOCategory Found', wocategory_found);  
-                if(wocategory_found.length > 0){
-                    this.asset_edit.selected_wocategory = {
-                        id: event.data.woCategoryId,
-                        text: wocategory_found[0].text
-                    };
-                
-                    // Only Done because bug in ng2-select
-                    this.editWOSelectBox.active = [this.asset_edit.selected_wocategory];
-                    this.editWOSelectBox.ngOnInit();
-                }  
-            }
-        }
-        console.log('Pass WOCategory');
-        if(event.data.locationId != null){
-            if (this.editLocationSelectBox) {
-              let location_found = this.items_location.filter(
-                    (location_object) => {
-                        return location_object.id == event.data.locationId;
-                    }
-              );
-              if(location_found.length > 0){
-                    this.asset_edit.selected_location = {
-                        id: event.data.locationId,
-                        text: location_found[0].text
-                  };
-
-                  // Only Done because bug in ng2-select
-                  this.editLocationSelectBox.active = [this.asset_edit.selected_location];
-                  this.editLocationSelectBox.ngOnInit();    
-              }
-              
-            }
-        }
-        console.log('Location Edit Initial Select:', this.asset_edit.selected_location);
         
         // Disable Stuff in Here
         this.editForm.disable();
@@ -684,6 +763,7 @@ export class Assets {
 
     public editAsset(event){
         console.log('Editing Asset:', event);
+        this.edit_form_submitted = false;
         this.asset_edit = event;
         this.disabled = false;
         this.editForm.enable();
@@ -702,7 +782,14 @@ export class Assets {
                         edit_asset_number: single_data.data.asset.assetNumber
                     }
                 );
-
+                
+                // Populate Photos
+                if(single_data.data.assetPhoto.length > 0){
+                    this.editExistingPhotos = single_data.data.assetPhoto;    
+                } else {
+                    this.editExistingPhotos = [];
+                }
+                
                 if(single_data.data.asset.parentAssetId){
                     if (this.editSelectBox) {
                       let assets_data = this.assets;
@@ -796,6 +883,10 @@ export class Assets {
     }
     public onSubmitEdit(values,event) {
         //event.preventDefault();
+        
+        // Trigger Validation 
+        this.edit_form_submitted = true;
+        
         console.log('EditForm:', values);
         if(this.editForm.valid){
             this.submitLoading = true;
@@ -820,8 +911,41 @@ export class Assets {
             if(this.asset_edit.selected_wocategory != null){
                 formatted_object.wocategory_id = this.asset_edit.selected_wocategory.id;
             }
-             
-            this.assetService.updateAsset(formatted_object).subscribe(
+            
+            // Moved from Service to here, to more easily accommodate upload photos
+            var final_formatted_object = {
+                asset: {
+                    assetId: formatted_object.id,
+                    assetNumber: formatted_object.asset_number,
+                    name: formatted_object.name,
+                    description: formatted_object.description,
+                    specification: formatted_object.specification,
+                    relatedVendorId: 1,
+                    parentAssetId: formatted_object.parent_asset_id,
+                    locationId: formatted_object.location_id,
+                    woCategoryId: formatted_object.wocategory_id,
+                    isActive: true
+                },
+                assetPhotos: this.readyPhotosData(this.editExistingPhotos),
+                deletedPhotosId: this.readyDeletedPhotosData(this.editExistingPhotos)
+            };
+            
+            let formData: FormData = new FormData();
+            formData.append("params", JSON.stringify(final_formatted_object));
+            
+            console.log('final formatted object edit', final_formatted_object);
+            console.log('Existing Edit Photos', this.editExistingPhotos);
+            // Loop through Photos
+            for (var i = 0; i < this.editExistingPhotos.length; i++) {
+                    if (this.editExistingPhotos[i].isActive == false) continue;
+
+                    if (this.editExistingPhotos[i].isActive && this.editExistingPhotos[i].assetPhotoId == null) {
+                        let actualFile: File = this.editExistingPhotos[i].actualFile;
+                        //formData.append("assetPhotos", actualFile);
+                        formData.append("assetPhotos", actualFile);
+                    }
+            }
+            this.assetService.updateAsset(formData).subscribe(
                 (data) => {
                     this.submitLoading = false;
                     console.log('Data after update', data);
@@ -829,6 +953,8 @@ export class Assets {
                     this.ngOnInit();
                 }
             );         
+        } else {
+            this.editGeneralTab.headerStyleClass = "tabpanel-has-error";
         }
         
         //event.preventDefault();
@@ -853,6 +979,12 @@ export class Assets {
         
     }
 
+    public resetFiltersTable(table){
+        
+        console.log('Table to be reset', table);
+        table.reset();
+    }
+
     public hideEditModal(){
         this.editChildModal.hide();
     }
@@ -869,11 +1001,11 @@ export class Assets {
         // Maybe some other logic to reset the form
     }
 
-    readyPhotosData() {
+    readyPhotosData(existingPhotos) {
         var currentActivePhotos = [];
 
-        for (var i = 0; i < this.existingPhotos.length; i++) {
-            var tmpFile = this.existingPhotos[i];
+        for (var i = 0; i < existingPhotos.length; i++) {
+            var tmpFile = existingPhotos[i];
 
             if (tmpFile.isActive
                 //&& tmpFile.actualFile.type.includes("image")
@@ -883,5 +1015,49 @@ export class Assets {
         }
 
         return currentActivePhotos;
+    }
+    readyDeletedPhotosData(existingPhotos) {
+        var deletedPhotos = [];
+
+        for (var i = 0; i < existingPhotos.length; i++) {
+            var tmpFile = existingPhotos[i];
+
+            if (!tmpFile.isActive
+                && tmpFile.assetPhotoId != null) {
+                deletedPhotos.push(tmpFile.assetPhotoId);
+            }
+        }
+
+        return deletedPhotos;
+    }
+
+    public exportCSV(){
+        
+        // Similar logic to refresh since using filter as well
+        this.dataLoading = true;
+        var formatted_object = {
+            filters : this.filter_master,
+            first: 0,
+            rows: 9999,
+            globalFilter: '',
+            multiSortMeta: null,
+            sortField: 'dateUpdated',
+            sortOrder: -1
+        }
+        console.log('Shoot Refresh', formatted_object);
+        this.assetService.getCSV(formatted_object).subscribe(
+            (data) => {
+                this.dataLoading = false;
+                console.log('Refresh Data', data);
+                this.downloadFile(data);
+            }
+        );
+    } 
+
+    private downloadFile(data: Response){
+        var blob = new Blob([data.blob()], { type: data.headers.get('Content-Type') });
+        saveAs(blob, 'assets.csv');
+      //var url = window.URL.createObjectURL(blob);
+      //window.open(url);
     }
 }

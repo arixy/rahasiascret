@@ -319,33 +319,38 @@ export class Preventatives {
      
     ngAfterViewInit(){
         // See if there is any parameter
-        let request_type = this.activatedRoute.snapshot.params['request_type'];
-        
-        console.log('Activated Route', this.activatedRoute.snapshot);
-        if(request_type){
-            // Open Particular Modal Based on Selected Type
-            if(request_type == 'single'){
-                console.log('Single!!');
-                this.createNewWorkOrder({
-                    id: 3, label: 'Single Request'
-                });
-            } else if(request_type == 'recurring'){
-                console.log('Recurring!');
-                this.createNewWorkOrder({
-                   id: 2, label: 'Recurring Request' 
-                });
-            } else if(request_type == 'preventive'){
-                this.createNewWorkOrder({
-                    id: 1, label: 'Preventive Maintenance'   
-                });
-            } else if(request_type == 'tenant'){
-                this.createNewWorkOrder(this.woTypes[3]);
-            } else if(request_type == 'guest'){
-                this.createNewWorkOrder(this.woTypes[4]);
-            } else if(request_type == 'owner'){
-                this.createNewWorkOrder(this.woTypes[5]);
+        //let request_type = this.activatedRoute.snapshot.params['request_type'];
+        this.activatedRoute.params.subscribe(
+            (params) => {
+                let request_type = params['request_type'];
+                if(request_type){
+                    // Open Particular Modal Based on Selected Type
+                    if(request_type == 'single'){
+                        console.log('Single!!');
+                        this.createNewWorkOrder({
+                            id: 3, label: 'Single Request'
+                        });
+                    } else if(request_type == 'recurring'){
+                        console.log('Recurring!');
+                        this.createNewWorkOrder({
+                           id: 2, label: 'Recurring Request' 
+                        });
+                    } else if(request_type == 'preventive'){
+                        this.createNewWorkOrder({
+                            id: 1, label: 'Preventive Maintenance'   
+                        });
+                    } else if(request_type == 'tenant'){
+                        this.createNewWorkOrder(this.woTypes[3]);
+                    } else if(request_type == 'guest'){
+                        this.createNewWorkOrder(this.woTypes[4]);
+                    } else if(request_type == 'owner'){
+                        this.createNewWorkOrder(this.woTypes[5]);
+                    }
+                }
             }
-        }
+        );
+        console.log('Activated Route', this.activatedRoute.snapshot);
+        
     }
     createNewWorkOrder(selectedType){
         console.log(selectedType);

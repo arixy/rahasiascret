@@ -1,4 +1,5 @@
 import {Component, Input, ChangeDetectorRef, ViewChild, ViewEncapsulation} from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
@@ -42,6 +43,10 @@ export class Entities {
 	public edit_entities;
 	deleteConfirm;
 	delete_name;
+
+    // Entity Type (Vendors, Guests, etc)
+    current_entity_type_pointer = null;
+    current_entity_type_name = null;
 	
     @ViewChild('addNewModal') addNewModal: ModalDirective;
     @ViewChild('editModal') editModal: ModalDirective;
@@ -51,7 +56,8 @@ export class Entities {
     public fb: FormBuilder,
     public cdr: ChangeDetectorRef,
     public entityService: EntityService,
-    public entityTypeService: EntityTypeService
+    public entityTypeService: EntityTypeService,
+    private route: ActivatedRoute
     ) {
         // Add New Form
         this.form = fb.group({
@@ -86,32 +92,50 @@ export class Entities {
 		
   }
 	ngOnInit(){
-		this.entityService.getEntities().subscribe(
+        this.route.params.subscribe(
+            (params) => {
+                this.entityService.getEntitiesByType(params['entity_type_id']).subscribe(
+                    (response) => {
+                        console.log('Entities by Type', response);
+                        this.entities = response.data;
+                    }
+                );
+                
+                this.current_entity_type_pointer = +params['entity_type_id'] - 1;
+                
+                // Initialize Select Box
+                this.entityTypeService.getEntityTypes().subscribe(
+                   (data) => {
+                       this.entity_types = data.data;
+                       
+                       // Mapping of current Entity Type
+                       this.current_entity_type_name = this.entity_types[this.current_entity_type_pointer].name;
+                       console.log('Current Entity Type Name', this.current_entity_type_name);
+                       
+                       this.items_entity_type = data.data;
+                       console.log('Entity Type', this.entity_types);
+
+                       this.items_entity_type = this.items_entity_type.map(
+                            (entity_type) => {
+                                return Object.assign({}, {
+                                   id: entity_type.entityTypeId,
+                                    text: entity_type.name
+                                });
+                            }
+                        );
+                   } 
+                );
+            }
+        );
+        
+		/*this.entityService.getEntities().subscribe(
             data => {
                 this.entities = data.data;
 				console.log('test ent',this.entities);
                 console.log('Full Data', data);
                 //this.processed_work_orders = this.injectDuration(JSON.parse(JSON.stringify(this.work_orders)));
             }
-        ); 
-        
-        // Initialize Select Box
-        this.entityTypeService.getEntityTypes().subscribe(
-           (data) => {
-               this.entity_types = data.data;
-               this.items_entity_type = data.data;
-               console.log('Entity Type', this.entity_types);
-               
-               this.items_entity_type = this.items_entity_type.map(
-                    (entity_type) => {
-                        return Object.assign({}, {
-                           id: entity_type.entityTypeId,
-                            text: entity_type.name
-                        });
-                    }
-                );
-           } 
-        );
+        ); */
         
         
 	}

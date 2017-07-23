@@ -66,6 +66,7 @@ import { TreeTableModule, TreeNode, ChartModule } from 'primeng/primeng';
 import {MdTabsModule} from '@angular/material';
 import { LoadingSmallComponent } from './loading-small.component';
 import { SpinnerComponent } from './spinner.component';
+import { ResetFilterComponent } from './reset-filter.component';
 
 @NgModule({
   imports: [CommonModule, NgaModule, routing, SelectModule, Ng2SmartTableModule, ModalModule.forRoot(), ReactiveFormsModule,
@@ -115,6 +116,7 @@ import { SpinnerComponent } from './spinner.component';
       WorkOrderFilesComponent,
       AssetFilesComponent,
       SpinnerComponent,
+      ResetFilterComponent,
       LoadingSmallComponent,
       UtilityFormComponent,
       // reports

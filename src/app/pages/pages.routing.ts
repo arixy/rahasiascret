@@ -56,6 +56,7 @@ export const routes: Routes = [
       { path: 'woreports', component: WOReports },
       { path: 'all-list', component: AllList },
       { path: 'priorities', component: Priorities },
+      { path: 'entities/:entity_type_id', component: Entities },
       { path: 'entities', component: Entities },
       { path: 'utility-types', component: UtilityTypes },
       { path: 'utility-uom', component: UtilityUom },

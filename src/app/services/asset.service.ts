@@ -15,6 +15,7 @@ export class AssetService{
     //private appUrl = 'http://ec2-52-40-147-30.us-west-2.compute.amazonaws.com/api/v1/master/';
     private appUrl = GlobalConfigs.APP_MASTER_URL;
     private woUrl = GlobalConfigs.APP_BASE_URL;
+    private appBaseUrl = GlobalConfigs.APP_BASE_URL;
 
   constructor(private http: Http){
       var first_elevator_id = UUID.UUID();
@@ -99,6 +100,8 @@ export class AssetService{
       
     return this.http.get(load_url, options).map(this.extractData);
   }
+  
+  
 
   getAssetsNormal(){
       return this.asset_data;
@@ -133,6 +136,35 @@ export class AssetService{
         return this.http.post(load_url, formatted_object, options).map(this.extractData);
     }
 
+    getCSV(filter_data): Observable<any> {
+        var bearer = "Bearer " + localStorage.getItem('bearer_token');
+
+        
+        var headers = new Headers();
+        headers.append("Accept", "application/octet-stream");
+        headers.append('Authorization', bearer);
+        headers.append('Access-Control-Allow-Origin', '*');
+        headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
+
+        var options = new RequestOptions({ headers: headers, responseType: ResponseContentType.Blob });
+        var load_url = this.appUrl + '/asset/all/export';
+        
+        let formatted_object = {
+                filters: {},
+                first: 0,
+                rows: 9999,
+                globalFilter: '',
+                multiSortMeta: null,
+                sortField: 'dateUpdated',
+                sortOrder: -1
+        };
+        if(filter_data){
+           formatted_object = filter_data; 
+        }
+        
+        return this.http.post(load_url, formatted_object, options);
+    }
+    
     getAssetsFake(): Observable<any>{
       return Observable.of(this.asset_data);
     }
@@ -206,9 +238,9 @@ export class AssetService{
         return this.http.post(add_url, formData, options).map(this.extractData);
     }
     
-    updateAsset(updated_asset): Observable<any>{
+    updateAsset(formData: FormData): Observable<any>{
         
-        console.log('Update Asset in Service', updated_asset);
+        //console.log('Update Asset in Service', updated_asset);
         var headers = new Headers();
         //headers.append('Content-Type', 'multipart/form-data');
         headers.append('Authorization', 'Bearer ' + localStorage.getItem('bearer_token'));
@@ -221,27 +253,10 @@ export class AssetService{
             headers: headers
         });
 
-        let asset_multipart = new FormData();
         
         var update_url = this.appUrl + '/asset/update';
-        var formatted_object = {
-            asset: {
-                assetId: updated_asset.id,
-                assetNumber: updated_asset.asset_number,
-                name: updated_asset.name,
-                description: updated_asset.description,
-                specification: updated_asset.specification,
-                relatedVendorId: 1,
-                parentAssetId: updated_asset.parent_asset_id,
-                locationId: updated_asset.location_id,
-                woCategoryId: updated_asset.wocategory_id,
-                isActive: true
-            },
-            assetPhotos:[],
-            deletedPhotosId:[]
-        };
+        
 
-        asset_multipart.append('params', JSON.stringify(formatted_object));
         //asset_multipart.append('files', []);
         /*
         asset_multipart.append('assetNumber', asset.assetNumber);
@@ -251,7 +266,7 @@ export class AssetService{
         asset_multipart.append('locationId',);
         asset_multipart.append('woCategoryId',);*/
 
-        return this.http.post(update_url, asset_multipart, options).map(this.extractData);
+        return this.http.post(update_url, formData, options).map(this.extractData);
     }
     deleteAsset(asset_id): Observable<any> {
         var headers = new Headers();
@@ -303,7 +318,7 @@ export class AssetService{
         headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
 
         var options = new RequestOptions({ headers: headers, responseType: ResponseContentType.Blob });
-        return this.http.get(this.appUrl + '/images/asset/' + imageId, options);
+        return this.http.get(this.appBaseUrl + '/images/asset/' + imageId, options);
     }
 
     public getFileById(imageId: number) {

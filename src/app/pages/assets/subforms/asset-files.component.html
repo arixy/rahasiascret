@@ -1,4 +1,4 @@
-<p-fileUpload (onSelect)="onSelectFile($event)" multiple="multiple" chooseLabel="Choose Photo" accept="image/*" [disabled]="false">
+<p-fileUpload (onSelect)="onSelectFile($event)" multiple="multiple" chooseLabel="Choose Photo" accept="image/*" [disabled]="!isCanEdit">
   <template let-file pTemplate="file">
   </template>
   <template pTemplate="content">
@@ -10,8 +10,8 @@
       </p-header>
       <p-column field="name" header="Filename" [style]="{'width':'200px'}">
         <template let-file="rowData" pTemplate="body">
-          <span *ngIf="file.workOrderPhotoId == null">{{file.name}}</span>
-          <span *ngIf="file.workOrderPhotoId != null" class="link" (click)="downloadPhoto(file)">{{file.name}}</span>
+          <span *ngIf="file.assetPhotoId == null">{{file.name}}</span>
+          <span *ngIf="file.assetPhotoId != null" class="link" (click)="downloadPhoto(file)">{{file.name}}</span>
         </template>
       </p-column>
       <p-column>
@@ -19,8 +19,8 @@
           Notes
         </template>
         <template let-file="rowData" pTemplate="body">
-          <input type="text" [(ngModel)]="file.notes" class="form-control" *ngIf="file.workOrderPhotoId == null" (blur)="markAsTouched(file, 'noteTouched')"/>
-          <span *ngIf="file.workOrderPhotoId != null">{{file.notes}}</span>
+          <input type="text" [(ngModel)]="file.notes" class="form-control" *ngIf="file.assetPhotoId == null" (blur)="markAsTouched(file, 'noteTouched')"/>
+          <span *ngIf="file.assetPhotoId != null">{{file.notes}}</span>
           <div class="error-message col-xg-10"
                *ngIf="file.notes.trim() == '' && file.noteTouched">
             Notes is required

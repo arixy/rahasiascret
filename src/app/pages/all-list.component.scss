@@ -17,9 +17,13 @@
 	padding: 10px 0px 35px 10px;
     color: #22272a;
 }
-.all-list__card h3:hover {
+.all-list__card:hover h3 {
     color: #00ABFF;
 }
-.all-list__card p:hover {
+.all-list__card:hover p {
+    color: #00ABFF;
+}
+.all-list__card:hover {
+    background-color: #f1f1f1;
     color: #00ABFF;
 }

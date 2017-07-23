@@ -159,7 +159,7 @@ body .ui-datatable thead th.ui-state-active {
 }
 .content_confirm h3{
 	text-align: center;
-	margin-bottom: 2em;
+	margin-bottom: 1em;
 	font-weight: 400;
 }
 .delete-btn_confirm{
@@ -167,7 +167,7 @@ body .ui-datatable thead th.ui-state-active {
 	margin-bottom: 2em;
 }
 button.btn-yes{
-	background: #00ABFF;
+	background: #ffc400;
     padding: 8px 30px;
     border-radius: 5px;
     border: none;
@@ -175,12 +175,12 @@ button.btn-yes{
 }
 
 button.btn-no{
-	background: #00ABFF;
+	background: #4f595d;
     padding: 8px 30px;
     border-radius: 5px;
     border: none;
 	color: #fff;
-	margin-left: 2em;
+	margin-left: 0.2em;
 }
 
 .top-main-menu {
@@ -189,9 +189,13 @@ button.btn-no{
 .add-btn-group {
     float: right;
 }
-button.btn-no:hover,button.btn-yes:hover{
-	-webkit-box-shadow: 0 0 20px 5px #00ABFF;
-	box-shadow: 0 0 20px 5px #00ABFF;
+button.btn-no:hover{
+	-webkit-box-shadow: 0 0 20px 5px #4f595d;
+	box-shadow: 0 0 20px 5px #4f595d;
+}
+button.btn-yes:hover{
+	-webkit-box-shadow: 0 0 20px 5px #ffc400;
+	box-shadow: 0 0 20px 5px #ffc400;
 }
 /* .mat-tab-label {
     min-width: 110px !important;
@@ -409,6 +413,34 @@ td .dropdown li{
     border-radius: 0;  
 }
 
+.ui-sortable-column {
+  vertical-align: top;
+}
+
+.tabpanel-has-error .ui-tabview-title{
+  color: red;
+}
+
+.tabpanel-has-error .ui-tabview-title:after{
+  content: " !";
+}
+
+.modal.delete-modal {
+    max-width: 350px;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.delete-modal .content_confirm {
+    text-align: center;
+    padding-bottom: 1.6em;
+}
+.delete-modal .icon {
+    font-size: 5em;
+    color: #ffc400;
+    
+}
 /* Added by Mike */
 .ui-fileupload-buttonbar button:not(.ui-fileupload-choose) {
   display: none !important;

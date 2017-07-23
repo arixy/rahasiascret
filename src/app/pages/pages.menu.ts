@@ -143,7 +143,50 @@ export const PAGES_MENU = [
                   pathMatch: 'prefix',
                   hidden: true
               }
-          }
+          },
+          pathMatch: 'prefix',
+          children: [
+              {
+                path: '1',
+                pathMatch: 'partial',
+                data: {
+                    menu: {
+                        title: 'Vendors',
+                        hidden: true
+                    }
+                },
+            },
+            {
+                path: '2',
+                pathMatch: 'partial',
+                data: {
+                    menu: {
+                        title: 'Tenants',
+                        hidden: true
+                    }
+                },
+            },
+            {
+                path: '3',
+                pathMatch: 'partial',
+                data: {
+                    menu: {
+                        title: 'Guests',
+                        hidden: true
+                    }
+                },
+            },
+            {
+                path: '4',
+                pathMatch: 'partial',
+                data: {
+                    menu: {
+                        title: 'Owners',
+                        hidden: true
+                    }
+                },
+            },
+          ]
       },
         {
           path: 'utility-types',
