@@ -1,12 +1,41 @@
 <div class="widgets">
+  <div class="row">
+   <div class="ui-helper-clearfix add-new-button__container">
+              <div class="btn-group add-new-dropdown" style="float: right">
+                <button (click)="addEntity()" type="button" class="btn btn-primary">
+                    
+                    <i class="icon ion-plus-round"></i>
+                    
+                    
+                        New {{current_entity_type_name}}
+                </button>
+
+            </div>
+    </div>
     <ba-card title="" baCardClass="with-scroll">
         <p-dataTable #dt [value]="entities" [lazy]="false" [rows]="10" [paginator]="true">
+          <!-- <p-header>
+            <div class="ui-helper-clearfix">
+                <button type="button" iconPos="left" label="CSV" (click)="dt.exportCSV()" style="float:left" class="btn-export__csv">
+                    <i class="icon ion-ios-download-outline"></i>
+                </button>
+                <button (click)="addEntity()" class="btn btn-primary" style="float:right">Add New {{ current_entity_type_name }}</button>
+            </div>
+                  </p-header> -->
           <p-header>
             <div class="ui-helper-clearfix">
                 <button type="button" iconPos="left" label="CSV" (click)="dt.exportCSV()" style="float:left" class="btn-export__csv">
                     <i class="icon ion-ios-download-outline"></i>
                 </button>
-                <button (click)="addEntity()" class="btn btn-primary" style="float:right">Add New Entity</button>
+                <div class="btn-group" dropdown style="float: right">
+                            
+                            <reset-filter (click)="resetFilters()">
+                            </reset-filter>
+
+                            <button title="Refresh" id="resetFilters" type="button" class="btn-sets-right" (click)="refresh($event)">
+                                <i class="icon ion-ios-reload"></i>
+                            </button>
+                        </div>
             </div>
         </p-header>
            <p-column field="entityId" header="ID" [sortable]="true"></p-column>
@@ -35,6 +64,7 @@
             </p-column>
         </p-dataTable>
     </ba-card>
+    </div>
 </div>
 <div bsModal #addNewModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
@@ -43,19 +73,20 @@
         <button class="close" aria-label="Close" (click)="hideChildModal()">
           <span aria-hidden="true">&times;</span>
         </button>
-        <h4 class="modal-title">ADD NEW ENTITY</h4>
+        <h4 class="modal-title">ADD NEW {{current_entity_type_name}}</h4>
           <div *ngIf="error_from_server" class="error-from-server">
               <i class="fa fa-exclamation-circle"></i> {{error_from_server}}
           </div>
       </div>
       <div class="modal-body">
         <div>
-            <ba-card title="" baCardClass="with-scroll">
+            <ba-card title="" baCardClass="with-scroll custom-card">
               <form [formGroup]="form" (ngSubmit)="onSubmit(form.value)" class="form-horizontal">
+              <div class="modal-form-container">
               <div class="form-group row" [ngClass]="{'has-error': (!name.valid && name.touched), 'has-success': (name.valid && name.touched)}">
-                <label for="inputEmail3" class="col-sm-2 control-label">Name</label>
 
-                <div class="col-sm-10">
+                <div class="col-sm-12">
+                 <label for="inputEmail3">Name</label>
                   <input [formControl]="name" type="text" class="form-control" id="inputEmail3" placeholder="Name">
                 </div>
                 
@@ -74,9 +105,9 @@
                     </div>
               </div>
               <div class="form-group row" [ngClass]="{'has-error': (!description.valid && description.touched), 'has-success': (description.valid && description.touched)}">
-                <label for="inputPassword3" class="col-sm-2 control-label">Description</label>
 
-                <div class="col-sm-10">
+                <div class="col-sm-12">
+                 <label for="inputPassword3">Description</label>
                   <input [formControl]="description" type="text" class="form-control" id="inputPassword3" placeholder="Description">
                 </div>
               </div>
@@ -94,9 +125,8 @@
                     </div>
               </div>
               <div class="form-group row">
-                  <label for="inputPassword3" class="col-sm-2 control-label">Address 1</label>
-
-                <div class="col-sm-10">
+                <div class="col-sm-12">
+                 <label for="inputPassword3">Address 1</label>
                   <input [formControl]="address1" type="text" class="form-control" id="inputPassword3" placeholder="address 1">
                 </div>
               </div>
@@ -114,9 +144,9 @@
                     </div>
               </div>
 			 <div class="form-group row">
-                  <label for="inputPassword3" class="col-sm-2 control-label">Contact</label>
 
-                <div class="col-sm-10">
+                <div class="col-sm-12">
+                 <label for="inputPassword3">Contact</label>
                   <input [formControl]="contact_person" type="text" class="form-control" id="inputPassword3" placeholder="contact person">
                 </div>
               </div>
@@ -134,9 +164,8 @@
                     </div>
               </div>	
 			 <div class="form-group row">
-                  <label for="inputPassword3" class="col-sm-2 control-label">Phone</label>
-
-                <div class="col-sm-10">
+                <div class="col-sm-12">
+                 <label>Phone</label>
                   <input [formControl]="phone1" type="text" class="form-control" id="inputPassword3" placeholder="phone">
                 </div>
               </div>
@@ -153,7 +182,7 @@
                       Minimum of 2 characters
                     </div>
               </div>
-              <div *ngIf="items_entity_type" class="form-group row select-container">
+              <!-- <div *ngIf="items_entity_type" class="form-group row select-container">
                  <label for="selectlocation" class="col-sm-2 control-label">Entity Type</label>
                  <div class="col-sm-10">
                       <ng-select #addEntityTypeSelectBox
@@ -163,18 +192,29 @@
                                   placeholder="No Entity Type selected">
                       </ng-select>
                   </div>
-              </div>		  
-              <div class="form-group row">
-               <div class="col-sm-3">
-                  <button type="button" class="btn btn-default btn-cancel">Cancel</button> 
-               </div>
-               <div class="col-sm-6">
-                   &nbsp;
-               </div>
-                <div class="col-sm-3">
-                  <button [disabled]="!form.valid" type="submit" class="btn btn-default btn-save">Save</button>
-                </div>
+              </div>		 -->  
               </div>
+              <div class="form-group modal-action-row row">
+                  <div class="col-sm-3 btn-with-icon">
+                    <button type="button" class="btn btn-default btn-cancel" (click)="cancel()">
+                    <i class="icon ion-close"></i>
+                    Cancel</button>
+                  </div>
+                  <div class="col-sm-5">
+                       &nbsp;
+                   </div>
+                   <div class="col-sm-1 no-padding">
+                       <span *ngIf="submitLoading" class="loading-container">
+                            <loading-small></loading-small>
+                        </span>
+                   </div>
+                  <div class="col-sm-3 btn-with-icon">
+                    <button type="submit" class="btn btn-default btn-save">
+                    <i class="icon ion-checkmark"></i>
+                        Save
+                    </button>
+                  </div>
+            </div>
             </form>
             </ba-card>
           </div>
@@ -190,12 +230,13 @@
         <button class="close" aria-label="Close" (click)="hideEditModal()">
           <span aria-hidden="true">&times;</span>
         </button>
-        <h4 class="modal-title">Edit Entities</h4>
+        <h4 class="modal-title">Edit {{current_entity_type_name}}</h4>
       </div>
       <div class="modal-body">
         <div>
-            <ba-card title="Edit Entity" baCardClass="with-scroll">
+            <ba-card title="" baCardClass="with-scroll custom-card">
               <form [formGroup]="edit_form" (ngSubmit)="onSubmitEdit(edit_form.value, $event)" class="form-horizontal">
+              <div class="modal-form-container">
               <div class="form-group row">
                 <label for="inputEmail3" class="col-sm-2 control-label">Name</label>
 
@@ -231,7 +272,7 @@
                   <input [formControl]="edit_phone1" type="text" class="form-control" id="inputPassword3" placeholder="phone">
                 </div>
               </div>
-              <div *ngIf="items_entity_type" class="form-group row select-container">
+              <!-- <div *ngIf="items_entity_type" class="form-group row select-container">
                  <label for="selectlocation" class="col-sm-2 control-label">Entity Type</label>
                  <div class="col-sm-10">
                       <ng-select #editEntityTypeSelectBox
@@ -241,12 +282,29 @@
                                   placeholder="No Entity Type selected">
                       </ng-select>
                   </div>
+              </div> -->
               </div>		  
-              <div class="form-group row">
-                <div class="offset-sm-2 col-sm-10">
-                  <button [disabled]="!edit_form.valid" type="submit" class="btn btn-default btn-auth">Submit</button>
-                </div>
-              </div>
+              <div class="form-group modal-action-row row">
+                  <div class="col-sm-3 btn-with-icon">
+                    <button type="button" class="btn btn-default btn-cancel" (click)="cancel()">
+                    <i class="icon ion-close"></i>
+                    Cancel</button>
+                  </div>
+                  <div class="col-sm-5">
+                       &nbsp;
+                   </div>
+                   <div class="col-sm-1 no-padding">
+                       <span *ngIf="submitLoading" class="loading-container">
+                            <loading-small></loading-small>
+                        </span>
+                   </div>
+                  <div class="col-sm-3 btn-with-icon">
+                    <button type="submit" class="btn btn-default btn-save">
+                    <i class="icon ion-checkmark"></i>
+                        Save
+                    </button>
+                  </div>
+            </div>
             </form>
             </ba-card>
           </div>

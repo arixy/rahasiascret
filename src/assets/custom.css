@@ -441,6 +441,18 @@ td .dropdown li{
     color: #ffc400;
     
 }
+
+.custom-filter-datatable .ui-sortable-column-icon {
+    display: none !important;
+}
+
+.custom-filter-datatable .sortable-custom-icon {
+    float: right;
+}
+
+.custom-filter-datatable th.ui-state-active .sortable-custom-icon.fa-sort:before {
+    content: "\f0de";
+}
 /* Added by Mike */
 .ui-fileupload-buttonbar button:not(.ui-fileupload-choose) {
   display: none !important;

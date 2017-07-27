@@ -87,18 +87,18 @@ export class AssetService{
   }
 
   getAssets(): Observable<any> {
-    var headers = new Headers();
-    headers.append('Content-Type', 'application/json');
-    var bearer = "Bearer " + localStorage.getItem('bearer_token');
+        var headers = new Headers();
+        headers.append('Content-Type', 'application/json');
+        var bearer = "Bearer " + localStorage.getItem('bearer_token');
 
-    headers.append('Authorization', bearer);
-    headers.append('Access-Control-Allow-Origin', '*');
-    headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
-    
-    var options = new RequestOptions({headers: headers});
-    var load_url = this.appUrl + '/asset/all';
-      
-    return this.http.get(load_url, options).map(this.extractData);
+        headers.append('Authorization', bearer);
+        headers.append('Access-Control-Allow-Origin', '*');
+        headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
+
+        var options = new RequestOptions({headers: headers});
+        var load_url = this.appUrl + '/asset/all';
+
+        return this.http.get(load_url, options).map(this.extractData);
   }
   
   
@@ -182,11 +182,13 @@ export class AssetService{
 
         return this.http.get(load_url, options).map(this.extractData);    
     }
-  private extractData(res: Response){
-    let body = res.json();
-    console.debug(body);
-    return body || { };
-  }
+
+    private extractData(res: Response){
+        let body = res.json();
+        console.debug(body);
+        return body || { };
+    }
+
     addAsset(formData: FormData): Observable<any> {
         console.log('Adding Asset', formData);
         var headers = new Headers();

@@ -97,7 +97,7 @@ export class UsersRolesService{
             (role_from_all) => {
                 let found_role = user_roles.find(
                     (user_role_id) => {
-                        user_role_id == role_from_all.id;
+                        user_role_id == role_from_all.roleId;
                     }
                 );
                 if(found_role != undefined){

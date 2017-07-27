@@ -13,97 +13,19 @@
             </div>
     </div>
     <ba-card title="" baCardClass="with-scroll">
-        <p-dataTable #dt [value]="users">
+       <spinner *ngIf="dataLoading"></spinner>
+        <p-dataTable #dt [value]="users" [lazy]="true" (onLazyLoad)="refresh(filter_master, dt)" [rows]="10" [paginator]="true" [totalRecords]="totalRecords" sortField="dateUpdated" sortOrder="-1" styleClass="custom-filter-datatable">
           <p-header>
             <div class="ui-helper-clearfix">
                 <button type="button" iconPos="left" label="CSV" (click)="exportCSV()" style="float:left" class="btn-export__csv">
                     <i class="icon ion-ios-download-outline"></i>
                 </button>
                 <div class="btn-group" dropdown style="float: right">
-                            <button title="Reset" id="resetFilters" type="button" class="btn-sets-right-filter" (click)="resetFilters()">
-                                <!-- <img class="reset-filter" src="./assets/img/clear-filter.svg" /> -->
-                                <!-- <span>&nbsp;</span>
-                                <object class="reset-filter-object" type="image/svg+xml" data="./assets/img/clear-filter.svg"></object> -->
-                                <svg (click)="resetFilters()"
-                               xmlns:dc="http://purl.org/dc/elements/1.1/"
-                               xmlns:cc="http://creativecommons.org/ns#"
-                               xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-                               xmlns:svg="http://www.w3.org/2000/svg"
-                               xmlns="http://www.w3.org/2000/svg"
-                               xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-                               xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-                               width="40"
-                               height="43"
-                               preserveAspectRatio="xMinYMin meet"
-                                 viewBox="0 0 40 43">
-                                <style type="text/css">
-                                    svg {
-                                        cursor: pointer;
-                                        width: 26px;
-                                        height: 26px;
-                                        position: relative;
-                                        top: 2px;
-                                    }
-                                    svg * {
-                                        transition: all .2s ease-out;
-                                        stroke-width: 1.5 !important;
-                                        stroke: #fff !important;
-                                    }
-                                    svg path {
-                                        stroke: #fff !important;
-                                    }
-                                    svg:hover path {
-                                        stroke: #fff !important;
-                                    }
-                                    .btn-sets-right-filter:hover path {
-                                        stroke: #fff !important;
-                                    }
-                                    .btn-sets-right-filter path{
-                                        stroke: #fff !important;
-                                    }
-                                </style>
-                              <defs
-                                 id="defs4" />
-                              <g
-                                 inkscape:label="Layer 1"
-                                 inkscape:groupmode="layer"
-                                 id="layer1"
-                                 transform="translate(0,-1009.3622)">
-                                <path class="main-line"
-                                   style="fill:none;stroke:#00abff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-                                   d="m 2.8280048,1019.4764 34.7684222,0"
-                                   id="path2985"
-                                   inkscape:connector-curvature="0" />
-                                <path class="main-line"
-                                   inkscape:connector-curvature="0"
-                                   id="path3755"
-                                   d="m 9.8048228,1029.3127 20.8147862,0"
-                                   style="fill:none;stroke:#00abff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
-                                <path class="main-line"
-                                   style="fill:none;stroke:#00abff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-                                   d="m 16.134497,1039.149 8.155438,0"
-                                   id="path3757"
-                                   inkscape:connector-curvature="0" />
-                                <g
-                                   id="layer2"
-                                   transform="matrix(0.7901613,0,0,0.78363052,0.57269904,225.98743)"
-                                   style="stroke:#00abff;stroke-width:1.27082705;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none">
-                                  <path class="main-line"
-                                     inkscape:connector-curvature="0"
-                                     id="path3761"
-                                     d="m 33.303572,1044.3265 9.330357,-9.3304"
-                                     style="fill:none;stroke:#00abff;stroke-width:1.27082705;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
-                                  <path class="main-line"
-                                     style="fill:none;stroke:#00abff;stroke-width:1.27082705;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-                                     d="m 42.633929,1044.3265 -9.330357,-9.3304"
-                                     id="path3763"
-                                     inkscape:connector-curvature="0" />
-                                </g>
-                              </g>
-                            </svg>
-                            </button>
+                            
+                            <reset-filter (click)="resetFilters()">
+                            </reset-filter>
 
-                            <button title="Refresh" id="resetFilters" type="button" class="btn-sets-right" (click)="refresh($event)">
+                            <button title="Refresh" id="resetFilters" type="button" class="btn-sets-right" (click)="refresh(filter_master, dt)">
                                 <i class="icon ion-ios-reload"></i>
                             </button>
                         </div>
@@ -127,11 +49,49 @@
                     </template>
             </p-column>
            <p-column field="userId" header="User ID"></p-column>
-            <p-column field="username" header="Username"></p-column>
-            <p-column field="fullname" header="Fullname"></p-column>
-            <p-column field="email" header="Email"></p-column>
-			<p-column field="mobilePhoneNumber" header="mobile phone number"></p-column>
-			
+            <!-- <p-column field="username" [filter]="true" header="Username"></p-column> -->
+            <p-column header="Username" [sortable]="true" field="username" [filter]="false">
+                    <template pTemplate="header">
+                       <span class="ui-column-title">Username</span> <span *ngIf="dt.sortOrder == 1 || dt.sortField != 'username'" class="sortable-custom-icon fa fa-sort"></span>
+                       <span *ngIf="dt.sortOrder == -1 && dt.sortField == 'username'" class="sortable-custom-icon fa fa-sort-desc"></span>
+                       <input class="ui-column-filter ui-inputtext ui-corner-all ui-widget" type="text" [formControl]="filter_username_fc" />
+                   </template>
+                    <template let-node="rowData" pTemplate="body">
+                        {{node.username}}
+                    </template>
+            </p-column>
+            <!-- <p-column field="fullname" header="Fullname"></p-column> -->
+            <p-column header="Fullname" [sortable]="true" field="fullname" [filter]="false">
+                    <template pTemplate="header">
+                       <span class="ui-column-title">Fullname</span> <span *ngIf="dt.sortOrder == 1 || dt.sortField != 'fullname'" class="sortable-custom-icon fa fa-sort"></span>
+                       <span *ngIf="dt.sortOrder == -1 && dt.sortField == 'fullname'" class="sortable-custom-icon fa fa-sort-desc"></span>
+                       <input class="ui-column-filter ui-inputtext ui-corner-all ui-widget" type="text" [formControl]="filter_fullname_fc" />
+                   </template>
+                    <template let-node="rowData" pTemplate="body">
+                        {{node.fullname}}
+                    </template>
+            </p-column>
+            <!-- <p-column field="email" header="Email"></p-column> -->
+            <p-column header="Email" [sortable]="true" field="email" [filter]="false" [style]="{'width':'200px'}">
+                    <template pTemplate="header">
+                       <span class="ui-column-title">Email</span> <span *ngIf="dt.sortOrder == 1 || dt.sortField != 'email'" class="sortable-custom-icon fa fa-sort"></span>
+                       <span *ngIf="dt.sortOrder == -1 && dt.sortField == 'email'" class="sortable-custom-icon fa fa-sort-desc"></span>
+                       <input class="ui-column-filter ui-inputtext ui-corner-all ui-widget" type="text" [formControl]="filter_email_fc" />
+                   </template>
+                    <template let-node="rowData" pTemplate="body">
+                        {{node.email}}
+                    </template>
+            </p-column>
+			<p-column header="Mobile Phone Number" [sortable]="true" field="mobilePhoneNumber" [filter]="false" [style]="{'width':'300px'}">
+                    <template pTemplate="header">
+                       <span class="ui-column-title">Mobile Phone Number</span> <span *ngIf="dt.sortOrder == 1 || dt.sortField != 'mobilePhoneNumber'" class="sortable-custom-icon fa fa-sort"></span>
+                       <span *ngIf="dt.sortOrder == -1 && dt.sortField == 'mobilePhoneNumber'" class="sortable-custom-icon fa fa-sort-desc"></span>
+                       <input class="ui-column-filter ui-inputtext ui-corner-all ui-widget" type="text" [formControl]="filter_mobile_fc" />
+                   </template>
+                    <template let-node="rowData" pTemplate="body">
+                        {{node.mobilePhoneNumber}}
+                    </template>
+            </p-column>
         </p-dataTable>
     </ba-card>
     </div>
@@ -160,11 +120,25 @@
 					<input [formControl]="username" type="text" class="form-control" id="inputEmail3" placeholder="Username">
                 </div>
               </div>
+              <div class="row error-row">
+                   <div class="col-sm-12">
+                        <div class="error-message col-xg-10" *ngIf="form.get('username').hasError('required') && add_form_submitted">
+                              Username is required
+                        </div>
+                    </div>
+              </div>
 			  <div class="form-group row" [ngClass]="{'has-error': (!fullname.valid && fullname.touched), 'has-success': (fullname.valid && fullname.touched)}">
                 <div class="col-sm-12">
 					<label>Fullname</label>
 					<input [formControl]="fullname" type="text" class="form-control" id="inputEmail3" placeholder="fullname">
                 </div>
+              </div>
+              <div class="row error-row">
+                   <div class="col-sm-12">
+                        <div class="error-message col-xg-10" *ngIf="form.get('fullname').hasError('required') && add_form_submitted">
+                              Fullname is required
+                        </div>
+                    </div>
               </div>
               <div class="form-group row" [ngClass]="{'has-error': (!email.valid && email.touched), 'has-success': (email.valid && email.touched)}">
                 <div class="col-sm-12">
@@ -172,25 +146,52 @@
 					<input [formControl]="email" type="email" class="form-control" id="inputPassword3" placeholder="Email">
                 </div>
               </div>
+              <div class="row error-row">
+                   <div class="col-sm-12">
+                        <div class="error-message col-xg-10" *ngIf="form.get('email').hasError('required') && add_form_submitted">
+                              Email is required
+                        </div>
+                    </div>
+              </div>
 			  <div class="form-group row">
                 <div class="col-sm-12">
 					<label>Mobile Phone</label>
 					<input [formControl]="mobilePhoneNumber" type="text" class="form-control" id="inputPassword3" placeholder="Mobile Phone">
                 </div>
               </div>
+              <div class="row error-row">
+                   <div class="col-sm-12">
+                        <div class="error-message col-xg-10" *ngIf="form.get('mobilePhoneNumber').hasError('required') && add_form_submitted">
+                              Mobile Phone is required
+                        </div>
+                    </div>
+              </div>
 			  <div class="form-group row" [ngClass]="{'has-error': (!password.valid && password.touched), 'has-success': (password.valid && password.touched)}">
                 <div class="col-sm-12">
 					<label>Password</label>
-					<input [formControl]="password" type="password" class="form-control" id="inputPassword3" placeholder="Hash password">
+					<input [formControl]="password" type="password" class="form-control" id="inputPassword3" placeholder="Password">
                 </div>
               </div>
+              <div class="row error-row">
+                   <div class="col-sm-12">
+                        <div class="error-message col-xg-10" *ngIf="form.get('password').hasError('required') && add_form_submitted">
+                              Password is required
+                        </div>
+                    </div>
+              </div>
               <ba-card title="Users Role" baCardClass="with-scroll role-card">
+                 <div class="row error-row">
+                   <div class="col-sm-12">
+                        <div class="error-message col-xg-10" *ngIf="hasValueError(add_roles).required && add_form_submitted">
+                              At least one Role must be picked
+                        </div>
+                    </div>
+                  </div>
                   <div *ngFor="let role of loaded_roles">
                         <div class="form-group">
                           <div class="checkbox">
                             <label>
-                              <input type="checkbox" name="role"
-                               [(ngModel)]="role.is_selected" (ngModelChange)="onRoleChange(selected_user,role)">
+                             <p-checkbox binary="true" [(ngModel)]="role.is_selected" (ngModelChange)="onRoleChange(selected_user, role, add_roles)" [ngModelOptions]="{standalone: true}"></p-checkbox>
                               {{role.name}}
                             </label>
                           </div>
@@ -201,7 +202,7 @@
                 </div>
             <div class="form-group modal-action-row row">
                   <div class="col-sm-3 btn-with-icon">
-                    <button type="button" class="btn btn-default btn-cancel" (click)="hideModal()">
+                    <button type="button" class="btn btn-default btn-cancel" (click)="cancel()">
                     <i class="icon ion-close"></i>
                     Cancel</button>
                   </div>
@@ -214,7 +215,7 @@
                         </span>
                    </div>
                   <div class="col-sm-3 btn-with-icon">
-                    <button [disabled]="!form.valid" type="submit" class="btn btn-default btn-save">
+                    <button type="submit" class="btn btn-default btn-save">
                     <i class="icon ion-checkmark"></i>
                         Save
                     </button>
@@ -241,7 +242,7 @@
       </div>
       <div class="modal-body">
         <div>
-            <ba-card title="Edit Users" baCardClass="with-scroll custom-card">
+            <ba-card title="" baCardClass="with-scroll custom-card">
              <form [formGroup]="edit_form" (ngSubmit)="onSubmitEdit(edit_form.value , $event)" class="form-horizontal">
               <div class="form-group row" [ngClass]="{'has-error': (!edit_username.valid && edit_username.touched), 'has-success': (edit_username.valid && edit_username.touched)}">
                 <div class="col-sm-12">
@@ -270,7 +271,7 @@
 			  <div class="form-group row">
                 <div class="col-sm-12">
 					<label>Password</label>
-                  	<input [formControl]="edit_password" type="text" class="form-control" id="inputPassword3" placeholder="Password Salt">
+                  	<input [formControl]="edit_password" type="text" class="form-control" id="inputPassword3" placeholder="Password">
                 </div>
               </div>
 <!--
@@ -287,7 +288,7 @@
                           <div class="checkbox">
                             <label>
                               <input type="checkbox" name="role"
-                               [(ngModel)]="role.is_selected" (ngModelChange)="onRoleChange(selected_user,role)">
+                               [(ngModel)]="role.is_selected" (ngModelChange)="onRoleChange(selected_user,role, edit_roles)" [ngModelOptions]="{standalone: true}">
                               {{role.name}}
                             </label>
                           </div>

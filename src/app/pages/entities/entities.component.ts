@@ -98,6 +98,9 @@ export class Entities {
                     (response) => {
                         console.log('Entities by Type', response);
                         this.entities = response.data;
+                        
+                        this.selected_entity_type = params['entity_type_id'];
+                        this.selected_edit_entity_type = params['entity_type_id'];
                     }
                 );
                 
@@ -145,7 +148,13 @@ export class Entities {
     public addEntity(){
         this.addNewModal.show();
     }
-	
+	public hideModal(){
+        this.addNewModal.hide();
+        this.editModal.hide();
+    }
+    public cancel(){
+        this.hideModal();
+    }
     public deleteEntity(event){
 		this.deleteConfirm= event;
 		this.delete_name= event.name;

@@ -46,6 +46,35 @@ export class EntityService{
         return this.http.get(load_url, options).map(this.extractData);
     }
     
+    getEntitiesFilter(entityTypeId: number, filter_data): Observable<any> {
+        var headers = new Headers();
+        headers.append('Content-Type', 'application/json');
+        var bearer = "Bearer " + localStorage.getItem('bearer_token');
+
+        headers.append('Authorization', bearer);
+        headers.append('Access-Control-Allow-Origin', '*');
+        headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
+
+        var options = new RequestOptions({ headers: headers });
+        var load_url = this.appUrl + 'entity/all';
+
+        let formatted_object = {
+            filters: {},
+            first: 0,
+            rows: 10,
+            globalFilter: '',
+            multiSortMeta: null,
+            sortField: 'dateUpdated',
+            sortOrder: -1
+        };
+
+        if(filter_data){
+            formatted_object = filter_data;
+        }
+    
+        console.log('Formatted_Object', formatted_object);
+        return this.http.post(load_url, formatted_object, options).map(this.extractData);
+    }
 	addEntity(new_entity): Observable<any> {
 		var headers = new Headers();
 		headers.append('Content-Type', 'application/x-www-form-urlencoded');
