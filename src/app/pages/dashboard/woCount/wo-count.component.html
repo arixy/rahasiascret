@@ -1,0 +1,19 @@
+﻿<div class="alert alert-danger" *ngIf="errMsg.length > 0">
+  <ul style="margin-bottom: 0px;">
+    <li *ngFor="let err of errMsg">
+      {{err}}
+    </li>
+  </ul>
+</div>
+<div class="col-md-4 dashboard-wo-count wo-new">
+  <div class="col-md-4 count" [style.background]="woCountModel.new.highlightColor">{{woCountModel.new.total}}</div>
+  <div class="col-md-8 label" [style.background]="woCountModel.new.baseColor">{{woCountModel.new.label}}</div>
+</div>
+<div class="col-md-4 dashboard-wo-count wo-progress">
+  <div class="col-md-4 count" [style.background]="woCountModel.inprogress.highlightColor">{{woCountModel.inprogress.total}}</div>
+  <div class="col-md-8 label" [style.background]="woCountModel.inprogress.baseColor">{{woCountModel.inprogress.label}}</div>
+</div>
+<div class="col-md-4 dashboard-wo-count wo-resolved">
+  <div class="col-md-4 count" [style.background]="woCountModel.resolved.highlightColor">{{woCountModel.resolved.total}}</div>
+  <div class="col-md-8 label" [style.background]="woCountModel.resolved.baseColor">{{woCountModel.resolved.label}}</div>
+</div>

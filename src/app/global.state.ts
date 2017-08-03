@@ -44,6 +44,7 @@ export class GlobalState {
 export class GlobalConfigs {
     public static readonly APP_BASE_URL = "http://ec2-52-40-147-30.us-west-2.compute.amazonaws.com/api/v1";
     public static readonly APP_MASTER_URL = "http://ec2-52-40-147-30.us-west-2.compute.amazonaws.com/api/v1/master";
+    public static readonly APP_AUTH_URL = "http://ec2-52-40-147-30.us-west-2.compute.amazonaws.com/api/v1/auth";
 
     // used for ng-prime date picker year range
     public static readonly yearRange = '1970:2100';
@@ -52,6 +53,7 @@ export class GlobalConfigs {
 export class WorkflowActions {
     public static readonly CREATE = -1;
     public static readonly VIEW = -2;
+    public static readonly PRINT = -3;
     public static readonly EDIT = 2;
     public static readonly DELETE = 3;
     public static readonly ASSIGN_REASSIGN = 4;

@@ -1,6 +1,6 @@
 <div class="page-top clearfix" baScrollPosition maxHeight="50" (scrollChange)="scrolledChanged($event)"
      [ngClass]="{scrolled: isScrolled}">
-  <a routerLink="/pages/dashboard" class="al-logo clearfix"><img src="assets/img/company2.png"><span>EMS</span></a>
+  <a routerLink="/pages/dashboard" class="al-logo clearfix"><img src="assets/img/company2.png"><span>SMART</span></a>
   <a href (click)="toggleMenu()" class="collapse-menu-link ion-navicon"></a>
 <!--
   <div class="search">
@@ -12,7 +12,7 @@
             <a (click)="toggleDropdownNew()" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> <i class="fa fa-plus-circle"></i> New <span class="fa fa-caret-down"></span></a>
           
         </li>
-        <li class="dropdown-full">
+        <li class="dropdown-full" *ngIf="configurationPerm.isCanShow()">
             <a (click)="toggleDropdownConfig()" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> <i class="fa fa-gears"></i> Configuration <span class="fa fa-caret-down"></span></a>
           
         </li>
@@ -27,8 +27,8 @@
       <ul *ngIf="isDropdownProfile" class="dropdown-menu user-dropdown top-dropdown-menu profile-dropdown" aria-labelledby="user-profile-dd">
         <li class="dropdown-item"><i class="dropdown-arr"></i></li>
         
-        <li class="dropdown-item"><a href><i class="fa fa-cog"></i>Settings</a></li>
-        <hr class="user-divider" />
+        <!--<li class="dropdown-item"><a routerLink="/pages/settings"><i class="fa fa-cog"></i>Settings</a></li>-->
+        <!--<hr class="user-divider" />-->
         <li class="dropdown-item"><a (click)="changePassword()"><i class="fa fa-cog"></i>Change Password</a></li>
         <hr class="user-divider" />
         <li class="dropdown-item"><a (click)="logout()"><i class="fa fa-power-off"></i>Sign out</a></li>
@@ -71,26 +71,28 @@
 </div>
 <div *ngIf="isDropdownConfiguration" class="top-dropdown dropdown-configuration">
     <div class="row dropdown-row">
-        <div class="col-md-3">
+        <div class="col-md-3" *ngIf="configurationPerm.configurations.isCanShow()">
          <ul class="dropdown-menu__">
-        <h5>Configurations</h5>
-        <li><i class="fa fa-angle-right"></i><a routerLink="/pages/setups/locations">Units/Locations</a></li>
-        <li><i class="fa fa-angle-right"></i><a routerLink="/pages/setups/work-orders">WO Categories</a></li>
-        <li><i class="fa fa-angle-right"></i><a routerLink="/pages/weekends">Weekends &amp; Holidays</a></li>
-    </ul>
+            <h5>Configurations</h5>
+            <li *ngIf="configurationPerm.configurations.Location"><i class="fa fa-angle-right"></i><a routerLink="/pages/setups/locations">{{ sitemap.Location.name }}</a></li>
+            <li *ngIf="configurationPerm.configurations.WOCategory"><i class="fa fa-angle-right"></i><a routerLink="/pages/setups/work-orders">{{ sitemap.WOCategory.name }}</a></li>
+            <!-- By Mike: Hide weekends and holidays -->
+            <!--<li><i class="fa fa-angle-right"></i><a routerLink="/pages/weekends">Weekends &amp; Holidays</a></li>-->
+        </ul>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3" *ngIf="configurationPerm.allList.isCanShow()">
             <ul class="dropdown-menu__">
                 <h5>List</h5>
                 <li><i class="fa fa-angle-right"></i><a routerLink="/pages/all-list">All Lists</a></li>
             </ul>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3" *ngIf="configurationPerm.administration.isCanShow()">
          <ul class="dropdown-menu__">
-            <h5>Administrations    </h5>
-            <li><i class="fa fa-angle-right"></i><a routerLink="/pages/users">Manage Users</a></li>
-            <li><i class="fa fa-angle-right"></i><a routerLink="/pages/role">Manage Roles</a></li>
-            <li><i class="fa fa-angle-right"></i><a routerLink="/pages/access-rights">Access Rights</a></li>
+            <h5>Administration</h5>
+            <li *ngIf="configurationPerm.administration.User"><i class="fa fa-angle-right"></i><a routerLink="/pages/users">{{ sitemap.User.name }}</a></li>
+            <li *ngIf="configurationPerm.administration.Role"><i class="fa fa-angle-right"></i><a routerLink="/pages/role">{{sitemap.Role.name}}</a></li>
+            <li *ngIf="configurationPerm.administration.AccessRights"><i class="fa fa-angle-right"></i><a routerLink="/pages/access-rights">{{sitemap.AccessRights.name}}</a></li>
+           <li *ngIf="configurationPerm.administration.SystemSetting"><i class="fa fa-angle-right"></i><a routerLink="/pages/settings">{{sitemap.SystemSetting.name}}</a></li>
             <!-- <li><i class="fa fa-angle-right"></i><a href="#">Redirect Tasks(Reassign)</a></li> -->
         </ul>
         </div>

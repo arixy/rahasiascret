@@ -1,5 +1,5 @@
 ﻿import { Injectable } from '@angular/core';
-import { Http, Response, Headers, RequestOptions, ResponseContentType } from '@angular/http';
+import { Http, Response, Headers, RequestOptions, ResponseContentType, URLSearchParams } from '@angular/http';
 import { UUID } from 'angular2-uuid';
 import { Observable } from 'rxjs/Observable';
 import { Subject }    from 'rxjs/Subject';
@@ -71,6 +71,7 @@ export class TaskService{
     public announceEvent(eventName: string){
         this.eventEmitted.next(eventName);
     }
+
     // Move to other file?
     public addNewWorkOrder(formData: FormData) {
         //console.log("prepareSend", formData);
@@ -105,6 +106,27 @@ export class TaskService{
 
         var options = new RequestOptions({ headers: headers });
         return this.http.post(this.appUrl + '/work-order/action', formData, options).map(this.extractData);
+    }
+
+    public deleteWorkOrder(id: number) {
+        var headers = new Headers();
+        ////headers.append('Content-Type', 'multipart/form-data');
+        headers.append('Content-Type', 'application/x-www-form-urlencoded');
+        var bearer = "Bearer " + localStorage.getItem('bearer_token');
+
+        headers.append('Authorization', bearer);
+        headers.append('Access-Control-Allow-Origin', '*');
+        headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
+
+        //formData.append('taskName', 'testing');
+
+        let urlSearchParams = new URLSearchParams();
+        urlSearchParams.append('workOrderId', id + "");
+
+        let requestBody = urlSearchParams.toString();
+
+        var options = new RequestOptions({ headers: headers });
+        return this.http.post(this.appUrl + '/work-order/delete', requestBody, options).map(this.extractData);
     }
 
     // Deprecated: maybe deleted later

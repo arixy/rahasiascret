@@ -143,10 +143,16 @@ export class Preventatives {
     public show_new_complete = true;
     public submitted;
 
+    // print related
+    private selPrintWOId;
+    // delete
+    private deleteWO;
+    private errDelete;
     @ViewChild('addNewModal') addNewModal: ModalDirective;
     @ViewChild('editModal') editModal: ModalDirective;
     @ViewChild('deleteModal') deleteModal: ModalDirective;
     @ViewChild('dt') taskListsTable: DataTable;
+    @ViewChild('dtschedule') scheduleListsTable: DataTable;
     //@Input() public source: LocalDataSource = new LocalDataSource();
 
     //@ViewChild('dynamicModalContent', {read: ViewContainerRef}) viewAddNewModal: ViewContainerRef;
@@ -173,6 +179,7 @@ export class Preventatives {
     public fb: FormBuilder,
     public activatedRoute: ActivatedRoute
   ) {
+      this.deleteWO = {};
       
       // hardcoded wo type list
       this.woTypes = [{ id: 1, label: "Preventive Maintenance"},
@@ -453,6 +460,16 @@ export class Preventatives {
     doAction(modelData, selectedAction){
         console.log("doAction", modelData, selectedAction);
 
+        this.selPrintWOId = modelData.workOrderId;
+        this.cdr.detectChanges();
+        if (selectedAction.workflowActionId == WorkflowActions.PRINT) {
+            this._taskService.announceEvent("printWO");
+            return;
+        } else if (selectedAction.workflowActionId == WorkflowActions.DELETE) {
+            this.deleteWO = modelData;
+            this.deleteModal.show();
+            return;
+        }
         this.viewModalBody.clear();
         if (modelData.woTypeId == this.SINGLE_TIME_REQUEST) {
             this.currentOpenModal = this.createNewSingleRequestComponent(this.viewModalBody, SingleRequestComponent);
@@ -713,6 +730,7 @@ export class Preventatives {
                     }
 
                     this.myTasks[i].actions.unshift({ workflowActionId: -2, name: "View" });
+                    this.myTasks[i].actions.push({ workflowActionId: -3, name: "Print" });
                     //this.myTasks[i].actions.push({ workflowActionId: 4, name: "Assign/Reassign" });
                     this.myTasks[i].dueDate = new Date(this.myTasks[i].dueDate);
                     this.myTasks[i].dateUpdated = new Date(this.myTasks[i].dateUpdated);
@@ -757,6 +775,20 @@ export class Preventatives {
 
     onCancel(){
         this.addNewModal.hide();
+    }
+    cancelDelete() {
+        this.deleteModal.hide();
+    }
+    saveDelete() {
+        this._taskService.deleteWorkOrder(this.deleteWO.workOrderId).subscribe(response => {
+            if (response.resultCode.code == "0") {
+                this.deleteModal.hide();
+                this.refresh("delete_success", this.taskListsTable);
+                this.refreshScheduled("delete_success", this.scheduleListsTable);
+            } else {
+                this.errDelete = response.resultCode.message;
+            }
+        });
     }
     ngOnDestroy(){
         this.subscription.unsubscribe();

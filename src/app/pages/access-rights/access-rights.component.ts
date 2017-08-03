@@ -36,11 +36,14 @@ export class AccessRightsComponent implements OnDestroy {
     private _confirmClickedButton = null;
 
     // error message from server
-    private errMsgServer = "";
+    private errMsg = [];
 
     // save button
     private isSaving = false;
     private btnSaveLabel = "Save";
+
+    // loading flag
+    private isLoadingData = true;
 
     @ViewChild("roleGroupSelectBox") roleGroupSelectBox: SelectComponent;
     @ViewChild("confirmModal") viewConfirmModal: ModalDirective;
@@ -69,6 +72,8 @@ export class AccessRightsComponent implements OnDestroy {
             } else {
                 // show error message?
             }
+
+            this.isLoadingData = false;
         });
     }
 
@@ -97,6 +102,7 @@ export class AccessRightsComponent implements OnDestroy {
             this.prevSelectedRole = event;
 
             this.roleAuthorizations = [];
+            this.isLoadingData = true;
             this._accessRightService.getAllMenus().subscribe(response => {
                 if (response.resultCode.code == "0") {
                     this.lstMenus = response.data;
@@ -133,11 +139,18 @@ export class AccessRightsComponent implements OnDestroy {
                                 }
                             } else {
                                 // show error message?
+                                this.errMsg = [];
+                                this.errMsg = this.errMsg.concat(response.resultCode.message);
                             }
+
+                            this.isLoadingData = false;
                         });
                     }
                 } else {
                     // show error message?
+                    this.errMsg = [];
+                    this.errMsg = this.errMsg.concat(response.resultCode.message);
+                    this.isLoadingData = false;
                 }
             });
         }
@@ -160,6 +173,7 @@ export class AccessRightsComponent implements OnDestroy {
         }
 
         console.log("objRoleAuth to send", objRoleAuth);
+        this.isLoadingData = true;
         this._accessRightService.insertTruncRoleAuthorizations(objRoleAuth).subscribe(response => {
             if (response.resultCode.code == "0") {
                 // reset flags
@@ -168,10 +182,13 @@ export class AccessRightsComponent implements OnDestroy {
 
                 this.btnSaveLabel = "Save";
 
-                this.viewInfoModal.show();
+                //this.viewInfoModal.show();
             } else {
                 // show error message?
+                this.errMsg = [];
+                this.errMsg = this.errMsg.concat(response.resultCode.message);
             }
+            this.isLoadingData = false;
         });
     }
 
@@ -195,6 +212,7 @@ export class AccessRightsComponent implements OnDestroy {
         this.viewConfirmModal.hide();
 
         this.roleAuthorizations = [];
+        this.isLoadingData = true;
         this._accessRightService.getAllMenus().subscribe(response => {
             if (response.resultCode.code == "0") {
                 this.lstMenus = response.data;
@@ -231,11 +249,17 @@ export class AccessRightsComponent implements OnDestroy {
                             }
                         } else {
                             // show error message?
+                            this.errMsg = [];
+                            this.errMsg = this.errMsg.concat(response.resultCode.message);
                         }
+                        this.isLoadingData = false;
                     });
                 }
             } else {
                 // show error message?
+                this.errMsg = [];
+                this.errMsg = this.errMsg.concat(response.resultCode.message);
+                this.isLoadingData = false;
             }
         });
     }

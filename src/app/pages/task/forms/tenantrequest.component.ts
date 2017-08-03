@@ -25,6 +25,7 @@ import { CustomValidators } from './custom-validators';
 @Component({
     selector: 'form-tenant-request',
     templateUrl: './tenantrequest.component.html',
+    styleUrls: ['../../preventatives/modals.scss', '../../preventatives/tablestyle.scss', '../../preventatives/purple-green.scss'],
     providers: [LocationService, AssetService, UsersService, RoleService, EntityService, WorkOrderService, ExpenseTypeService, PriorityService, EntityService]
 })
 export class TenantRequestComponent {
@@ -704,6 +705,10 @@ export class TenantRequestComponent {
     onCancel() {
         console.log("cancel");
         this._taskService.announceEvent("addNewModal_btnCancelOnClick");
+    }
+
+    onPrint() {
+        this._taskService.announceEvent("printWO");
     }
 
     removeSelectBoxValue(field, event) {

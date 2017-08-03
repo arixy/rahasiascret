@@ -1,4 +1,4 @@
-import {Component, Input, ViewContainerRef, ChangeDetectorRef, ViewChild, ViewEncapsulation, ComponentFactoryResolver, ComponentRef, OnDestroy } from '@angular/core';
+﻿import {Component, Input, ViewContainerRef, ChangeDetectorRef, ViewChild, ViewEncapsulation, ComponentFactoryResolver, ComponentRef, OnDestroy } from '@angular/core';
 //import { Observable } from 'rxjs/Observable';
 //import 'rxjs/add/operator/map';
 import { FormGroup, AbstractControl, FormBuilder, Validators, FormControl } from '@angular/forms';
@@ -32,6 +32,7 @@ import { OwnerRequestComponent } from './forms/ownerrequest.component';
 import { GuestRequestComponent } from './forms/guestrequest.component';
 import { RecurringRequestComponent } from './forms/recurringrequest.component';
 import { PreventiveRequestComponent } from './forms/preventiverequest.component';
+import { PrintWOComponent } from './print/print-wo.component';
 
 import { GlobalState, WorkOrderStatuses, WorkflowActions } from '../../global.state';
 
@@ -39,107 +40,12 @@ import { GlobalState, WorkOrderStatuses, WorkflowActions } from '../../global.st
   selector: 'my-task',
   templateUrl: './task.component.html',
   styleUrls: ['./../styles/basic-theme.scss', './../styles/primeng.min.css', './../styles/modals.scss','./task.component.css'],
+  //styleUrls: ['../preventatives/modals.scss', '../preventatives/tablestyle.scss', '../preventatives/purple-green.scss'],
   encapsulation: ViewEncapsulation.None,
   providers: [TaskService, LocationService],
-  entryComponents: [SingleRequestComponent, TenantRequestComponent, OwnerRequestComponent, GuestRequestComponent, RecurringRequestComponent, PreventiveRequestComponent]
+  entryComponents: [SingleRequestComponent, TenantRequestComponent, OwnerRequestComponent, GuestRequestComponent, RecurringRequestComponent, PreventiveRequestComponent, PrintWOComponent]
 })
 export class TaskComponent implements OnDestroy{
-    // #TEST REGION
-    //public __lst_type = [
-    //    { id: 1, text: "Preventive Maintenance" },
-    //    { id: 2, text: "Recurring Request" },
-    //    { id: 3, text: "Single Request" },
-    //    { id: 4, text: "Tenant Request" },
-    //    { id: 5, text: "Guest Request" },
-    //    { id: 6, text: "Owner Request" }
-    //];
-
-    //public __lst_actions = [
-    //    {id: -1, text: "Create"},
-    //    { id: -2, text: "View" },
-    //    { id: -3, text: "View (Schedule)"},
-    //    { id: 2, text: "Edit" },
-    //    { id: -4, text: "Edit (Schedule)" },
-    //    { id: 3, text: "Delete" },
-    //    { id: 4, text: "Assign/Reassign" },
-    //    { id: 5, text: "Cancel" },
-    //    { id: 6, text: "Pending" },
-    //    { id: 7, text: "In Progress" },
-    //    { id: 8, text: "Close for Confirmation" },
-    //    { id: 9, text: "Complete" },
-    //    { id: 10, text: "Return" },
-    //];
-
-    //public __sel_type: { id, text };
-    //public __sel_action: { id, text };
-
-    //public __setSelectedType(event) {
-    //    this.__sel_type = event;
-    //}
-
-    //public __setSelectedAction(event) {
-    //    this.__sel_action = event;
-    //}
-
-    //public testOpenModal() {
-    //    this.viewModalBody.clear();
-    //    if (this.__sel_type.id == this.SINGLE_TIME_REQUEST) {
-    //        this.currentOpenModal = this.createNewSingleRequestComponent(this.viewModalBody, SingleRequestComponent);
-    //        // send specific parameters if needed
-    //        //this.currentOpenModal.instance.variable_name = value
-    //    } else if (this.__sel_type.id == this.TENANT_REQUEST) {
-    //        this.currentOpenModal = this.createNewTenantRequestComponent(this.viewModalBody, TenantRequestComponent);
-    //    } else if (this.__sel_type.id == this.GUEST_REQUEST) {
-    //        this.currentOpenModal = this.createNewGuestRequestComponent(this.viewModalBody, GuestRequestComponent);
-    //    } else if (this.__sel_type.id == this.OWNER_REQUEST) {
-    //        this.currentOpenModal = this.createNewOwnerRequestComponent(this.viewModalBody, OwnerRequestComponent);
-    //    } else if (this.__sel_type.id == this.RECURRING_REQUEST) {
-    //        this.currentOpenModal = this.createNewRecurringRequestComponent(this.viewModalBody, RecurringRequestComponent);
-    //    } else if (this.__sel_type.id == this.PREVENTIVE_REQUEST) {
-    //        this.currentOpenModal = this.createNewPreventiveRequestComponent(this.viewModalBody, PreventiveRequestComponent);
-    //    }
-
-    //    this.currentOpenModal.instance.selectedWoType = this.__sel_type;
-
-    //    if (this.__sel_action.id == -3) {
-    //        // Edit WO
-    //        this.currentOpenModal.instance.actionType = { workflowActionId: -2, name: this.__sel_action.text };
-    //        this.currentOpenModal.instance.isSchedule = true;
-    //    } else if (this.__sel_action.id == -4) {
-    //        // Edit WO
-    //        this.currentOpenModal.instance.actionType = { workflowActionId: 2, name: this.__sel_action.text };
-    //        this.currentOpenModal.instance.isSchedule = true;
-    //    } else {
-    //        this.currentOpenModal.instance.actionType = { workflowActionId: this.__sel_action.id, name: this.__sel_action.text };
-    //    }
-        
-
-    //    // change modal title
-    //    this.modalTitle = "ADD NEW WO - " + this.__sel_type.text + "(" + this.__sel_action.text + ")";
-
-    //    this.addNewModal.show();
-    //}
-    //testImage() {
-    //    //this._taskService.getImage().subscribe((response) => {
-    //    //    //console.log("testImage", response.blob());
-    //    //    //var blob = new Blob([response.blob()], { type: 'image/*' });
-    //    //    //var url = URL.createObjectURL(blob);
-    //    //    //console.log("blob url", url);
-    //    //    // can't access _body because it is private
-    //    //    // no method appears to exist to get to the _body without modification             
-    //    //    let data: Blob = new Blob([response.blob()], { type: response.headers.get('Content-Type')});
-    //    //    console.log("data", data);
-    //    //    //var url = URL.createObjectURL(data);
-    //    //    var reader = new FileReader();
-    //    //    reader.onload = function (e) {
-    //    //        //window.location.href = reader.result;
-    //    //        window.open(reader.result);
-    //    //        //var a: MSFileSaver = new MSFileSaver();
-    //    //    }
-    //    //    reader.readAsDataURL(data);
-    //    //});
-    //}
-    // #END TEST REGION
 
     private myTasks : any;
     private totalRecords;
@@ -155,7 +61,11 @@ export class TaskComponent implements OnDestroy{
     private woTypes;
 
     // selected wo type
-    public selectedWoType: {id, label};
+    public selectedWoType: { id, label };
+
+    // delete
+    private deleteWO;
+    private errDelete;
 
     // forms
     public formGroupAdd;
@@ -180,12 +90,20 @@ export class TaskComponent implements OnDestroy{
     //@Input() public source: LocalDataSource = new LocalDataSource();
 
     //@ViewChild('dynamicModalContent', {read: ViewContainerRef}) viewAddNewModal: ViewContainerRef;
-    @ViewChild('dynamicModalBody', {read: ViewContainerRef}) viewModalBody: ViewContainerRef;
+    @ViewChild('dynamicModalBody', { read: ViewContainerRef }) viewModalBody: ViewContainerRef;
+    @ViewChild('printView', { read: ViewContainerRef }) printView: ViewContainerRef;
     
 
     private currentOpenModal: any;
     private modalTitle: string;
-    
+
+    // print data
+    private selPrintWOId;
+
+    // private
+    private isLoadingData = true;
+
+
     private subscription: Subscription;
 
   constructor(
@@ -202,14 +120,16 @@ export class TaskComponent implements OnDestroy{
                         {id: 4, label: "Tenant Request"},
                         {id: 5, label: "Guest Request"},
                         {id: 6, label: "Owner Request"},
-                       ];
+      ];
+
+      this.deleteWO = {};
 
       this.subscription = this._taskService.eventEmitted$.subscribe(event => {
           console.log("event: " + event);
 
           // separate action between events
           if (event == "addNewModal_btnCancelOnClick") {
-            this.addNewModal.hide();
+              this.addNewModal.hide();
           } else if (event == "addNewModal_btnSaveOnClick_createSuccess") {
               this.addNewModal.hide();
               this.getAllMyTasks(this.buildFilter(this.taskListsTable));
@@ -217,7 +137,7 @@ export class TaskComponent implements OnDestroy{
               this.addNewModal.hide();
               this.getAllMyTasks(this.buildFilter(this.taskListsTable));
           }
-        });
+      });
   	}
 
 	ngOnInit(){
@@ -234,8 +154,7 @@ export class TaskComponent implements OnDestroy{
         //================================
         // clear modal body
         this.viewModalBody.clear();
-        
-        
+
         // change modal title
         this.modalTitle = "Create " + selectedType.label;
 
@@ -257,7 +176,6 @@ export class TaskComponent implements OnDestroy{
         
         this.currentOpenModal.instance.selectedWoType = selectedType;
         this.currentOpenModal.instance.actionType = { workflowActionId: -1, name: "Create" };
-
 
         this.addNewModal.show();
         console.log(this.addNewModal);
@@ -327,6 +245,19 @@ export class TaskComponent implements OnDestroy{
         console.log("doAction", modelData, selectedAction);
 
         this.viewModalBody.clear();
+
+        this.selPrintWOId = modelData.workOrderId;
+        this.cdr.detectChanges();
+
+        if (selectedAction.workflowActionId == WorkflowActions.PRINT) {
+            this._taskService.announceEvent("printWO");
+            return;
+        } else if (selectedAction.workflowActionId == WorkflowActions.DELETE) {
+            this.deleteWO = modelData;
+            this.deleteModal.show();
+            return;
+        }
+
         if (modelData.woTypeId == this.SINGLE_TIME_REQUEST) {
             this.currentOpenModal = this.createNewSingleRequestComponent(this.viewModalBody, SingleRequestComponent);
             //this.modalTitle = "Work Order - Single Request (" + selectedAction.name + ")";
@@ -352,12 +283,15 @@ export class TaskComponent implements OnDestroy{
             //this.modalTitle = "Work Order - Preventative Request (" + selectedAction.name + ")";
             this.currentOpenModal.instance.selectedWoType = this.woTypes[1];
         }
+
         // set modal title
         if(selectedAction.workflowActionId == WorkflowActions.IN_PROGRESS){
             this.modalTitle = "Set " + selectedAction.name + " ";
         }else{
             this.modalTitle = selectedAction.name + " ";
         }
+        
+
         for(var i=0; i < this.woTypes.length; i++){
             if (this.woTypes[i].id == modelData.woTypeId){
                 this.modalTitle += this.woTypes[i].label;
@@ -415,7 +349,8 @@ export class TaskComponent implements OnDestroy{
         }
     }
 
-    private getAllMyTasks(filters){
+    private getAllMyTasks(filters) {
+        this.isLoadingData = true;
         this._taskService.getAllMyTasks(filters).subscribe(
             (response)=>{
                 console.log("Response Data");
@@ -429,6 +364,7 @@ export class TaskComponent implements OnDestroy{
                     }
 
                     this.myTasks[i].actions.unshift({ workflowActionId: -2, name: "View" });
+                    this.myTasks[i].actions.push({ workflowActionId: -3, name: "Print" });
                     //this.myTasks[i].actions.push({ workflowActionId: 4, name: "Assign/Reassign" });
                     this.myTasks[i].dueDate = new Date(this.myTasks[i].dueDate);
                     this.myTasks[i].dateUpdated = new Date(this.myTasks[i].dateUpdated);
@@ -438,12 +374,31 @@ export class TaskComponent implements OnDestroy{
                     this.totalRecords = response.paging.total;
                 else
                     this.totalRecords = 0;
+
+                this.isLoadingData = false;
             }
         );
     }
     
     onCancel(){
         this.addNewModal.hide();
+    }
+
+    cancelDelete() {
+        this.deleteModal.hide();
+    }
+
+    saveDelete() {
+        this.isLoadingData = true;
+        this._taskService.deleteWorkOrder(this.deleteWO.workOrderId).subscribe(response => {
+            if (response.resultCode.code == "0") {
+                this.deleteModal.hide();
+                this.getAllMyTasks(this.buildFilter(this.taskListsTable));
+            } else {
+                this.errDelete = response.resultCode.message;
+            }
+            this.isLoadingData = false;
+        });
     }
 
     // close opening modal

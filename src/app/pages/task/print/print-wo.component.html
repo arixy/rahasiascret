@@ -1,0 +1,84 @@
+﻿<div #printView>
+  <img src="{{dataModel.logo}}" height="64px" class="logo-print"/><br />
+  <div style="text-align: center">
+    <div style="font-size: 20pt;">Work Order</div><br />
+    <span>{{ dataModel.companyName }}</span>
+  </div>
+  <br /><br />
+  <table border="1" cellspacing="0" cellpadding="4" width="100%">
+    <tr>
+      <td width="50%">
+        <strong>WO#:</strong>&nbsp;{{dataModel.woNumber}}
+      </td>
+      <td width="50%">
+        <strong>WO Date:</strong>&nbsp;{{dataModel.woDate | date: 'y-MM-dd HH:mm'}}
+      </td>
+    </tr>
+    <tr>
+      <td width="50%">
+        <strong>PIC:</strong>&nbsp;{{dataModel.pic}}
+      </td>
+      <td width="50%">
+        <strong>Asset:</strong>&nbsp;{{dataModel.asset}}
+      </td>
+    </tr>
+    <tr>
+      <td width="50%" height="76px">
+        <strong>Reported By:</strong><br />
+        <div>{{ dataModel.entity == null ? '' : dataModel.entity}}</div>
+        <div>{{ dataModel.contactPerson == null ? '' : dataModel.contactPerson }}</div>
+        <div>{{ dataModel.contactNumber }}</div>
+      </td>
+      <td width="50%">
+        <strong>Location:</strong><br />{{dataModel.location}}<br />{{dataModel.locationInfo}}
+      </td>
+    </tr>
+  </table>
+  <br /><br />
+  <strong>Description:</strong><br />
+  <table border="1" cellspacing="0" cellpadding="4" width="100%">
+    <tr>
+      <td style="vertical-align: top; height: 128px;">
+        {{dataModel.task}}<br />
+        {{dataModel.description}}
+      </td>
+    </tr>
+  </table>
+  <br /><br />
+  <table border="1" cellspacing="0" cellpadding="4" width="100%">
+    <tr>
+      <td colspan="2">
+        <strong>Completed On:</strong>&nbsp;{{dataModel.completedOn}}
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2">
+        <strong>Completed By:</strong>&nbsp;{{ dataModel.pic }}
+      </td>
+    </tr>
+    <tr>
+      <td width="50%" height="152px">
+        <strong>Remarks:</strong><br />
+        {{ dataModel.solution }}
+      </td>
+      <td>
+        <strong>Material Used:</strong><br />
+        
+      </td>
+    </tr>
+  </table>
+  <br /><br />
+  <table border="1" cellspacing="0" cellpadding="4" width="100%">
+    <tr>
+      <td width="33%">
+        <strong>Completed By</strong><br /><br /><br /><br /><br />{{ dataModel.pic }}<br />
+      </td>
+      <td width="34%">
+        <strong>Authorized By</strong><br /><br /><br /><br /><br />{{ dataModel.leader }}<br />
+      </td>
+      <td width="33%">
+        <strong>Received By</strong><br /><br /><br /><br /><br />________________________<br />
+      </td>
+    </tr>
+  </table>
+</div> 

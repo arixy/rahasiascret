@@ -7,7 +7,7 @@
                     <i class="icon ion-plus-round"></i>
                     
                     
-                        Add New Work Order <span class="caret"></span>
+                        New Work Order <span class="caret"></span>
                 </button>
                 <ul dropdownMenu role="menu" class="table-header-dropdown dropdown-menu" aria-labelledby="addNewWorkOrder">
                     <li role="menuitem" *ngFor="let type of woTypes">
@@ -167,11 +167,11 @@
                     <i class="icon ion-ios-download-outline"></i>
                 </button>
                 <div class="btn-group" dropdown style="float: right">
-                            <button title="Reset" id="resetFilters" type="button" class="btn-sets-right-filter" (click)="resetFiltersScheduled(dt)">
+                            <button title="Reset" id="resetFilters" type="button" class="btn-sets-right-filter" (click)="resetFiltersScheduled(dtschedule)">
                                 <!-- <img class="reset-filter" src="./assets/img/clear-filter.svg" /> -->
                                 <!-- <span>&nbsp;</span>
                                 <object class="reset-filter-object" type="image/svg+xml" data="./assets/img/clear-filter.svg"></object> -->
-                                <svg (click)="resetFilters(dt)"
+                                <svg (click)="resetFiltersScheduled(dt)"
                                xmlns:dc="http://purl.org/dc/elements/1.1/"
                                xmlns:cc="http://creativecommons.org/ns#"
                                xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -243,7 +243,7 @@
                             </svg>
                             </button>
 
-                            <button title="Refresh" id="resetFilters" type="button" class="btn-sets-right" (click)="refreshScheduled($event, dt)">
+                            <button title="Refresh" id="resetFilters" type="button" class="btn-sets-right" (click)="refreshScheduled($event, dtschedule)">
                                 <i class="icon ion-ios-reload"></i>
                             </button>
                         </div>
@@ -498,4 +498,29 @@
       </div>
     </div>
   </div>
+</div>
+<div bsModal #deleteModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+      </div>
+      <div class="modal-body">
+        <div class="content_confirm">
+          <h3>Delete Work Order {{ deleteWO.woNumber }}?</h3>
+        </div>
+        <div style="margin-top: 8px"></div>
+        <div class="delete-btn_confirm">
+          <button (click)="cancelDelete()" class="btn btn-no btn-danger" type="button">
+            No
+          </button>
+          <button (click)="saveDelete()" class="btn btn-yes" type="button" style="margin-left: 12px">
+            Yes
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div style="display: none">
+  <print-wo [workOrderId]="selPrintWOId"></print-wo>
 </div>

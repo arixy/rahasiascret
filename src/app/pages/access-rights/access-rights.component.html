@@ -1,5 +1,17 @@
 ﻿<div class="widgets">
   <ba-card baCardClass="with-scroll">
+    <spinner *ngIf="isLoadingData"></spinner> 
+
+    <div class="ui-helper-clearfix">
+      <div class="alert alert-danger" *ngIf="errMsg.length > 0">
+        <ul style="margin-bottom: 0px;">
+          <li *ngFor="let err of errMsg">
+            {{err}}
+          </li>
+        </ul>
+      </div>
+    </div>
+
     <p-dataTable [value]="roleAuthorizations">
       <p-header>
         <div class="row">
@@ -14,13 +26,8 @@
             <br /><br />
           </div>
         </div>
-        <div class="row" *ngIf="errMsgServer != ''">
-          <div class="col-md-12" style="text-align: left">
-            <div class="alert alert-danger"><strong>Server Error Occured</strong><br/>{{ errMsgServer }}</div>
-          </div>
-        </div>
       </p-header>
-      <p-column field="menuId" header="Menu ID" [style]="{'width':'100px'}"></p-column>
+      <p-column field="menuId" header="Menu ID"></p-column>
       <p-column field="menuName" header="Menu Name"></p-column>
       <p-column field="allowAccessOrView" header="Allow Access">
         <template pTemplate="body" let-data="rowData">
@@ -51,8 +58,13 @@
         </template>
       </p-column>
       <p-footer>
-        <div style="text-align: right">
-          <button type="button" class="btn btn-primary" (click)="onSubmit()" [disabled]="roleGroupSelectBox.active.length == 0 || isSaving">{{ btnSaveLabel }}</button>
+        <div class="form-group" style="text-align: right;">
+          <div class="btn-with-icon">
+            <button type="submit" class="btn btn-primary btn-save" (click)="onSubmit()" [disabled]="roleGroupSelectBox.active.length == 0 || isSaving">
+              <i class="icon ion-checkmark"></i>
+              {{ btnSaveLabel }}
+            </button>
+          </div>
         </div>
       </p-footer>
     </p-dataTable>

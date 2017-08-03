@@ -314,6 +314,16 @@ export const PAGES_MENU = [
                   hidden: true
               }
           }
+      },
+      {
+          path: 'settings',
+          data: {
+              menu: {
+                  title: 'Settings',
+                  pathMatch: 'prefix',
+                  hidden: true
+              }
+          }
       }
     ]
   }

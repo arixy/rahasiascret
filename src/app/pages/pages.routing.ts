@@ -22,6 +22,7 @@ import { AccessRightsComponent } from './access-rights/access-rights.component';
 import { WorkOrderListReportComponent } from './reports/workorder/wo-report.component';
 import { ConsumptionReportComponent } from './reports/consumption/consumption-report.component';
 import { PerformanceReportComponent } from './reports/performance/performance-report.component';
+import { SettingsComponent } from './settings/settings.component';
 // noinspection TypeScriptValidateTypes
 
 // export function loadChildren(path) { return System.import(path); };
@@ -74,7 +75,8 @@ export const routes: Routes = [
       { path: 'access-rights', component: AccessRightsComponent },
       { path: 'wo-report', component: WorkOrderListReportComponent },
       { path: 'consumption-report', component: ConsumptionReportComponent },
-      { path: 'performance-report', component: PerformanceReportComponent }
+      { path: 'performance-report', component: PerformanceReportComponent },
+      { path: 'settings', component: SettingsComponent },
     ]
   }
 ];

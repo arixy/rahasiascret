@@ -41,6 +41,9 @@ export class Login {
           data => {
                     this.saveOAuthToken(data.data.token);
                     localStorage.setItem('logged_user', data.data.email);
+                    // added by Mike: authorization & sitemaps
+                    localStorage.setItem('authorizedSitemaps', JSON.stringify(this.processAuthorization(data.data.authorizations)));
+                    localStorage.setItem('sitemaps', JSON.stringify(this.processSitemap(data.data.sitemaps)));
                   },
           err => {
               this.message = 'Please check your username / password';
@@ -74,5 +77,25 @@ saveOAuthToken(oauth_token){
     if(oauth_token){
       localStorage.setItem('bearer_token', oauth_token);
     }
+  }
+  processAuthorization(authorization) {
+      let processedAuthorization = {};
+      if(authorization != null){
+            for (let auth of authorization) {
+                processedAuthorization[auth.menuId] = auth;
+            }
+            console.error("processedAuthorization", processedAuthorization);
+      }
+      return processedAuthorization;
+  }
+  processSitemap(sitemap) {
+      let processedSitemap = {};
+      if(sitemap != null){
+            for (let map of sitemap) {
+                processedSitemap[map.menuId] = map;
+            }
+            console.error("processedSitemap", processedSitemap);
+      }
+      return processedSitemap;
   }
 }

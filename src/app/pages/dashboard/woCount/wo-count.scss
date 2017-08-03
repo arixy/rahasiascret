@@ -1,0 +1,33 @@
+﻿.dashboard-wo-count div {
+  text-align: center;
+  color: white;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.wo-new .count {
+  font-size: 14pt;
+  background-color: #23b7e5;
+}
+
+.wo-new .label {
+  background-color: #16aad8;
+}
+
+.wo-progress .count {
+  font-size: 14pt;
+  background-color: #7266ba;
+}
+
+.wo-progress .label {
+  background-color: #6051b5;
+}
+
+.wo-resolved .count {
+  font-size: 14pt;
+  background-color: #27c24c;
+}
+
+.wo-resolved .label {
+  background-color: #20af42;
+}

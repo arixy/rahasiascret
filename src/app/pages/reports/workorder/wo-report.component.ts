@@ -21,7 +21,7 @@ import { WorkOrderService } from '../../../services/work-order.service';
 @Component({
     selector: 'report1',
     templateUrl: './wo-report.component.html',
-    styleUrls: ['../wo-report.css'],
+    styleUrls: ['../../../../assets/custom.css','../wo-report.scss'],
     encapsulation: ViewEncapsulation.None
 })
 export class WorkOrderListReportComponent implements OnDestroy {
@@ -38,7 +38,7 @@ export class WorkOrderListReportComponent implements OnDestroy {
     private filterModel: { _itemsDateTypes, dateType, dateFrom, dateTo, _itemsStatuses, status, _itemsWOTypes, woType, _itemsWOCategories, woCategory } = {
         _itemsDateTypes: [
             { id: 1, text: "Created On", field: "dateCreated" },
-            { id: 2, text: "Completed On", field: "completedDate" },
+            { id: 2, text: "Completed On", field: "completeDateTime" },
             { id: 3, text: "Start On", field: "startDate" },
             { id: 4, text: "Due On", field: "dueDate" }
         ],
@@ -116,7 +116,7 @@ export class WorkOrderListReportComponent implements OnDestroy {
                 this._lsbSelectStatus.active = [__itemStatuses[0]];
                 this.filterModel.status = [__itemStatuses[0]];
             } else {
-                this.errMsg = [response.resultCode.message];
+                this.errMsg = this.errMsg.concat(response.resultCode.message);
             }
         });
 
@@ -132,7 +132,7 @@ export class WorkOrderListReportComponent implements OnDestroy {
                 }
                 this.filterModel._itemsWOCategories = __itemCategories;
             } else {
-                this.errMsg = [response.resultCode.message];
+                this.errMsg = this.errMsg.concat(response.resultCode.message);
             }
         });
 
@@ -149,7 +149,7 @@ export class WorkOrderListReportComponent implements OnDestroy {
                 this._lsbSelectWOType.active = [__woTypes[0]];
                 this.filterModel.woType = [__woTypes[0]];
             } else {
-                this.errMsg = [response.resultCode.message];
+                this.errMsg = this.errMsg.concat(response.resultCode.message);
             }
         });
 
@@ -230,7 +230,8 @@ export class WorkOrderListReportComponent implements OnDestroy {
                 this.totalRecords = response.paging.total;
             } else {
                 // show error message?
-                this.errMsg.push(response.resultCode.message);
+                this.errMsg = [];
+                this.errMsg = this.errMsg.concat(response.resultCode.message);
             }
 
         });

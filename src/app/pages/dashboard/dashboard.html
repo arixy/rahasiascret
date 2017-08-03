@@ -1,10 +1,10 @@
-<!-- <div class="row">
+﻿<!-- <div class="row">
   <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-xs-12">
     <pie-chart></pie-chart>
   </div>
 </div>
  -->
-<div class="row">
+<!--<div class="row">
   <ba-card class="col-xlg-6 col-xl-6 col-lg-12 col-sm-12 col-xs-12"
                      title="Work Order in Priorities" baCardClass="traffic-panel medium-card">
     <traffic-chart></traffic-chart>
@@ -13,9 +13,41 @@
                title="Monthly Request per Categories" baCardClass="medium-card">
         <line-chart></line-chart>
       </ba-card>
+  <ba-card class="col-xlg-6 col-lg-6 col-md-12 col-sm-12 col-xs-12"
+           title="Testing Stacked Bar Chart" baCardClass="medium-card">
+    <p-chart type="bar" [data]="chartData" [options]="options" #chart></p-chart>
+  </ba-card>
+</div>-->
+<div class="row">
+  <dashboard-wo-count></dashboard-wo-count>
+</div>
+<div style="margin-top: 24px"></div>
+<div class="row">
+  <ba-card class="col-xlg-6 col-lg-6 col-md-12 col-sm-12 col-xs-12"
+           title="Open WO per Category">
+    <wo-category-chart></wo-category-chart>
+  </ba-card>
+  <ba-card class="col-xlg-6 col-lg-6 col-md-12 col-sm-12 col-xs-12"
+           title="Open WO Per PIC">
+    <wo-pic-chart></wo-pic-chart>
+  </ba-card>
 </div>
 
 <div class="row">
+  <ba-card class="col-xlg-12 col-lg-12 col-md-12 col-sm-12 col-xs-12"
+           title="Weekly WO Trend per Category">
+    <wo-weekly-chart></wo-weekly-chart>
+  </ba-card>
+</div>
+
+<!-- <div class="row">
+  <ba-card class="col-xlg-12 col-lg-12 col-md-12 col-sm-12 col-xs-12"
+           title="Sample Print">
+    <button (click)="doOpenPopup()">Print</button>
+  </ba-card>
+</div> -->
+
+<!-- <div class="row">
   <div class="col-xlg-9 col-xl-6 col-lg-6  col-md-12 col-sm-12 col-xs-12">
     <div class="row">
      <ba-card class="col-xlg-8 col-xl-12 col-lg-12 col-md-7 col-sm-12 col-xs-12" title="Calendar"
@@ -25,5 +57,5 @@
       
     </div>
   </div>
-</div>
+</div> -->
 

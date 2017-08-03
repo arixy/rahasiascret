@@ -45,6 +45,10 @@ export class UtilityConsumptions implements OnDestroy {
     // to delete
     private utilityConsumptionToDelete;
 
+    // error messages
+    private errMsg = [];
+    // flag is loading
+    private isLoadingData = true;
 
     // ViewChilds
     @ViewChild('dt') consumptionsTable: DataTable;
@@ -86,6 +90,7 @@ export class UtilityConsumptions implements OnDestroy {
             };
         }
 
+        this.isLoadingData = true;
         this._utilityConsumptionService.getUtilityConsumptions(filters).subscribe(response => {
             if (response.resultCode.code == "0") {
                 this.lstUtilityConsumptions = response.data;
@@ -94,7 +99,10 @@ export class UtilityConsumptions implements OnDestroy {
                 console.log("util cons", this.lstUtilityConsumptions);
             } else {
                 // show error message?
+                this.errMsg = [];
+                this.errMsg = this.errMsg.concat(response.resultCode.message);
             }
+            this.isLoadingData = false;
         });
     }
 
@@ -203,6 +211,8 @@ export class UtilityConsumptions implements OnDestroy {
                 this.getAllUtilityConsumptions(this.buildFilter(this.consumptionsTable));
             } else {
                 // error?
+                this.errMsg = [];
+                this.errMsg = this.errMsg.concat(response.resultCode.message);
             }
         });
     }
