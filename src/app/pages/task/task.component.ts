@@ -409,4 +409,25 @@ export class TaskComponent implements OnDestroy{
     ngOnDestroy(){
         this.subscription.unsubscribe();
     }
+    public exportMyTaskCSV(dataTable: DataTable){
+       
+        console.log("export CSV");
+        this._taskService.getMyTaskCSV(this.buildFilter(dataTable)).subscribe(
+            (data)=>{      
+                console.log("prepared download file ");   
+                this.downloadFileMyTaskToCSV(data);
+            }
+        );
+
+    }
+
+    private downloadFileMyTaskToCSV(data:Response){
+        var dataCsv= new Blob([data.blob()], {type: 'text/csv;charset=utf-8;'});
+        var urlCsv=window.URL.createObjectURL(dataCsv);
+        var link = document.createElement('a');
+        
+        link.setAttribute('href', urlCsv);
+        link.setAttribute('download', "MyTask.csv");
+        link.click();
+    }
 }
