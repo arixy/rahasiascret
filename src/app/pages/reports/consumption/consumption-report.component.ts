@@ -19,7 +19,7 @@ import { ConsumptionReportService } from './consumption-report.service';
 @Component({
     selector: 'report2',
     templateUrl: './consumption-report.component.html',
-    styleUrls: ['./../wo-report.css'],
+    styleUrls: ['./../wo-report.scss'],
     encapsulation: ViewEncapsulation.None
 })
 export class ConsumptionReportComponent implements OnDestroy {
@@ -41,16 +41,13 @@ export class ConsumptionReportComponent implements OnDestroy {
         dateTo: null
     }
 
-    //private options = {
-    //    scales: {
-    //        xAxes: [{
-    //            stacked: true
-    //        }],
-    //        yAxes: [{
-    //            stacked: true
-    //        }]
-    //    }
-    //};
+    private options = {
+        elements: {
+            line: {
+                tension: 0,
+            }
+        }
+    };
 
     private chartData;
 
@@ -101,7 +98,8 @@ export class ConsumptionReportComponent implements OnDestroy {
                 //this._lsbUtilityType.active = [{ id: -1, text: "All" }];
             } else {
                 // show error message?
-                this.errMsg = [response.resultCode.message];
+                this.errMsg = [];
+                this.errMsg.push(response.resultCode.message);
             }
         });
         this._lsbUtilityType.active = [{ id: -1, text: "All" }];
@@ -180,10 +178,11 @@ export class ConsumptionReportComponent implements OnDestroy {
                 this.lstConsumptions = response.data;
                 this.totalRecords = response.paging.total;
 
-                console.log("totalRecords",this.totalRecords, response.paging);
+                console.log("totalRecords", this.totalRecords, response.paging);
             } else {
                 // show error message?
-                this.errMsg.push(response.resultCode.message);
+                this.errMsg = [];
+                this.errMsg = this.errMsg.concat(response.resultCode.message);
             }
             
         });
@@ -214,7 +213,10 @@ export class ConsumptionReportComponent implements OnDestroy {
                 // build chart X-Axis
                 //this.chartFilterModel.dateFrom
                 let tmpChartXAxis = [];
-                let tmpDateFrom: Date = this.chartFilterModel.dateFrom;
+                // changed to support older date if 'Created On' is selected
+                // this may need confirmation first
+                let tmpDateFrom: Date = (response.data.length > 0 && new Date(response.data[0].date) < this.chartFilterModel.dateFrom) ? new Date(response.data[0].date) : this.chartFilterModel.dateFrom;
+                console.log("tmpDateFrom", tmpDateFrom);
                 let tmpLastIndexData = 0;
                 do {
                     // generate label for each day
@@ -234,7 +236,7 @@ export class ConsumptionReportComponent implements OnDestroy {
                     if (!hasMatch) {
                         for (let data in tmpChartData) {
                             if (tmpChartData.hasOwnProperty(data)) {
-                                tmpChartData[data].push(null);
+                                tmpChartData[data].push(0);
                             }
                         }
                     } else {
@@ -253,7 +255,7 @@ export class ConsumptionReportComponent implements OnDestroy {
                             if (tmpChartData.hasOwnProperty(data)) {
                                 if (tmpChartData[data].length < maxLength) {
                                     for (var i = tmpChartData[data].length; i < maxLength; i++) {
-                                        tmpChartData[data].push(null);
+                                        tmpChartData[data].push(0);
                                     }
                                 }
                             }
@@ -290,7 +292,9 @@ export class ConsumptionReportComponent implements OnDestroy {
             } else {
                 // show error message?
                 //this.errMsg.push(response.resultCode.message);
-                this.errMsg.push("A server error occured. Please try again later.");
+                //this.errMsg.push("A server error occured. Please try again later.");
+                this.errMsg = [];
+                this.errMsg = this.errMsg.concat(response.resultCode.message);
             }
         });
     }

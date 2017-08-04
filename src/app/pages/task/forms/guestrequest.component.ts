@@ -711,6 +711,10 @@ export class GuestRequestComponent {
         this._taskService.announceEvent("addNewModal_btnCancelOnClick");
     }
 
+    onPrint() {
+        this._taskService.announceEvent("printWO");
+    }
+
     removeSelectBoxValue(field, event) {
         console.log("removeSelectBoxValue", field, event);
 

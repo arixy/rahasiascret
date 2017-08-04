@@ -1,0 +1,19 @@
+﻿@import "../../theme/sass/conf/conf";
+
+.wo-report-filter{
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+.ui-select-container.ui-select-multiple{
+  border: 1px solid silver !important;
+}
+
+.ui-select-container .btn {
+  border: 1px solid #d4d4d4;
+  border-radius: 2px;
+}
+
+.ui-select-container .btn:hover {
+  transform: scale(1.0);
+}

@@ -297,15 +297,31 @@
       </p-tabPanel>
     </p-tabView>
 
-    <div class="form-group row">
-      <div class="col-sm-3">
-        <button type="button" class="btn btn-default btn-cancel" (click)="onCancel()">Cancel</button>
+    <div class="form-group modal-action-row row">
+      <div class="col-sm-3 btn-with-icon">
+        <button type="button" class="btn btn-default btn-cancel" (click)="onCancel()">
+          <i class="icon ion-close"></i>
+          Cancel
+        </button>
       </div>
-      <div class="col-sm-6">
+      <div class="col-sm-3">
         &nbsp;
       </div>
-      <div class="col-sm-3" *ngIf="_defFieldPermissions.btn_submit != 'hide'">
-        <button [disabled]="!formGroupAdd.valid || !isFilesFormValid() || !isExpensesFormValid()" type="button" class="btn btn-default btn-save" (click)="onSubmit(formGroupAdd.value)">Save</button>
+      <div class="col-sm-3 btn-with-icon">
+        <button type="button" class="btn btn-print" (click)="onPrint()" *ngIf="actionType != null && actionType.workflowActionId != -1">
+          <i class="icon ion-printer"></i>
+          Print
+        </button>
+      </div>
+      <div class="col-sm-3 btn-with-icon" *ngIf="_defFieldPermissions.btn_submit != 'hide'">
+        <!--<button [disabled]="!formGroupAdd.valid || !isFilesFormValid() || !isExpensesFormValid()" type="button" class="btn btn-default btn-save" (click)="onSubmit(formGroupAdd.value)">
+          <i class="icon ion-checkmark"></i>
+          Save
+        </button>-->
+        <button type="submit" class="btn btn-default btn-save" (click)="onSubmit(formGroupAdd.value)" [disabled]="!formGroupAdd.valid || !isFilesFormValid() || !isExpensesFormValid()">
+          <i class="icon ion-checkmark"></i>
+          Save
+        </button>
       </div>
     </div>
 </form>

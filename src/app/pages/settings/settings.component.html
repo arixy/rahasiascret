@@ -1,0 +1,35 @@
+﻿<div class="widgets">
+  <ba-card title="" baCardClass="with-scroll">
+    <spinner *ngIf="isLoadingData"></spinner> 
+
+    <div class="ui-helper-clearfix">
+      <div class="alert alert-danger" *ngIf="errMsg.length > 0">
+        <ul style="margin-bottom: 0px;">
+          <li *ngFor="let err of errMsg">
+            {{err}}
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <p-dataTable #dt [value]="settingsModel">
+      <p-header></p-header>
+      <p-column field="label" header="Setting" [sortable]="true" [style]="{'width':'240px'}"></p-column>
+      <p-column header="Value">
+        <template pTemplate="body" let-data="rowData">
+          <input type="text" [(ngModel)]="data.value" class="form-control"/>
+        </template>
+      </p-column>
+    </p-dataTable>
+
+    <div style="margin-top: 24px;"></div>
+    <div class="form-group" style="text-align: right;">
+      <div class="btn-with-icon">
+        <button type="submit" class="btn btn-primary btn-save" (click)="onSubmit()">
+          <i class="icon ion-checkmark"></i>
+          Save
+        </button>
+      </div>
+    </div>
+  </ba-card>
+</div>

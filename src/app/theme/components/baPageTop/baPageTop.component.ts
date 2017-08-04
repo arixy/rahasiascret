@@ -3,7 +3,7 @@ import { Http, Response, Headers, RequestOptions, URLSearchParams } from '@angul
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 
-import { GlobalState } from '../../../global.state';
+import { GlobalState, GlobalConfigs } from '../../../global.state';
 import { AuthenticationService } from '../../../services/authentication.service';
 import { Router } from '@angular/router';
 import { ModalDirective } from 'ng2-bootstrap';
@@ -21,7 +21,7 @@ import 'style-loader!./baPageTop.scss';
 })
 export class BaPageTop {
 
-    private appUrl = 'http://ec2-52-40-147-30.us-west-2.compute.amazonaws.com/api/v1/auth/';
+    private appUrl = GlobalConfigs.APP_AUTH_URL + '/';
   public oldpassword;
   public newpassword;
   public loggedUser;
@@ -29,7 +29,61 @@ export class BaPageTop {
   public isScrolled:boolean = false;
   public isMenuCollapsed:boolean = false;
   public isDropdownNewmenu:boolean = false;
-  public isDropdownConfiguration:boolean = false;
+  public isDropdownConfiguration: boolean = false;
+
+  /*
+    * Added by Mike
+    *   to hide Configure Menu
+  */
+  private isCanConfigure: boolean = true;
+  private configurationPerm = {
+      isCanShow: () => {
+          return this.configurationPerm.configurations.isCanShow()
+              || this.configurationPerm.allList.isCanShow()
+              || this.configurationPerm.administration.isCanShow();
+      },
+      "configurations": {
+          isCanShow: () => {
+              return this.configurationPerm.configurations.Location || this.configurationPerm.configurations.WOCategory;
+          },
+          "Location": false,
+          "WOCategory": false,
+      },
+      "allList": {
+          isCanShow: () => {
+              return this.configurationPerm.allList.Vendor
+                  || this.configurationPerm.allList.Tenant
+                  || this.configurationPerm.allList.Owner
+                  || this.configurationPerm.allList.Guest
+                  || this.configurationPerm.allList.WOPriority
+                  || this.configurationPerm.allList.ExpenseType
+                  || this.configurationPerm.allList.UtilityType
+                  || this.configurationPerm.allList.UtilityUOM;
+          },
+          "Vendor": false,
+          "Tenant": false,
+          "Owner": false,
+          "Guest": false,
+          "WOPriority": false,
+          "ExpenseType": false,
+          "UtilityType": false,
+          "UtilityUOM": false
+      },
+      "administration": {
+          isCanShow: () => {
+              return this.configurationPerm.administration.User
+                  || this.configurationPerm.administration.Role
+                  || this.configurationPerm.administration.AccessRights
+                  || this.configurationPerm.administration.SystemSetting;
+          },
+          "User": false,
+          "Role": false,
+          "AccessRights": false,
+          "SystemSetting": false
+      }
+  }
+
+  private sitemap;
 
   @ViewChild('changeModal') changeModal: ModalDirective;
 
@@ -42,6 +96,32 @@ export class BaPageTop {
       this.isMenuCollapsed = isCollapsed;
     });
       this.loggedUser = localStorage.getItem('logged_user');
+      this.sitemap = {};
+  }
+
+  ngOnInit() {
+      let authorizedSitemaps = JSON.parse(localStorage.getItem("authorizedSitemaps"));
+      console.log("Sitemaps", authorizedSitemaps);
+
+      this.sitemap = JSON.parse(localStorage.getItem("sitemaps"));
+
+      for(let auth in this.configurationPerm){
+          if(this.configurationPerm.hasOwnProperty(auth)){
+              if(typeof this.configurationPerm[auth] != "function"){
+                  for(let menu in this.configurationPerm[auth]){
+                      if(this.configurationPerm[auth].hasOwnProperty(menu)){
+                          if(typeof this.configurationPerm[auth][menu] != "function"){
+                              if (authorizedSitemaps[menu] != null) {
+                                  this.configurationPerm[auth][menu] = authorizedSitemaps[menu].allowAccessOrView || authorizedSitemaps[menu].allowAdd || authorizedSitemaps[menu].allowDelete || authorizedSitemaps[menu].allowUpdate;
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+      }
+
+      console.log("config perms:", this.configurationPerm); 
   }
 
   public toggleMenu() {

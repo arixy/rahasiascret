@@ -538,4 +538,11 @@ input[disabled], textarea[disabled] {
 .ui-fileupload-choose[disabled]{
   display: none !important;
 }
+
+.btn-print {
+  transform: initial !important;
+  background: #27c24c !important;
+  color: #fff !important;
+  width: 100% !important;
+}
 /* End Added by Mike */

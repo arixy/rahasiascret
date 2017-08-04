@@ -752,6 +752,10 @@ export class SingleRequestComponent {
         this._taskService.announceEvent("addNewModal_btnCancelOnClick");
     }
 
+    onPrint() {
+        this._taskService.announceEvent("printWO");
+    }
+
     readyExpenses() {
 
         let _expenses = this.wo_expenses.filter(function (expense) {

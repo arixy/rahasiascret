@@ -16,7 +16,9 @@
           <div class="col-md-12">
             <span><strong>Date</strong></span><br />
             <div class="col-md-3 wo-report-filter">
-              <ng-select #selectDateType [items]="filterModel._itemsDateTypes" placeholder="No Date Type Selected" (removed)="removeFilterSelectBox('dateType', $event)" (selected)="selectFilterSelectBox('dateType', $event)" allowClear="false"></ng-select>
+              <div class="form-group row select-container">
+                <ng-select #selectDateType [items]="filterModel._itemsDateTypes" placeholder="No Date Type Selected" (removed)="removeFilterSelectBox('dateType', $event)" (selected)="selectFilterSelectBox('dateType', $event)" allowClear="false"></ng-select>
+              </div>
             </div>
             <div class="col-md-3 wo-report-filter">
               <p-calendar [(ngModel)]="filterModel.dateFrom" [showIcon]="true" dateFormat="yy-mm-dd" [yearNavigator]="true" [yearRange]="_yearRange" [showTime]="false"></p-calendar>
@@ -35,13 +37,17 @@
           <div class="col-md-4">
             <span><strong>WO Type</strong></span><br />
             <div class="col-md-12 wo-report-filter">
-              <ng-select #selectWOType [active]="filterModel.woType" [items]="filterModel._itemsWOTypes" placeholder="No Type selected" (removed)="removeFilterSelectBox('woType', $event)" (selected)="selectFilterSelectBox('woType', $event)"></ng-select>
+              <div class="form-group row select-container">
+                <ng-select #selectWOType [active]="filterModel.woType" [items]="filterModel._itemsWOTypes" placeholder="No Type selected" (removed)="removeFilterSelectBox('woType', $event)" (selected)="selectFilterSelectBox('woType', $event)"></ng-select>
+              </div>
             </div>
           </div>
           <div class="col-md-4">
-            <span><strong>Category</strong></span><br />
-            <div class="col-md-12 wo-report-filter">
-              <ng-select #selectWOCategory [active]="filterModel.woCategory" [items]="filterModel._itemsWOCategories" placeholder="No Category selected" (removed)="removeFilterSelectBox('woCategory', $event)" (selected)="selectFilterSelectBox('woCategory', $event)"></ng-select>
+            <span><strong>WO Category</strong></span><br />
+            <div class="col-md-12 wo-report-filter">  
+              <div class="form-group row select-container">
+                <ng-select #selectWOCategory [active]="filterModel.woCategory" [items]="filterModel._itemsWOCategories" placeholder="No Category selected" (removed)="removeFilterSelectBox('woCategory', $event)" (selected)="selectFilterSelectBox('woCategory', $event)"></ng-select>
+              </div>
             </div>
           </div>
         </div>
@@ -50,7 +56,9 @@
           <div class="col-md-4">
             <span><strong>PIC</strong></span><br />
             <div class="col-md-12 wo-report-filter">
-              <ng-select #selectPIC [active]="filterModel.pic" [items]="filterModel._itemsPIC" placeholder="No PIC selected" (removed)="removeFilterSelectBox('pic', $event)" (selected)="selectFilterSelectBox('pic', $event)"></ng-select>
+              <div class="form-group row select-container">
+                <ng-select #selectPIC [active]="filterModel.pic" [items]="filterModel._itemsPIC" placeholder="No PIC selected" (removed)="removeFilterSelectBox('pic', $event)" (selected)="selectFilterSelectBox('pic', $event)"></ng-select>
+              </div>
             </div>
           </div>
         </div>
@@ -73,7 +81,7 @@
       </button>
     </div>
     <div style="width: 100%; overflow-y: auto">
-      <p-dataTable #dt [value]="lstPerformances" (onPage)="refresh($event, dt)" [lazy]="true" [sortField]="DEFAULT_SORT_FIELD" sortOrder="-1" [rows]="DEFAULT_ITEM_PER_PAGE" [totalRecords]="totalRecords" [paginator]="true">
+      <p-dataTable #dt [value]="lstPerformances" (onSort)="refresh($event, dt)" (onPage)="refresh($event, dt)" [lazy]="true" [sortField]="DEFAULT_SORT_FIELD" sortOrder="-1" [rows]="DEFAULT_ITEM_PER_PAGE" [totalRecords]="totalRecords" [paginator]="true">
         <p-header>
         </p-header>
         <p-column field="pic" header="PIC" sortable="true" [style]="{'width':'120px'}"></p-column>
@@ -84,7 +92,7 @@
         <p-column field="task" header="Task" sortable="true" [style]="{'width':'120px'}"></p-column>
         <p-column field="createdDate" header="Created Date" sortable="true" [style]="{'width':'160px'}">
           <template pTemplate="body" let-data="rowData">
-            {{data.createdDate | date: 'y-MM-dd HH:mm:ss'}}
+            {{data.createdDate | date: 'y-MM-dd HH:mm'}}
           </template>
         </p-column>
         <p-column field="startDate" header="Start Date" [style]="{'width':'120px'}" sortable="true">
@@ -94,7 +102,11 @@
         </p-column>
         <p-column field="dueDate" header="Due Date" sortable="true" [style]="{'width':'120px'}"></p-column>
         <p-column field="status" header="Status" sortable="true" [style]="{'width':'120px'}"></p-column>
-        <p-column field="completeDate" header="Completed On" sortable="true" [style]="{'width':'160px'}"></p-column>
+        <p-column field="completedOn" header="Completed On" sortable="true" [style]="{'width':'160px'}">
+          <template pTemplate="body" let-data="rowData">
+            {{data.completedOn | date: 'y-MM-dd HH:mm'}}
+          </template>
+        </p-column>
         <p-column field="expectedCompletionTime" header="Expected Completion Time" sortable="true" [style]="{'width':'220px'}"></p-column>
         <p-column field="completionTime" header="Completion Time" sortable="true" [style]="{'width':'160px'}"></p-column>
         <p-column field="overdue" header="Overdue" sortable="true" [style]="{'width':'120px'}"></p-column>

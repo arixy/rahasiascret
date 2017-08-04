@@ -47,6 +47,8 @@ import { TaskService } from './pages/task/task.service';
 import { ConsumptionReportService } from './pages/reports/consumption/consumption-report.service';
 import { WorkOrderReportService } from './pages/reports/workorder/wo-report.service';
 import { PerformanceReportService } from './pages/reports/performance/performance-report.service';
+import { PrintWOService } from './pages/task/print/print-wo.service';
+import { SettingsService } from './pages/settings/settings.service';
 
 // App is our top level component
 import { App } from './app.component';
@@ -125,7 +127,9 @@ export function httpFactory(backend: XHRBackend, options: RequestOptions) {
       WorkOrderTypeService,
       ConsumptionReportService,
       WorkOrderReportService,
-      PerformanceReportService
+      PerformanceReportService,
+      PrintWOService,
+      SettingsService
   ]
 })
 

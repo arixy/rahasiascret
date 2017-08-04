@@ -51,6 +51,8 @@ import { PreventiveRequestComponent } from './task/forms/preventiverequest.compo
 //import { TabContentRecurringComponent } from './task/tabs/recurring.component';
 import { WorkOrderExpensesComponent } from './task/forms/subforms/workorder-expenses.component';
 import { WorkOrderFilesComponent } from './task/forms/subforms/workorder-files.component';
+import { PrintWOComponent } from './task/print/print-wo.component';
+import { SettingsComponent } from './settings/settings.component';
 import { UtilityFormComponent } from './utility-consumptions/forms/utility-form.component';
 
 import { AssetFilesComponent } from './assets/subforms/asset-files.component';
@@ -115,14 +117,18 @@ import { ResetFilterComponent } from './reset-filter.component';
       WorkOrderExpensesComponent,
       WorkOrderFilesComponent,
       AssetFilesComponent,
+      PrintWOComponent,
       SpinnerComponent,
       ResetFilterComponent,
       LoadingSmallComponent,
       UtilityFormComponent,
+      //AddNewWorkOrderComponent,
+      //TabContentRecurringComponent
       // reports
       WorkOrderListReportComponent,
       ConsumptionReportComponent,
-      PerformanceReportComponent
+      PerformanceReportComponent,
+      SettingsComponent
     ],
 })
 export class PagesModule {

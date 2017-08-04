@@ -21,11 +21,12 @@ import { PerformanceReportService } from './performance-report.service';
 @Component({
     selector: 'report3',
     templateUrl: './performance-report.component.html',
+    styleUrls: ['../wo-report.scss'],
     encapsulation: ViewEncapsulation.None
 })
 export class PerformanceReportComponent implements OnDestroy {
 	// constants
-    private readonly DEFAULT_SORT_FIELD = "lastUpdated";
+    private readonly DEFAULT_SORT_FIELD = "dateUpdated";
     private readonly DEFAULT_ITEM_PER_PAGE = GlobalConfigs.DEFAULT_ITEM_PER_PAGE;
     private readonly _yearRange = GlobalConfigs.yearRange;
 
@@ -84,7 +85,7 @@ export class PerformanceReportComponent implements OnDestroy {
                 }
                 this.filterModel._itemsWOCategories = __itemCategories;
             } else {
-                this.errMsg = [response.resultCode.message];
+                this.errMsg = this.errMsg.concat(response.resultCode.message);
             }
         });
 
@@ -101,7 +102,7 @@ export class PerformanceReportComponent implements OnDestroy {
                 this._lsbSelectWOType.active = [__woTypes[0]];
                 this.filterModel.woType = [__woTypes[0]];
             } else {
-                this.errMsg = [response.resultCode.message];
+                this.errMsg = this.errMsg.concat(response.resultCode.message);
             }
         });
 
@@ -116,7 +117,7 @@ export class PerformanceReportComponent implements OnDestroy {
                 }
                 this.filterModel._itemsPIC = __users;
             } else {
-                this.errMsg = [response.resultCode.message];
+                this.errMsg = this.errMsg.concat(response.resultCode.message);
             }
         });
 
@@ -196,7 +197,7 @@ export class PerformanceReportComponent implements OnDestroy {
                 this.lstPerformances = response.data;
                 this.totalRecords = response.paging.total;
             } else {
-                this.errMsg = [response.resultCode.message];
+                this.errMsg = this.errMsg.concat(response.resultCode.message);
             }
         });
 

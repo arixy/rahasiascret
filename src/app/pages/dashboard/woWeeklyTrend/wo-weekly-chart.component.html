@@ -1,0 +1,11 @@
+﻿<div>
+  <div class="alert alert-danger" *ngIf="errMsg.length > 0">
+    <ul style="margin-bottom: 0px;">
+      <li *ngFor="let err of errMsg">
+        {{err}}
+      </li>
+    </ul>
+  </div>
+  <!--<ng-select #selectWOCategory [items]="filterBaseModel._itemsWOCategories" placeholder="No Category selected" (removed)="removeFilterSelectBox('woCategory', $event)" (selected)="selectFilterSelectBox('woCategory', $event)"></ng-select>-->
+  <p-chart type="line" [data]="chartData" [options]="options" #chart (click)="updateChart()"></p-chart>
+</div>
