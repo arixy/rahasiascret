@@ -30,6 +30,13 @@
 .top-dropdown-menu.profile-dropdown {
     width: 245px !important;
 }
+.top-dropdown-menu i.dropdown-arr:after {
+    border-bottom-color: #fff !important;
+}
+
+.top-dropdown li {
+    cursor: pointer;
+}
 .dropdown-item {
     cursor: pointer;
 }
@@ -109,7 +116,8 @@ a.al-logo:hover {
   margin-right: 12px;
   transition: all .15s ease-in-out;
   padding: 16px 0 0 0;
-  width: 140px;
+  /* width: 140px; */
+  max-width: 100%;
   height: 36px;
   border: 0;
   opacity: 1;

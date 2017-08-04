@@ -1,18 +1,36 @@
 <div class="widgets">
-    <ba-card title="WO Utility" baCardClass="with-scroll">
-        <p-dataTable #dt [value]="utilities">
+  <div class="row">
+   <div class="ui-helper-clearfix add-new-button__container">
+              <div class="btn-group add-new-dropdown" style="float: right">
+                <button (click)="addUtilityType()" type="button" class="btn btn-primary">
+                    
+                    <i class="icon ion-plus-round"></i>
+                    
+                        New Utility Types
+                </button>
+
+            </div>
+    </div>
+    <ba-card title="" baCardClass="with-scroll">
+       <spinner *ngIf="dataLoading"></spinner>
+        <p-dataTable #dt [value]="utilities" [lazy]="true" (onLazyLoad)="refresh(filter_master, dt)" [rows]="10" [paginator]="true" [totalRecords]="totalRecords" sortField="dateUpdated" sortOrder="-1" styleClass="custom-filter-datatable">
           <p-header>
             <div class="ui-helper-clearfix">
                 <button type="button" iconPos="left" (click)="dt.exportCSV()" style="float:left" class="btn-export__csv">
                     <i class="icon ion-ios-download-outline"></i>
                 </button>
-                <button (click)="addUtilityType()" class="btn btn-primary" style="float:right">Add New Utility Types</button>
+                <div class="btn-group" dropdown style="float: right">
+                            
+                            <reset-filter (click)="resetFilters()">
+                            </reset-filter>
+
+                            <button title="Refresh" id="resetFilters" type="button" class="btn-sets-right" (click)="refresh($event)">
+                                <i class="icon ion-ios-reload"></i>
+                            </button>
+                </div>
             </div>
         </p-header>
-           <p-column field="utilityTypeId" header="Utility Type ID"></p-column>
-            <p-column field="name" header="Name"></p-column>
-            <p-column field="description" header="Description"></p-column>
-            <p-column styleClass="col-button">
+          <p-column styleClass="col-button">
                     <template pTemplate="header">
                         Action
                     </template>
@@ -28,28 +46,63 @@
                             </div>
                     </template>
             </p-column>
+           <p-column field="utilityTypeId" header="Utility Type ID"></p-column>
+            <p-column field="name" header="Name" 
+            [sortable]="true"
+            [filter]="false">
+                <template pTemplate="header">
+                       <span class="ui-column-title">Name</span> <span *ngIf="dt.sortOrder == 1 || dt.sortField != 'name'" class="sortable-custom-icon fa fa-sort"></span>
+                       <span *ngIf="dt.sortOrder == -1 && dt.sortField == 'name'" class="sortable-custom-icon fa fa-sort-desc"></span>
+                       <input class="ui-column-filter ui-inputtext ui-corner-all ui-widget" type="text" [formControl]="filter_name_fc" />
+                   </template>
+                    <template let-node="rowData" pTemplate="body">
+                        {{node.name}}
+                    </template>            
+            </p-column>
+            <p-column field="description" header="Description" 
+            [sortable]="true"
+            [filter]="false">
+                <template pTemplate="header">
+                       <span class="ui-column-title">Description</span> <span *ngIf="dt.sortOrder == 1 || dt.sortField != 'description'" class="sortable-custom-icon fa fa-sort"></span>
+                       <span *ngIf="dt.sortOrder == -1 && dt.sortField == 'description'" class="sortable-custom-icon fa fa-sort-desc"></span>
+                       <input class="ui-column-filter ui-inputtext ui-corner-all ui-widget" type="text" [formControl]="filter_description_fc" />
+                   </template>
+                    <template let-node="rowData" pTemplate="body">
+                        {{node.description}}
+                    </template>            
+            </p-column>
+            
         </p-dataTable>
     </ba-card>
+    </div>
 </div>
 <div bsModal #addNewModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <button class="close" aria-label="Close" (click)="hideChildModal()">
+        <button class="close" aria-label="Close" (click)="cancel()">
           <span aria-hidden="true">&times;</span>
         </button>
-        <h4 class="modal-title">Add New</h4>
+        <h4 class="modal-title">Add New Utility Type</h4>
 		<hr/>
       </div>
       <div class="modal-body">
         <div>
-            <ba-card title="Add New Priority" baCardClass="with-scroll custom-card">
+            <ba-card title="" baCardClass="with-scroll custom-card">
               <form [formGroup]="form" (ngSubmit)="onSubmit(form.value)" class="form-horizontal padding-form-horizontal">
+              <div class="modal-form-container">
               <div class="form-group row">
 				  <div class="col-sm-12">
 					  <label>Name</label>
 					  <input [formControl]="name" type="text" class="form-control" id="inputEmail3" placeholder="Name">
 				  </div>  
+              </div>
+              <div class="row error-row">
+                   <div class="col-sm-12">
+                        <div class="error-message col-xg-10" *ngIf="form.get('name').hasError('required') && add_form_submitted">
+                              Name is required
+                        </div>
+                    </div>
               </div>
               <div class="form-group row" [ngClass]="{'has-error': (!description.valid && description.touched), 'has-success': (description.valid && description.touched)}">
 				<div class="col-sm-12">  
@@ -57,11 +110,35 @@
 					<textarea [formControl]="description" type="text" class="form-control" id="inputPassword3" rows="2" cols="2" placeholder="Description"></textarea>
 				</div>	
               </div>
-              <div class="form-group row">
-                <div class="col-sm-12 btn-submit-center">
-                  <button [disabled]="!form.valid" type="submit" class="btn btn-default btn-auth btn-custom">Submit</button>
-                </div>
+              <div class="row error-row">
+                   <div class="col-sm-12">
+                        <div class="error-message col-xg-10" *ngIf="form.get('description').hasError('required') && add_form_submitted">
+                              Description is required
+                        </div>
+                    </div>
               </div>
+              </div>
+              <div class="form-group modal-action-row row">
+                  <div class="col-sm-3 btn-with-icon">
+                    <button type="button" class="btn btn-default btn-cancel" (click)="cancel()">
+                    <i class="icon ion-close"></i>
+                    Cancel</button>
+                  </div>
+                  <div class="col-sm-5">
+                       &nbsp;
+                   </div>
+                   <div class="col-sm-1 no-padding">
+                       <span *ngIf="submitLoading" class="loading-container">
+                            <loading-small></loading-small>
+                        </span>
+                   </div>
+                  <div class="col-sm-3 btn-with-icon">
+                    <button type="submit" class="btn btn-default btn-save">
+                    <i class="icon ion-checkmark"></i>
+                        Save
+                    </button>
+                  </div>
+            </div>
             </form>
             </ba-card>
           </div>
@@ -74,21 +151,29 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <button class="close" aria-label="Close" (click)="hideChildModalEdit()">
+        <button class="close" aria-label="Close" (click)="cancel()">
           <span aria-hidden="true">&times;</span>
         </button>
-        <h4 class="modal-title">Edit Utilities</h4>
+        <h4 class="modal-title">Edit Utility Type</h4>
 		 <hr/> 
       </div>
       <div class="modal-body">
         <div>
-            <ba-card title="Edit Utilities" baCardClass="with-scroll custom-card">
+            <ba-card title="" baCardClass="with-scroll custom-card">
               <form [formGroup]="edit_form" (ngSubmit)="onSubmitEdit(edit_form.value, $event)" class="form-horizontal">
+              <div class="modal-form-container">
               <div class="form-group row">
                 <div class="col-sm-12">
 					<label>Name</label>
                   <input [formControl]="edit_name" type="text" class="form-control" id="inputEmail3" placeholder="Name">
                 </div>
+              </div>
+              <div class="row error-row">
+                   <div class="col-sm-12">
+                        <div class="error-message col-xg-10" *ngIf="edit_form.get('edit_name').hasError('required') && edit_form_submitted">
+                              Name is required
+                        </div>
+                    </div>
               </div>
               <div class="form-group row" [ngClass]="{'has-error': (!description.valid && description.touched), 'has-success': (description.valid && description.touched)}">
                 <div class="col-sm-12">
@@ -96,11 +181,36 @@
 					<textarea [formControl]="edit_description" type="text" class="form-control" id="inputPassword3" placeholder="Description" rows="2" cols="2"></textarea>
                 </div>
               </div>
-              <div class="form-group row">
-                <div class="col-sm-12 btn-submit-center">
-                  <button [disabled]="!edit_form.valid" type="submit" class="btn btn-default btn-auth btn-custom">Submit</button>
-                </div>
+              <div class="row error-row">
+                   <div class="col-sm-12">
+                        <div class="error-message col-xg-10" *ngIf="edit_form.get('edit_description').hasError('required') && edit_form_submitted">
+                              Description is required
+                        </div>
+                    </div>
               </div>
+              
+              </div>
+              <div class="form-group modal-action-row row">
+                  <div class="col-sm-3 btn-with-icon">
+                    <button type="button" class="btn btn-default btn-cancel" (click)="cancel()">
+                    <i class="icon ion-close"></i>
+                    Cancel</button>
+                  </div>
+                  <div class="col-sm-5">
+                       &nbsp;
+                   </div>
+                   <div class="col-sm-1 no-padding">
+                       <span *ngIf="submitLoading" class="loading-container">
+                            <loading-small></loading-small>
+                        </span>
+                   </div>
+                  <div class="col-sm-3 btn-with-icon">
+                    <button type="submit" class="btn btn-default btn-save">
+                    <i class="icon ion-checkmark"></i>
+                        Save
+                    </button>
+                  </div>
+            </div>
             </form>
             </ba-card>
           </div>

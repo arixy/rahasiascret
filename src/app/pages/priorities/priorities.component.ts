@@ -1,15 +1,16 @@
 import {Component, Input, ChangeDetectorRef, ViewChild, ViewEncapsulation} from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
-import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
+import { FormControl, FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { PriorityService } from './priority.service';
 import { ModalDirective } from 'ng2-bootstrap';
+import { DataTable } from 'primeng/primeng';
 import * as moment from 'moment';
 
 @Component({
   selector: 'priorities',
   templateUrl: './priorities.component.html',
-  styleUrls: ['./priorities.component.scss', './../styles/primeng.min.css', './../styles/modals.scss'],
+  styleUrls: ['./../styles/basic-theme.scss', './../styles/primeng.min.css', './../styles/modals.scss'],
   encapsulation: ViewEncapsulation.None
 })
 export class Priorities {
@@ -27,12 +28,37 @@ export class Priorities {
     public edit_escalationPeriodInDays;
 	public priority_edit;
 	public submitted;
+    private totalRecords;
 	deleteConfirm;
 	delete_name;
+    
+    error_from_server = null;
 
+    add_form_submitted = false;
+    edit_form_submitted = false;
+
+    // Filtering 
+    filter_name_fc = new FormControl();
+    filter_description_fc = new FormControl();
+
+    filter_master = {
+        "name": {
+            "matchMode": "undefined", 
+            "value": ""
+        }, 
+        "description": {
+            "matchMode": "undefined", 
+            "value": ""
+        }
+    }
+
+    // Loading State
+    dataLoading = false;
+    
     @ViewChild('addNewModal') addNewModal: ModalDirective;
 	@ViewChild('editModal') editModal: ModalDirective;
 	@ViewChild('deleteModal') deleteModal: ModalDirective;
+    @ViewChild('dt') prioritiesTable: DataTable;
 
   constructor(
     public fb: FormBuilder,
@@ -41,8 +67,8 @@ export class Priorities {
     ) {
         // Add New Form
         this.form = fb.group({
-          'name': ['', Validators.compose([Validators.required, Validators.minLength(2)])],
-          'description': ['', Validators.compose([Validators.required, Validators.minLength(2)])],
+          'name': ['', Validators.compose([Validators.required])],
+          'description': ['', Validators.compose([Validators.required])],
           'escalationPeriodInDays': ['']
         });
         this.name = this.form.controls['name'];
@@ -51,8 +77,8 @@ export class Priorities {
 	  
 	   // editForm
         this.edit_form = fb.group({
-          'edit_name': ['', Validators.compose([Validators.required, Validators.minLength(2)])],
-          'edit_description': ['', Validators.compose([Validators.required, Validators.minLength(2)])],
+          'edit_name': ['', Validators.compose([Validators.required])],
+          'edit_description': ['', Validators.compose([Validators.required])],
           'edit_escalationPeriodInDays': ['']
         });
         this.edit_name = this.edit_form.controls['edit_name'];
@@ -69,13 +95,109 @@ export class Priorities {
         
   }
 	ngOnInit(){
-		 this.priorityService.getPriorities().subscribe(
+		 /*this.priorityService.getPriorities().subscribe(
             data => {
                 this.priorities = data.data;
                 //this.processed_work_orders = this.injectDuration(JSON.parse(JSON.stringify(this.work_orders)));
             }
-        );	
+        );	*/
 	}
+
+    ngAfterViewInit(){
+         // Set manual filter debounce
+        this.filter_name_fc.valueChanges
+            .debounceTime(800)
+            .distinctUntilChanged()
+            .subscribe(
+                (filter_text) => {
+                    this.filter_master.name = {
+                        matchMode: 'undefined',
+                        value: filter_text
+                    };
+                    this.refresh(this.filter_master, this.prioritiesTable);
+                }
+                
+        );
+        
+        this.filter_description_fc.valueChanges
+            .debounceTime(800)
+            .distinctUntilChanged()
+            .subscribe(
+                (filter_text) => {
+                    this.filter_master.description = {
+                        matchMode: 'undefined',
+                        value: filter_text
+                    };
+                    this.refresh(this.filter_master, this.prioritiesTable);
+                }
+                
+        );
+        
+        this.refresh(this.filter_master, this.prioritiesTable);
+    }
+
+    public hideModal(){
+        this.addNewModal.hide();
+        this.editModal.hide();
+    }
+
+    public clearFormInputs(form){
+        form.reset();
+    }
+
+    public cancel(){
+        this.hideModal();
+        
+        // TODO: Logic to reset the form
+        this.clearFormInputs(this.form);
+    }
+
+    refresh(filter_master, table: DataTable){
+        
+        this.dataLoading = true;
+        
+        // The only custom element is the filter master since we want to implement debounce
+        var formatted_object = {};
+        
+        if(table == null){
+            formatted_object = {
+                filters : filter_master,
+                first: 0,
+                rows: 10,
+                globalFilter: "",
+                multiSortMeta: null,
+                sortField: 'dateUpdated',
+                sortOrder: -1
+            }
+        } else {
+            formatted_object = {
+                filters : filter_master,
+                first: table.first,
+                rows: table.rows,
+                globalFilter: table.globalFilter,
+                multiSortMeta: table.multiSortMeta,
+                sortField: table.sortField,
+                sortOrder: table.sortOrder    
+            }
+            
+        }
+        
+        console.log('Shoot Refresh', formatted_object);
+        this.priorityService.getPrioritiesFilter(formatted_object).subscribe(
+            (response) => {
+                this.dataLoading = false;
+                console.log('Refresh Data', response);
+                this.priorities = response.data;
+
+                if(response.paging != null){
+                    this.totalRecords = response.paging.total;
+                } else {
+                    this.totalRecords = 0;
+                }
+            }
+        );
+    }
+
 	public deleteClose(){
 		this.deleteModal.hide();
 	}
@@ -125,6 +247,7 @@ export class Priorities {
 
 	public onSubmit(values:Object):void {
 		this.submitted = true;
+        this.add_form_submitted = true;
 		 console.log('create component');
 		if (this.form.valid) {
 			console.log(values);
@@ -141,8 +264,10 @@ export class Priorities {
 			this.ngOnInit();
 		}
 	  }
+
 	public onSubmitEdit(values,event){
-    	console.log('edit form',values)
+    	console.log('edit form',values);
+        this.edit_form_submitted = true;
 		if(this.edit_form.valid){
 			 var formatted_object = Object.assign({}, {
                	id: this.priority_edit,
@@ -161,6 +286,18 @@ export class Priorities {
                 }
            );
 		}    
+    }
+
+    public resetFilters(table){
+        
+        // Clear all filter in filter master. Might be Redundant
+        this.filter_master.name.value = "";
+        this.filter_master.description.value = "";
+        
+        // Actually changing the value on the input field. Auto Refresh
+        this.filter_name_fc.setValue("");
+        this.filter_description_fc.setValue("");
+        
     }
      
 }  

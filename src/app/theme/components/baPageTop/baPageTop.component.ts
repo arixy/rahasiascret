@@ -119,4 +119,29 @@ export class BaPageTop {
       this.isDropdownConfiguration = false;
        }
   }
+    
+    goToAllList(){
+        this.isDropdownProfile = false;
+        this.isDropdownNewmenu = false;
+        this.isDropdownConfiguration = false;
+        this.router.navigate(['/pages/all-list']);
+    }
+    goToUsers(){
+        this.isDropdownProfile = false;
+        this.isDropdownNewmenu = false;
+        this.isDropdownConfiguration = false;
+        this.router.navigate(['/pages/users']);
+    }
+    goToRoles(){
+        this.isDropdownProfile = false;
+        this.isDropdownNewmenu = false;
+        this.isDropdownConfiguration = false;
+        this.router.navigate(['/pages/role']);
+    }
+    goToAccessRights(){
+        this.isDropdownProfile = false;
+        this.isDropdownNewmenu = false;
+        this.isDropdownConfiguration = false;
+        this.router.navigate(['/pages/access-rights']);
+    }
 }

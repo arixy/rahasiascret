@@ -1,15 +1,16 @@
 import {Component, Input, ChangeDetectorRef, ViewChild, ViewEncapsulation, OnInit} from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
-import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
+import { FormControl, FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { ModalDirective } from 'ng2-bootstrap';
 import * as moment from 'moment';
 import { ExpenseTypeService } from './expense-type.service';
+import { DataTable } from 'primeng/primeng';
 
 @Component({
   selector: 'expense-types',
   templateUrl: './expense-type.component.html',
-  styleUrls: ['./../styles/primeng.min.css', './../styles/modals.scss'],
+  styleUrls: ['./../styles/basic-theme.scss','./../styles/primeng.min.css', './../styles/modals.scss'],
   encapsulation: ViewEncapsulation.None
 })
 export class ExpenseType {
@@ -25,12 +26,37 @@ export class ExpenseType {
 	public edit_name;
 	public edit_description;
 	public expense_edit;
+    private totalRecords;
 	deleteConfirm;
 	delete_name;
+    
+    error_from_server = null;
+
+    add_form_submitted = false;
+    edit_form_submitted = false;
+
+    // Filtering
+    filter_name_fc = new FormControl();
+    filter_description_fc = new FormControl();
+
+    filter_master = {
+        "name": {
+            "matchMode": "undefined", 
+            "value": ""
+        }, 
+        "description": {
+            "matchMode": "undefined", 
+            "value": ""
+        }
+    }
+
+    // Loading State
+    dataLoading = false;
 
     @ViewChild('addNewModal') addNewModal: ModalDirective;
     @ViewChild('editModal') editModal: ModalDirective;
 	@ViewChild('deleteModal') deleteModal: ModalDirective;
+    @ViewChild('dt') expenseTypesTable: DataTable;
 
   constructor(
     public fb: FormBuilder,
@@ -63,13 +89,103 @@ export class ExpenseType {
   }
 	
 	 ngOnInit(){
-		this.expenseTypeService.getExpenses().subscribe(
-            data => {
-                this.expenses = data.data;
-                //this.processed_work_orders = this.injectDuration(JSON.parse(JSON.stringify(this.work_orders)));
+		
+	}
+
+    ngAfterViewInit(){
+         // Set manual filter debounce
+        this.filter_name_fc.valueChanges
+            .debounceTime(800)
+            .distinctUntilChanged()
+            .subscribe(
+                (filter_text) => {
+                    this.filter_master.name = {
+                        matchMode: 'undefined',
+                        value: filter_text
+                    };
+                    this.refresh(this.filter_master, this.expenseTypesTable);
+                }
+                
+        );
+        
+        this.filter_description_fc.valueChanges
+            .debounceTime(800)
+            .distinctUntilChanged()
+            .subscribe(
+                (filter_text) => {
+                    this.filter_master.description = {
+                        matchMode: 'undefined',
+                        value: filter_text
+                    };
+                    this.refresh(this.filter_master, this.expenseTypesTable);
+                }
+                
+        );
+        
+        this.refresh(this.filter_master, this.expenseTypesTable);
+    }
+
+    public hideModal(){
+        this.addNewModal.hide();
+        this.editModal.hide();
+    }
+
+    public clearFormInputs(form){
+        form.reset();
+    }
+
+    public cancel(){
+        this.hideModal();
+        
+        // TODO: Logic to reset the form
+        this.clearFormInputs(this.form);
+    }
+
+    refresh(filter_master, table: DataTable){
+        
+        this.dataLoading = true;
+        
+        // The only custom element is the filter master since we want to implement debounce
+        var formatted_object = {};
+        
+        if(table == null){
+            formatted_object = {
+                filters : filter_master,
+                first: 0,
+                rows: 10,
+                globalFilter: "",
+                multiSortMeta: null,
+                sortField: 'dateUpdated',
+                sortOrder: -1
+            }
+        } else {
+            formatted_object = {
+                filters : filter_master,
+                first: table.first,
+                rows: table.rows,
+                globalFilter: table.globalFilter,
+                multiSortMeta: table.multiSortMeta,
+                sortField: table.sortField,
+                sortOrder: table.sortOrder    
+            }
+            
+        }
+        
+        console.log('Shoot Refresh', formatted_object);
+        this.expenseTypeService.getExpenseTypesFilter(formatted_object).subscribe(
+            (response) => {
+                this.dataLoading = false;
+                console.log('Refresh Data', response);
+                this.expenses = response.data;
+
+                if(response.paging != null){
+                    this.totalRecords = response.paging.total;
+                } else {
+                    this.totalRecords = 0;
+                }
             }
         );
-	}
+    }
 
     public deleteExpenseType(event){
 		this.deleteConfirm= event;
@@ -110,6 +226,8 @@ export class ExpenseType {
 
 	public onSubmit(values){
 		this.submitted = true;
+        this.add_form_submitted = true;
+        
 	   	console.log('create component');
 			if (this.form.valid) {
 				console.log(values);
@@ -127,7 +245,8 @@ export class ExpenseType {
 		}
     }
   	public onSubmitEdit(values,event){
-		console.log('edit form',values)
+		console.log('edit form',values);
+        this.edit_form_submitted = true;
 		if(this.edit_form.valid){
 			 var formatted_object = Object.assign({}, {
                id: this.expense_edit,
@@ -145,6 +264,18 @@ export class ExpenseType {
                 }
            );
 		}
+    }
+
+    public resetFilters(table){
+        
+        // Clear all filter in filter master. Might be Redundant
+        this.filter_master.name.value = "";
+        this.filter_master.description.value = "";
+        
+        // Actually changing the value on the input field. Auto Refresh
+        this.filter_name_fc.setValue("");
+        this.filter_description_fc.setValue("");
+        
     }
      
 }  
