@@ -16,13 +16,15 @@
       <p-header>
         <div class="row">
           <div class="col-md-4" style="text-align: left">
-            <p>Role</p>
-            <ng-select #roleGroupSelectBox
-                       [disabled]="true"
-                       [items]="_itemsRoleGroup"
-                       (removed)="removeSelectBoxValue('lsbRoleGroup', $event)"
-                       (selected)="selectedSelectBoxValue('lsbRoleGroup', $event)"
-                       placeholder="No Role Selected"></ng-select>
+            <div class="row">
+              <p><strong>Role</strong></p>
+              <ng-select #roleGroupSelectBox
+                         [disabled]="true"
+                         [items]="_itemsRoleGroup"
+                         (removed)="removeSelectBoxValue('lsbRoleGroup', $event)"
+                         (selected)="selectedSelectBoxValue('lsbRoleGroup', $event)"
+                         placeholder="No Role Selected"></ng-select>
+            </div>
             <br /><br />
           </div>
         </div>

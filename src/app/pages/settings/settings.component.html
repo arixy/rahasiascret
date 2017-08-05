@@ -14,7 +14,7 @@
 
     <p-dataTable #dt [value]="settingsModel">
       <p-header></p-header>
-      <p-column field="label" header="Setting" [sortable]="true" [style]="{'width':'240px'}"></p-column>
+      <p-column field="label" header="Setting" [style]="{'width':'240px'}"></p-column>
       <p-column header="Value">
         <template pTemplate="body" let-data="rowData">
           <input type="text" [(ngModel)]="data.value" class="form-control"/>

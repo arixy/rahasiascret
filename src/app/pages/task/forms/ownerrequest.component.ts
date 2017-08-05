@@ -7,6 +7,10 @@ import { ModalDirective } from 'ng2-bootstrap';
 import { DatePickerOptions } from 'ng2-datepicker';
 import { SelectComponent, SelectItem } from 'ng2-select';
 import * as moment from 'moment';
+import { TabPanel } from 'primeng/primeng';
+
+import { WorkOrderFilesComponent } from './subforms/workorder-files.component';
+import { WorkOrderExpensesComponent } from './subforms/workorder-expenses.component';
 
 import { TaskService } from '../task.service';
 import { LocationService } from '../../../services/location.service';
@@ -97,6 +101,8 @@ export class OwnerRequestComponent {
         location: null,
     };
 
+    private errMsg = [];
+
     public _defFieldPermissions = {
         default: "show",
         btn_submit: 'show'
@@ -111,6 +117,14 @@ export class OwnerRequestComponent {
     @ViewChild("addVendorSelectBox") _addVendorSelectBox: SelectComponent;
     @ViewChild("addEntitySelectBox") _addEntitySelectBox: SelectComponent;
 
+    // child component
+    @ViewChild(WorkOrderFilesComponent) _workOrderFilesComponent: WorkOrderFilesComponent;
+    @ViewChild(WorkOrderExpensesComponent) _workOrderExpensesComponent: WorkOrderExpensesComponent;
+
+    // Tab Panels
+    @ViewChild("generalTab") _generalTab: TabPanel;
+    @ViewChild("filesTab") _filesTab: TabPanel;
+    @ViewChild("expensesTab") _expensesTab: TabPanel;
 
     constructor(
         public fb: FormBuilder,
@@ -255,6 +269,12 @@ export class OwnerRequestComponent {
                 console.log("list assignees", this.items_assignees);
             });
         }
+
+        this.formGroupAdd.valueChanges.subscribe(data => {
+            if (this.formGroupAdd.valid) {
+                this._generalTab.headerStyleClass = '';
+            }
+        });
     }
 
     private loadWorkOrderDataAndSetPermission() {
@@ -589,7 +609,37 @@ export class OwnerRequestComponent {
         console.log("onSubmit", formValue);
 
         try {
-            if (this.formGroupAdd.valid) {
+            this._generalTab.headerStyleClass = '';
+            this._filesTab.headerStyleClass = '';
+            this._expensesTab.headerStyleClass = '';
+            var hasError = false;
+
+            if (!this.formGroupAdd.valid) {
+                this.markAsTouchedAll();
+                this._generalTab.headerStyleClass = 'tabpanel-has-error';
+                hasError = true;
+            }
+
+            if (!this._workOrderFilesComponent.validateFiles() || !this._workOrderFilesComponent.validatePhotos()) {
+                this._workOrderFilesComponent.markAsTouchedAll();
+                this._filesTab.headerStyleClass = 'tabpanel-has-error';
+                hasError = true;
+            }
+
+            if (!this._workOrderExpensesComponent.validateExpenses()) {
+                this._workOrderExpensesComponent.markAsTouchedAll();
+                this._expensesTab.headerStyleClass = 'tabpanel-has-error';
+                hasError = true;
+            }
+
+            if (hasError) {
+                return;
+            }
+
+            if (this.formGroupAdd.valid
+                && this._workOrderExpensesComponent.validateExpenses()
+                && this._workOrderFilesComponent.validateFiles()
+                && this._workOrderFilesComponent.validatePhotos()){
                 console.log("valid");
 
                 // handle manual validation
@@ -680,6 +730,8 @@ export class OwnerRequestComponent {
                             this._taskService.announceEvent("addNewModal_btnSaveOnClick_createSuccess");
                         } else {
                             // an error occured
+                            this.errMsg = [];
+                            this.errMsg = this.errMsg.concat(response.resultCode.message);
                         }
                     });
                 } else {
@@ -689,6 +741,8 @@ export class OwnerRequestComponent {
                             this._taskService.announceEvent("addNewModal_btnSaveOnClick_updateSuccess");
                         } else {
                             // an error occured
+                            this.errMsg = [];
+                            this.errMsg = this.errMsg.concat(response.resultCode.message);
                         }
                     });
                 }
@@ -916,5 +970,24 @@ export class OwnerRequestComponent {
         }
 
         return true;
+    }
+
+    onChangesFiles() {
+        console.log("changes on notes files detected");
+        if (this._workOrderFilesComponent.validateFiles() && this._workOrderFilesComponent.validatePhotos()) {
+            this._filesTab.headerStyleClass = '';
+        }
+    }
+
+    onChangesExpenses() {
+        if (this._workOrderExpensesComponent.validateExpenses()) {
+            this._expensesTab.headerStyleClass = '';
+        }
+    }
+
+    markAsTouchedAll() {
+        Object.keys(this.formGroupAdd.controls).forEach(key => {
+            this.formGroupAdd.controls[key].markAsTouched();
+        });
     }
 }

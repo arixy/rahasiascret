@@ -1,4 +1,4 @@
-﻿import { Component, Input, Output, ChangeDetectorRef, ViewChild, ViewEncapsulation } from '@angular/core';
+﻿import { Component, Input, Output, ChangeDetectorRef, ViewChild, ViewEncapsulation, EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import { FormGroup, AbstractControl, FormBuilder, Validators, ValidatorFn, FormControl } from '@angular/forms';
@@ -15,14 +15,13 @@ import { ExpenseTypeService } from '../../../expense-type/expense-type.service';
 //import { UsersService } from '../../users/users.service';
 //import { RoleService } from '../../role/role.service';
 
-import { WorkflowActions, WorkOrderStatuses } from '../../../../global.state';
+import { WorkflowActions, WorkOrderStatuses, GlobalConfigs } from '../../../../global.state';
 
 import { CustomValidators } from '../custom-validators';
 
 @Component({
     selector: 'wo-expenses',
     templateUrl: './workorder-expenses.component.html',
-    providers: [ExpenseTypeService]
 })
 export class WorkOrderExpensesComponent {
     @Input('actionType') actionType;
@@ -36,7 +35,12 @@ export class WorkOrderExpensesComponent {
     @Input('isCanEdit')
     private isCanEdit = true;
 
-    private items_expenses_types = [{id: 1, text: 'Sample'}];
+    @Output('changes')
+    private changes = new EventEmitter<string>();
+
+    private items_expenses_types = [{ id: 1, text: 'Sample' }];
+
+    private _yearRange = GlobalConfigs.yearRange;
 
     constructor(private _expenseTypeService: ExpenseTypeService) {
         this.deleted_expenses = new Array();
@@ -78,6 +82,8 @@ export class WorkOrderExpensesComponent {
             this.deleted_expenses.push(expenseToRemove);
             //this._expensesFilters.push(expenseToRemove);
         }
+
+        this.changes.emit("removeExpenses");
     }
 
     private filterExpense(expense) {
@@ -107,6 +113,8 @@ export class WorkOrderExpensesComponent {
             case 'refNumberTouched': marker.refNumberTouched = true; break;
             case 'refDateTouched': marker.refDateTouched = true; break;
         }
+
+        this.changes.emit("elementTouched");
     }
 
     //isAmountValid(expense) {
@@ -127,19 +135,19 @@ export class WorkOrderExpensesComponent {
             return { required: true };
         }
 
-        return {};
+        return { };
     }
 
     hasErrorExpenseAmount(expense) {
+
         if (expense.amount == null || expense.amount == "") {
             return { required: true };
         } else {
             let amountControl = new FormControl();
             amountControl.setValue(expense.amount);
 
-            let validationResult = CustomValidators.numberOnly(amountControl);
-            if (validationResult != null) return validationResult;
-            else return {};
+            let validationResult: any = CustomValidators.numberOnly(amountControl);
+            return validationResult;
         }
     }
 
@@ -148,7 +156,7 @@ export class WorkOrderExpensesComponent {
             return { required: true };
         }
 
-        return {};
+        return { };
     }
 
     hasErrorRefNumber(expense) {
@@ -156,7 +164,7 @@ export class WorkOrderExpensesComponent {
             return { required: true };
         }
 
-        return {};
+        return { };
     }
 
     hasErrorRefDate(expense) {
@@ -164,6 +172,38 @@ export class WorkOrderExpensesComponent {
             return { required: true };
         }
 
-        return {};
+        return { };
+    }
+
+    public validateExpenses() {
+        for (let expense of this.expenses) {
+            if (expense.isActive == 1) {
+                let desc: any = this.hasErrorExpenseDescription(expense);
+                let refNum: any = this.hasErrorRefNumber(expense);
+                let refDate: any = this.hasErrorRefDate(expense);
+                let type: any = this.hasErrorExpenseType(expense);
+                let amount: any = this.hasErrorExpenseAmount(expense);
+                if (desc.required == true
+                    || refNum.required == true
+                    || refDate.required == true
+                    || type.required == true
+                    || amount.required == true
+                    || amount.nonnumber == true) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public markAsTouchedAll() {
+        for (let expense of this.expenses) {
+            expense.expenseTypeTouched = true; 
+            expense.amountTouched = true; 
+            expense.descTouched = true; 
+            expense.refNumberTouched = true; 
+            expense.refDateTouched = true;
+        }
     }
 }

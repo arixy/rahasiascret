@@ -1,4 +1,4 @@
-﻿import { Component, Input, ChangeDetectorRef, ViewChild, ViewEncapsulation } from '@angular/core';
+﻿import { Component, Input, ChangeDetectorRef, ViewChild, ViewEncapsulation, OnChanges, SimpleChanges } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import { FormGroup, AbstractControl, FormBuilder, Validators, ValidatorFn, FormControl } from '@angular/forms';
@@ -7,6 +7,11 @@ import { ModalDirective } from 'ng2-bootstrap';
 import { DatePickerOptions } from 'ng2-datepicker';
 import { SelectComponent, SelectItem } from 'ng2-select';
 import * as moment from 'moment';
+
+import { TabPanel } from 'primeng/primeng';
+
+import { WorkOrderFilesComponent } from './subforms/workorder-files.component';
+import { WorkOrderExpensesComponent } from './subforms/workorder-expenses.component';
 
 import { TaskService } from '../task.service';
 import { LocationService } from '../../../services/location.service';
@@ -27,7 +32,7 @@ import { CustomValidators } from './custom-validators';
     templateUrl: './singlerequest.component.html',
     providers: [LocationService, AssetService, UsersService, RoleService, WorkOrderService, ExpenseTypeService, PriorityService, EntityService]
 })
-export class SingleRequestComponent {
+export class SingleRequestComponent implements OnChanges {
     public selectedWoType: { id, label };
     public actionType: { workflowActionId, name, toRoleId, toRoleTypeId, toUserId }; // JSON of Action
     public selectedWO = null;
@@ -108,6 +113,8 @@ export class SingleRequestComponent {
         location: null,
     };
 
+    private errMsg = [];
+
     public _defFieldPermissions = {
         // just put fields that is different from other select box
         // show, hidden, disabled
@@ -132,6 +139,15 @@ export class SingleRequestComponent {
     @ViewChild("addAssigneeSelectBox") _addAssigneeSelectBox: SelectComponent;
     @ViewChild("addVendorSelectBox") _addVendorSelectBox: SelectComponent;
     //@ViewChild("fileuploadBox") _fileuploadBox: FileUpload;
+
+    // child component
+    @ViewChild(WorkOrderFilesComponent) _workOrderFilesComponent: WorkOrderFilesComponent;
+    @ViewChild(WorkOrderExpensesComponent) _workOrderExpensesComponent: WorkOrderExpensesComponent;
+
+    // Tab Panels
+    @ViewChild("generalTab") _generalTab: TabPanel;
+    @ViewChild("filesTab") _filesTab: TabPanel;
+    @ViewChild("expensesTab") _expensesTab: TabPanel;
     
 
     constructor(
@@ -148,6 +164,10 @@ export class SingleRequestComponent {
         private _entityService: EntityService
     ){
     
+    }
+
+    ngOnChanges(changes: SimpleChanges) {
+        console.error(changes);
     }
 
     ngOnInit() {
@@ -191,6 +211,12 @@ export class SingleRequestComponent {
         this.selected_duedate = this.formGroupAdd.controls['selected_duedate'];
 
         console.log("selected_category input", this.selected_category);
+
+        this.formGroupAdd.valueChanges.subscribe(data => {
+            if (this.formGroupAdd.valid) {
+                this._generalTab.headerStyleClass = '';
+            }
+        });
 
         if (this.selectedWO != null) {
             this.loadWorkOrderDataAndSetPermission();
@@ -567,129 +593,159 @@ export class SingleRequestComponent {
     // btn submit
     public onSubmit(formValue) {
         console.log("onSubmit", formValue);
+        
+        this._generalTab.headerStyleClass = '';
+        this._filesTab.headerStyleClass = '';
+        this._expensesTab.headerStyleClass = '';
+        var hasError = false;
 
-        try {
-            if (this.formGroupAdd.valid) {
-                console.log("valid");
+        if (!this.formGroupAdd.valid) {
+            this.markAsTouchedAll();
+            this._generalTab.headerStyleClass = 'tabpanel-has-error';
+            hasError = true;
+        }
 
-                // handle manual validation
+        if (!this._workOrderFilesComponent.validateFiles() || !this._workOrderFilesComponent.validatePhotos()) {
+            this._workOrderFilesComponent.markAsTouchedAll();
+            this._filesTab.headerStyleClass = 'tabpanel-has-error';
+            hasError = true;
+        }
 
-                // manual validation VALID
+        if (!this._workOrderExpensesComponent.validateExpenses()) {
+            this._workOrderExpensesComponent.markAsTouchedAll();
+            this._expensesTab.headerStyleClass = 'tabpanel-has-error';
+            hasError = true;
+        }
 
-                var workorder_object = {
-                    workOrderId: this.selectedWO == null ? null : this.selectedWO.workOrderId,
-                    woNumber: this.wo_number.value,
-                    woTypeId: this.selectedWO == null ? this.selectedWoType.id : this.selectedWO.woTypeId,
-                    taskName: this.task_name.value,
-                    description: this.task_desc.value,
-                    woCategoryId: this.selected_category.value.id,
-                    woPriorityId: this.selected_priority.value.id,
-                    entityId: null, // ?
-                    locationId: this.selected_location.value.id,
-                    locationInfo: this.location_info.value,
-                    assetId: this.selected_asset.value.id,
-                    currentStatusId: this.selected_status.value.id,
-                    // TODO: check later
-                    currentAssigneeId: this.selected_assignee.value.id,
-                    // TODO: check later
-                    //mainPicId: this.selected_assignee.value.id,
-                    // TODO: need to change to UTC+0 first
-                    startDate: this.selected_startdate.value,
-                    startTime: this.selected_startdate.value,
-                    repeatOptionId: null,
-                    every: null,
-                    everyPeriodId: null,
-                    dueAfter: null,
-                    duePeriodId: null,
-                    // TODO: need to change to UTC+0 first
-                    dueDate: this.selected_duedate.value,
-                    lastWoDate: null,
-                    nextWoDate: null,
-                    completeDateTime: null,
-                    completionHours: null,
-                    pendingHours: null,
-                    isComplete: false,
-                    workflowId: this.selectedWO == null ? null : this.selectedWO.workflowId,
-                    contactPerson: this.contact_person.value,
-                    contactNumber: this.contact_number.value,
-                    solution: this.solution.value,
-                    vendorId: this.selected_vendor.value.id
-                };
+        if (hasError) {
+            return;
+        }
 
-                var formatted_object = {
-                    workOrder: workorder_object,
-                    action: {
-                        actionId: this.actionType.workflowActionId,
-                        actionName: this.actionType.name
-                    },
-                    expenses: this.readyExpenses(),
-                    deletedExpenses: this.readyDeletedExpenses(),
-                    files: this.readyFilesData(),
-                    deletedFiles: this.readyDeletedFilesData(),
-                    photos: this.readyPhotosData(),
-                    deletedPhotos: this.readyDeletedPhotosData(),
-                };
-                console.log("To Send", formatted_object);
+        if (this.formGroupAdd.valid
+            && this._workOrderExpensesComponent.validateExpenses()
+            && this._workOrderFilesComponent.validateFiles()
+            && this._workOrderFilesComponent.validatePhotos()) {
+            console.log("valid");
 
-                let formData: FormData = new FormData();
-                formData.append("params", JSON.stringify(formatted_object));
+            // handle manual validation
 
-                // TODO: Loop through newlyAddedFiles
-                //formData.append("files", this.newlyAdded);
-                for (var i = 0; i < this.existingFiles.length; i++) {
-                    if (this.existingFiles[i].isActive == false) continue;
+            // manual validation VALID
 
-                    //let actualFile: File = this.newlyAddedFiles[i].actualFile;
-                    //if (actualFile.type.includes("image")) {
-                    //    formData.append("photos", actualFile);
-                    //} else {
-                    //    formData.append("files", actualFile);
-                    //}
-                    if (this.existingFiles[i].isActive && this.existingFiles[i].workOrderFileId == null) {
-                        let actualFile: File = this.existingFiles[i].actualFile;
-                        formData.append("files", actualFile);
-                    }
-                }
+            var workorder_object = {
+                workOrderId: this.selectedWO == null ? null : this.selectedWO.workOrderId,
+                woNumber: this.wo_number.value,
+                woTypeId: this.selectedWO == null ? this.selectedWoType.id : this.selectedWO.woTypeId,
+                taskName: this.task_name.value,
+                description: this.task_desc.value,
+                woCategoryId: this.selected_category.value.id,
+                woPriorityId: this.selected_priority.value.id,
+                entityId: null, // ?
+                locationId: this.selected_location.value.id,
+                locationInfo: this.location_info.value,
+                assetId: this.selected_asset.value.id,
+                currentStatusId: this.selected_status.value.id,
+                // TODO: check later
+                currentAssigneeId: this.selected_assignee.value.id,
+                // TODO: check later
+                //mainPicId: this.selected_assignee.value.id,
+                // TODO: need to change to UTC+0 first
+                startDate: this.selected_startdate.value,
+                startTime: this.selected_startdate.value,
+                repeatOptionId: null,
+                every: null,
+                everyPeriodId: null,
+                dueAfter: null,
+                duePeriodId: null,
+                // TODO: need to change to UTC+0 first
+                dueDate: this.selected_duedate.value,
+                lastWoDate: null,
+                nextWoDate: null,
+                completeDateTime: null,
+                completionHours: null,
+                pendingHours: null,
+                isComplete: false,
+                workflowId: this.selectedWO == null ? null : this.selectedWO.workflowId,
+                contactPerson: this.contact_person.value,
+                contactNumber: this.contact_number.value,
+                solution: this.solution.value,
+                vendorId: this.selected_vendor.value.id
+            };
 
-                for (var i = 0; i < this.existingPhotos.length; i++) {
-                    if (this.existingPhotos[i].isActive == false) continue;
+            var formatted_object = {
+                workOrder: workorder_object,
+                action: {
+                    actionId: this.actionType.workflowActionId,
+                    actionName: this.actionType.name
+                },
+                expenses: this.readyExpenses(),
+                deletedExpenses: this.readyDeletedExpenses(),
+                files: this.readyFilesData(),
+                deletedFiles: this.readyDeletedFilesData(),
+                photos: this.readyPhotosData(),
+                deletedPhotos: this.readyDeletedPhotosData(),
+            };
+            console.log("To Send", formatted_object);
 
-                    //let actualFile: File = this.newlyAddedFiles[i].actualFile;
-                    //if (actualFile.type.includes("image")) {
-                    //    formData.append("photos", actualFile);
-                    //} else {
-                    //    formData.append("files", actualFile);
-                    //}
-                    if (this.existingPhotos[i].isActive && this.existingPhotos[i].workOrderPhotoId == null) {
-                        let actualFile: File = this.existingPhotos[i].actualFile;
-                        formData.append("photos", actualFile);
-                    }
-                }
+            let formData: FormData = new FormData();
+            formData.append("params", JSON.stringify(formatted_object));
 
-                // TODO: uncomment later
-                // TODO: change function name and maybe location?
-                if (this.actionType.workflowActionId == WorkflowActions.CREATE) {
-                    this._taskService.addNewWorkOrder(formData).subscribe((response) => {
-                        console.log("save response", response);
-                        if (response.resultCode.code == 0) {
-                            this._taskService.announceEvent("addNewModal_btnSaveOnClick_createSuccess");
-                        } else {
-                            // an error occured
-                        }
-                    });
-                } else {
-                    this._taskService.updateWorkOrder(formData).subscribe((response) => {
-                        console.log("update response", response);
-                        if (response.resultCode.code == 0) {
-                            this._taskService.announceEvent("addNewModal_btnSaveOnClick_updateSuccess");
-                        } else {
-                            // an error occured
-                        }
-                    });
+            // TODO: Loop through newlyAddedFiles
+            //formData.append("files", this.newlyAdded);
+            for (var i = 0; i < this.existingFiles.length; i++) {
+                if (this.existingFiles[i].isActive == false) continue;
+
+                //let actualFile: File = this.newlyAddedFiles[i].actualFile;
+                //if (actualFile.type.includes("image")) {
+                //    formData.append("photos", actualFile);
+                //} else {
+                //    formData.append("files", actualFile);
+                //}
+                if (this.existingFiles[i].isActive && this.existingFiles[i].workOrderFileId == null) {
+                    let actualFile: File = this.existingFiles[i].actualFile;
+                    formData.append("files", actualFile);
                 }
             }
-        } catch (e) {
-            console.log("ERROR", e);
+
+            for (var i = 0; i < this.existingPhotos.length; i++) {
+                if (this.existingPhotos[i].isActive == false) continue;
+
+                //let actualFile: File = this.newlyAddedFiles[i].actualFile;
+                //if (actualFile.type.includes("image")) {
+                //    formData.append("photos", actualFile);
+                //} else {
+                //    formData.append("files", actualFile);
+                //}
+                if (this.existingPhotos[i].isActive && this.existingPhotos[i].workOrderPhotoId == null) {
+                    let actualFile: File = this.existingPhotos[i].actualFile;
+                    formData.append("photos", actualFile);
+                }
+            }
+
+            // TODO: uncomment later
+            // TODO: change function name and maybe location?
+            if (this.actionType.workflowActionId == WorkflowActions.CREATE) {
+                this._taskService.addNewWorkOrder(formData).subscribe((response) => {
+                    console.log("save response", response);
+                    if (response.resultCode.code == 0) {
+                        this._taskService.announceEvent("addNewModal_btnSaveOnClick_createSuccess");
+                    } else {
+                        // an error occured
+                        this.errMsg = [];
+                        this.errMsg = this.errMsg.concat(response.resultCode.message);
+                    }
+                });
+            } else {
+                this._taskService.updateWorkOrder(formData).subscribe((response) => {
+                    console.log("update response", response);
+                    if (response.resultCode.code == 0) {
+                        this._taskService.announceEvent("addNewModal_btnSaveOnClick_updateSuccess");
+                    } else {
+                        // an error occured
+                        this.errMsg = [];
+                        this.errMsg = this.errMsg.concat(response.resultCode.message);
+                    }
+                });
+            }
         }
 
         return false;
@@ -938,5 +994,24 @@ export class SingleRequestComponent {
         }
 
         return true;
+    }
+
+    onChangesFiles() {
+        console.log("changes on notes files detected");
+        if (this._workOrderFilesComponent.validateFiles() && this._workOrderFilesComponent.validatePhotos()) {
+            this._filesTab.headerStyleClass = '';
+        }
+    }
+
+    onChangesExpenses() {
+        if (this._workOrderExpensesComponent.validateExpenses()) {
+            this._expensesTab.headerStyleClass = '';
+        }
+    }
+
+    markAsTouchedAll() {
+        Object.keys(this.formGroupAdd.controls).forEach(key => {
+            this.formGroupAdd.controls[key].markAsTouched();
+        });
     }
 }

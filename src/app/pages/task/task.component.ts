@@ -421,7 +421,7 @@ export class TaskComponent implements OnDestroy{
 
     }
 
-    private downloadFileMyTaskToCSV(data:Response){
+    private downloadFileMyTaskToCSV(data){
         var dataCsv= new Blob([data.blob()], {type: 'text/csv;charset=utf-8;'});
         var urlCsv=window.URL.createObjectURL(dataCsv);
         var link = document.createElement('a');

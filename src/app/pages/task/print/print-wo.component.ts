@@ -30,6 +30,8 @@ export class PrintWOComponent implements OnDestroy {
     private subscription;
 
     @ViewChild('printView') printView: ElementRef;
+    @ViewChild('imageContainer') imageContainer: ElementRef;
+    @ViewChild('companyLogo') companyLogo: HTMLImageElement;
 
     constructor(private _taskService: TaskService,
         private _printWorkOrderService: PrintWOService,
@@ -46,20 +48,23 @@ export class PrintWOComponent implements OnDestroy {
                         this.dataModel = response.data;
 
                         // alter logo for test purpose
-                        this.dataModel.logo = GlobalConfigs.APP_BASE_URL + this.dataModel.logo;
+                        //this.dataModel.logo = GlobalConfigs.APP_BASE_URL + "/logo";
 
-                        this._changeDetector.detectChanges();
+                        this.loadImage(GlobalConfigs.APP_BASE_URL + "/logo").then(base64 => {
+                            this.imageContainer.nativeElement.innerHTML = '<img src="' + base64 + '" />';
+                            this._changeDetector.detectChanges();
 
-                        let windowObj;
-                        windowObj = window.open(
-                            '',
-                            'Print WO',
-                            'width=480px,resizable,scrollbars=yes,status=0,toolbar=0,menubar=0,location=0'
-                        );
-                        windowObj.document.open();
-                        windowObj.document.write('<!DOCTYPE html>  <html>  <style>    body {      font-family: Calibri;    }    td {      vertical-align: top;    }  @media print{   .logo-print{       width:291px;       height:109px; display: list-item; list-style-position: inside;   }}</style>' + this.printView.nativeElement.innerHTML + '</html>');
-                        windowObj.document.close();
-                        setTimeout(windowObj.print(), 500);
+                            let windowObj;
+                            windowObj = window.open(
+                                '',
+                                'Print WO',
+                                'width=480px,resizable,scrollbars=yes,status=0,toolbar=0,menubar=0,location=0'
+                            );
+                            windowObj.document.open();
+                            windowObj.document.write('<!DOCTYPE html>  <html> <head> <script>function doPrint(){if(document.readyState == "complete"){window.print()}else{setTimeout(doPrint, 200);}} </script> <style>    body {      font-family: Calibri;    }    td {      vertical-align: top;    }  @media print{   .logo-print{       max-width:291px;       max-height:64px; display: list-item; list-style-position: inside;   }}</style></head><body>' + this.printView.nativeElement.innerHTML + '<script>doPrint();</script></body></html>');
+                            windowObj.document.close();
+                            //setTimeout(windowObj.print(), 10000);
+                        });
                     } else {
 
                     }
@@ -67,6 +72,28 @@ export class PrintWOComponent implements OnDestroy {
 
                 console.log("print-wo.component", this.workOrderIdParam);
             }
+        });
+    }
+
+    loadImage(url) {
+        return new Promise((resolve, reject) => {
+            let image = new Image();
+            image.crossOrigin = "Anonymous";
+            image.onload = function () {
+                console.log(image.width);
+                let canvas = <HTMLCanvasElement>document.createElement("CANVAS");
+                let context = canvas.getContext('2d');
+
+                canvas.height = image.height;
+                canvas.width = image.width;
+                context.drawImage(image, 0, 0);
+
+                let dataURL = canvas.toDataURL("image/png");
+                canvas = null;
+                resolve(dataURL);
+
+            };
+            image.src = url;
         });
     }
 

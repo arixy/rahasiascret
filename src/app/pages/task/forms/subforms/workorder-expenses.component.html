@@ -54,7 +54,7 @@
     </p-column>
     <p-column header="Reference Date">
       <template let-expense="rowData" pTemplate="body">
-        <p-calendar [(ngModel)]="expense.referenceDate" [disabled]="!isCanEdit" [inputStyle]="{'width':'80%'}" [showIcon]="true" dateFormat="yy-mm-dd" [yearNavigator]="true" [yearRange]="'2017:2222'" (onBlur)="markAsTouched(expense, 'refDateTouched')"></p-calendar>
+        <p-calendar [(ngModel)]="expense.referenceDate" [disabled]="!isCanEdit" [inputStyle]="{'width':'80%'}" [showIcon]="true" dateFormat="yy-mm-dd" [yearNavigator]="true" [yearRange]="_yearRange" (onBlur)="markAsTouched(expense, 'refDateTouched')"></p-calendar>
         <div class="error-message col-xg-10"
              *ngIf="hasErrorRefDate(expense).required && expense.refDateTouched">
           Reference Date is required

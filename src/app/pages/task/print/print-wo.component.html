@@ -1,5 +1,7 @@
 ﻿<div #printView>
-  <img src="{{dataModel.logo}}" height="64px" class="logo-print"/><br />
+  <div #imageContainer>
+    <img src="#"/>
+  </div>
   <div style="text-align: center">
     <div style="font-size: 20pt;">Work Order</div><br />
     <span>{{ dataModel.companyName }}</span>
@@ -39,8 +41,7 @@
   <table border="1" cellspacing="0" cellpadding="4" width="100%">
     <tr>
       <td style="vertical-align: top; height: 128px;">
-        {{dataModel.task}}<br />
-        {{dataModel.description}}
+        {{dataModel.task}}
       </td>
     </tr>
   </table>
@@ -59,7 +60,8 @@
     <tr>
       <td width="50%" height="152px">
         <strong>Remarks:</strong><br />
-        {{ dataModel.solution }}
+        <div>{{dataModel.description}}</div>
+        <div>{{ dataModel.solution }}</div>
       </td>
       <td>
         <strong>Material Used:</strong><br />

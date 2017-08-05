@@ -1,7 +1,15 @@
 ﻿<form [formGroup]="formGroupAdd" onsubmit="return false;" class="form-horizontal" id="single-request-form">
+  <div class="alert alert-danger" *ngIf="errMsg.length > 0">
+    <ul style="margin-bottom: 0px;" class="lst-error">
+      <li *ngFor="let err of errMsg">
+        {{err}}
+      </li>
+    </ul>
+  </div>
+
   <p-tabView>
     <!-- General Tab -->
-    <p-tabPanel header="General">
+    <p-tabPanel header="General" #generalTab>
       <!-- WO Number -->
       <div class="form-group row" *ngIf="!isSchedule">
         <label for="inputEmail3" class="control-label">WO Number</label><br />
@@ -275,7 +283,7 @@
     </p-tabPanel>
 
     <!-- Recurring Tab -->
-    <p-tabPanel header="Recurring" *ngIf="isSchedule">
+    <p-tabPanel header="Recurring" *ngIf="isSchedule" #recurringTab>
       <!-- Repeat -->
       <div class="form-group row">
         <label for="selected_repeat" class="col-xg-2 control-label">Repeat</label>
@@ -401,12 +409,12 @@
     </p-tabPanel>
 
     <!-- Files & Photos Tab -->
-    <p-tabPanel header="Files" *ngIf="!isSchedule">
+    <p-tabPanel header="Files" *ngIf="!isSchedule" #filesTab>
       <wo-files [actionType]="actionType" [selectedWO]="selectedWO" [selectedWoType]="selectedWoType" [(existingFiles)]="existingFiles" [(existingPhotos)]="existingPhotos" [isCanEdit]="isCanEditFiles"></wo-files>
     </p-tabPanel>
 
     <!-- Expenses Tab -->
-    <p-tabPanel header="Expenses" *ngIf="!isSchedule">
+    <p-tabPanel header="Expenses" *ngIf="!isSchedule" #expensesTab>
       <wo-expenses [actionType]="actionType" [selectedWO]="selectedWO" [selectedWoType]="selectedWoType" [(expenses)]="wo_expenses" [formGroup]="formGroupAdd" [isCanEdit]="isCanEditExpenses"></wo-expenses>
     </p-tabPanel>
   </p-tabView>
@@ -428,10 +436,14 @@
       </button>
     </div>
     <div class="col-sm-3 btn-with-icon" *ngIf="_defFieldPermissions.btn_submit != 'hide'">
-      <button type="submit" class="btn btn-default btn-save" (click)="onSubmit(formGroupAdd.value)" [disabled]="!formGroupAdd.valid || !isFilesFormValid() || !isExpensesFormValid()">
+      <button type="submit" class="btn btn-default btn-save" (click)="onSubmit(formGroupAdd.value)">
         <i class="icon ion-checkmark"></i>
         Save
       </button>
+      <!--<button type="submit" class="btn btn-default btn-save" (click)="onSubmit(formGroupAdd.value)" [disabled]="!formGroupAdd.valid || !isFilesFormValid() || !isExpensesFormValid()">
+        <i class="icon ion-checkmark"></i>
+        Save
+      </button>-->
     </div>
   </div>
 
