@@ -210,7 +210,7 @@ export class Assets {
         this.form = fb.group({
           'name': ['', Validators.compose([Validators.required])],
           'asset_number': ['', Validators.compose([Validators.required])],
-          'description': ['', Validators.compose([Validators.required, Validators.minLength(2)])],
+          'description': ['', Validators.compose([Validators.required])],
             'photo': [''],
             'specification': ['', Validators.compose([Validators.required])],
             'wo_category_fc': ['', Validators.compose([Validators.required])],
@@ -227,7 +227,7 @@ export class Assets {
       
       this.editForm = fb.group({
             'edit_name': ['', Validators.compose([Validators.required])],
-            'edit_description': ['', Validators.compose([Validators.required, Validators.minLength(2)])],
+            'edit_description': ['', Validators.compose([Validators.required])],
             'edit_specification': ['', Validators.compose([Validators.required])],
             'edit_asset_number': ['', Validators.compose([Validators.required])]
         });
@@ -998,7 +998,23 @@ export class Assets {
 
     public cancel(){
         this.hideModal();
+        
         // Maybe some other logic to reset the form
+        // Clear all input in the form
+        this.clearFormInputs(this.form);
+                    
+        // Specific clearing for add select boxes
+        this.addSelectBox.active = [];
+        this.addSelectBox.ngOnInit();
+
+        this.addWOSelectBox.active = [];
+        this.addWOSelectBox.ngOnInit();
+
+        this.addLocationSelectBox.active = [];
+        this.addLocationSelectBox.ngOnInit();
+        
+        // Clear Tab Style 
+        this.addGeneralTab.headerStyleClass = '';
     }
 
     readyPhotosData(existingPhotos) {

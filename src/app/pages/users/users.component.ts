@@ -416,6 +416,8 @@ export class UsersComponent {
     
   	public onSubmitEdit(values,event){
 		console.log('edit form',values);
+        
+        this.edit_form_submitted = true;
 		if(this.edit_form.valid){
 //			 var formatted_object = Object.assign({}, {
 //                userId: this.user_edit,
@@ -489,10 +491,15 @@ export class UsersComponent {
         this.editModal.hide();
     }
 
+    public clearFormInputs(form){
+        form.reset();
+    }
+
     public cancel(){
         this.hideModal();
         
         // TODO: Logic to reset the form
+        this.clearFormInputs(this.form);
     }
 
     public resetFilters(table){

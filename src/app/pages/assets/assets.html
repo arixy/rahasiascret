@@ -139,9 +139,9 @@
                 <p-column [style]="{'width':'100px'}" field="woNumber" header="WO #" [sortable]="true" [filter]="true"></p-column>
                 <p-column field="woCategoryName" [style]="{'width':'110px'}" header="Category" [sortable]="true" [filter]="true"></p-column>
                 <p-column field="woPriorityName" header="Priority" [sortable]="true" [style]="{'width':'90px'}" [filter]="true"></p-column>
-                <p-column field="taskName" [style]="{'width':'120px'}" header="Task" [sortable]="true" [filter]="true" filterPlaceholder="Search"></p-column>
+                <p-column field="taskName" [style]="{'width':'120px'}" header="Task" [sortable]="true" [filter]="true"></p-column>
                 <p-column field="assetName" [style]="{'width':'110px'}" header="Asset" [sortable]="true" [filter]="true"></p-column>
-                <p-column field="locationName" header="Location" [sortable]="true" [style]="{'width':'120px'}" [filter]="true" filterPlaceholder="Search"></p-column>
+                <p-column field="locationName" header="Location" [sortable]="true" [style]="{'width':'120px'}" [filter]="true"></p-column>
             </p-dataTable>
         </div>
             </ba-card>
@@ -218,8 +218,10 @@
                         </div>
                       </div>
                       <div class="row error-row">
+                       <div class="col-sm-12">
                         <div class="error-message col-xg-10" *ngIf="form.get('name').hasError('required') && add_form_submitted">
                           Name is required
+                        </div>
                         </div>
                       </div>
                       <div class="form-group row" [ngClass]="{'has-error': (!asset_number.valid && asset_number.touched), 'has-success': (asset_number.valid && asset_number.touched)}">
@@ -256,6 +258,13 @@
                         <div class="col-sm-12">
                             <label>Specification</label>
                             <textarea [formControl]="specification" class="form-control" id="inputPassword3" placeholder="Specification"></textarea>
+                        </div>
+                      </div>
+                      <div class="row error-row">
+                       <div class="col-sm-12">
+                        <div class="error-message col-xg-10" *ngIf="form.get('specification').hasError('required') && add_form_submitted">
+                          Specification is required
+                        </div>
                         </div>
                       </div>
                       <div class="form-group row select-container">
@@ -321,8 +330,8 @@
                   <p-tabPanel header="Files">
                       <div class="form-group row" [ngClass]="{'has-error': (!photo.valid && photo.touched), 'has-success': (photo.valid && photo.touched)}">
                         <div class="col-sm-12">
-                            <label>Photo</label>
-                            <input type="file" (change)="addPhotoSelected($event)" placeholder="Upload file" accept=".jpg,.jpeg,.png">
+                            <!-- <label>Photo</label>
+                            <input type="file" (change)="addPhotoSelected($event)" placeholder="Upload file" accept=".jpg,.jpeg,.png"> -->
                           <!-- <input [formControl]="photo" type="text" class="form-control" id="inputPassword3" placeholder="Photo"> -->
                         </div>
                       </div>

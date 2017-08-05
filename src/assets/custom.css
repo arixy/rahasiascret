@@ -453,6 +453,61 @@ td .dropdown li{
 .custom-filter-datatable th.ui-state-active .sortable-custom-icon.fa-sort:before {
     content: "\f0de";
 }
+
+.ui-paginator .fa-step-backward:before {
+    content: "\f100" !important;
+}
+
+.ui-paginator .fa-step-forward:before {
+    content: "\f101" !important;
+}
+
+.ui-paginator .fa-backward:before {
+    content: "\f104" !important;
+}
+
+.ui-paginator .fa-forward:before {
+    content: "\f105" !important;
+}
+
+.ui-paginator .fa {
+    font-size: 1.2em !important;
+    position: relative;
+    bottom: 1px;
+}
+
+body .ui-paginator .ui-paginator-pages .ui-paginator-page {
+    color: #2d3439 !important;    
+}
+
+body .ui-paginator .ui-paginator-pages .ui-paginator-page:hover.ui-state-active {
+    background: none !important;    
+}
+
+body .ui-paginator .ui-paginator-pages .ui-paginator-page.ui-state-active {
+    background: none !important;
+    color: #00ABFF !important;
+}
+
+body .ui-paginator .ui-state-active {
+    background: none !important;
+    font-weight: 500 !important;
+    color: #00ABFF !important;
+}
+
+body .ui-paginator .ui-paginator-pages .ui-paginator-page .ui-state-active {
+    color: #00ABFF !important;
+}
+
+body .ui-paginator .ui-paginator-first, body .ui-paginator .ui-paginator-prev, body .ui-paginator .ui-paginator-next, body .ui-paginator .ui-paginator-last {
+    color: #2d3439 !important;
+}
+
+.table-header-dropdown li a{
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
 /* Added by Mike */
 .ui-fileupload-buttonbar button:not(.ui-fileupload-choose) {
   display: none !important;

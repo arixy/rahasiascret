@@ -1,25 +1,42 @@
 <div class="widgets">
-    <ba-card title="WO Utility UOM" baCardClass="with-scroll">
+   <div class="row">
+   <div class="ui-helper-clearfix add-new-button__container">
+              <div class="btn-group add-new-dropdown" style="float: right">
+                <button (click)="addUtilityUom()" type="button" class="btn btn-primary">
+                    
+                    <i class="icon ion-plus-round"></i>
+                    
+                        New Utility UOM
+                </button>
+
+            </div>
+    </div>
+    <ba-card title="" baCardClass="with-scroll">
         <p-dataTable #dt [value]="utilities">
           <p-header>
             <div class="ui-helper-clearfix">
                 <button type="button" iconPos="left" label="CSV" (click)="dt.exportCSV()" style="float:left" class="btn-export__csv">
                     <i class="icon ion-ios-download-outline"></i>
                 </button>
-                <button (click)="addUtilityUom()" class="btn btn-primary" style="float:right">Add New Utility UOM</button>
+                <div class="btn-group" dropdown style="float: right">
+                            
+                            <reset-filter (click)="resetFilters()">
+                            </reset-filter>
+
+                            <button title="Refresh" id="resetFilters" type="button" class="btn-sets-right" (click)="refresh($event)">
+                                <i class="icon ion-ios-reload"></i>
+                            </button>
+                </div>
             </div>
         </p-header>
-           <p-column field="utilityUomId" header="Utility Type ID"></p-column>
-            <p-column field="name" header="Name"></p-column>
-            <p-column field="description" header="Description"></p-column>
-            <p-column styleClass="col-button">
+          <p-column styleClass="col-button">
                     <template pTemplate="header">
                         Action
                     </template>
                     <template let-utilities="rowData" pTemplate="body">
                             <div class="btn-group" dropdown>
                               <button id="single-button" type="button" class="btn btn-primary" dropdownToggle>
-                                Button dropdown <span class="caret"></span>
+                                Action <span class="caret"></span>
                               </button>
                               <ul dropdownMenu role="menu" aria-labelledby="single-button">
                                 <li role="menuitem"><a  class="dropdown-item" (click)="editUtilityUom(utilities)">Edit</a></li>
@@ -28,8 +45,12 @@
                             </div>
                     </template>
             </p-column>
+           <p-column field="utilityUomId" header="Utility Type ID"></p-column>
+            <p-column field="name" header="Name"></p-column>
+            <p-column field="description" header="Description"></p-column>
         </p-dataTable>
     </ba-card>
+    </div>
 </div>
 <div bsModal #addNewModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
@@ -38,13 +59,15 @@
         <button class="close" aria-label="Close" (click)="hideChildModal()">
           <span aria-hidden="true">&times;</span>
         </button>
-        <h4 class="modal-title">Add New</h4>
+        <h4 class="modal-title">Add New Utility UOM</h4>
 		  <hr/>
       </div>
       <div class="modal-body">
         <div>
-            <ba-card title="Add New Priority" baCardClass="with-scroll custom-card">
+            <ba-card title="" baCardClass="with-scroll custom-card">
               <form [formGroup]="form" (ngSubmit)="onSubmit(form.value)" class="form-horizontal">
+              <div class="modal-form-container">
+                  
               <div class="form-group row">
                 <div class="col-sm-12">
 					 <label>Name</label>
@@ -57,11 +80,28 @@
 					<input [formControl]="description" type="text" class="form-control" id="inputPassword3" placeholder="Description">
                 </div>
               </div>
-              <div class="form-group row">
-                <div class="col-sm-12 btn-submit-center">
-                  <button [disabled]="!form.valid" type="submit" class="btn btn-default btn-auth btn-custom">Submit</button>
-                </div>
               </div>
+              <div class="form-group modal-action-row row">
+                  <div class="col-sm-3 btn-with-icon">
+                    <button type="button" class="btn btn-default btn-cancel" (click)="cancel()">
+                    <i class="icon ion-close"></i>
+                    Cancel</button>
+                  </div>
+                  <div class="col-sm-5">
+                       &nbsp;
+                   </div>
+                   <div class="col-sm-1 no-padding">
+                       <span *ngIf="submitLoading" class="loading-container">
+                            <loading-small></loading-small>
+                        </span>
+                   </div>
+                  <div class="col-sm-3 btn-with-icon">
+                    <button type="submit" class="btn btn-default btn-save">
+                    <i class="icon ion-checkmark"></i>
+                        Save
+                    </button>
+                  </div>
+            </div>
             </form>
             </ba-card>
           </div>
@@ -82,8 +122,9 @@
       </div>
       <div class="modal-body">
         <div>
-            <ba-card title="Edit Utilities" baCardClass="with-scroll custom-card">
+            <ba-card title="" baCardClass="with-scroll custom-card">
               <form [formGroup]="edit_form" (ngSubmit)="onSubmitEdit(edit_form.value, $event)" class="form-horizontal">
+              <div class="modal-form-container">
               <div class="form-group row">
                 <div class="col-sm-12">
 					 <label>Name</label>
@@ -96,11 +137,29 @@
 					<input [formControl]="edit_description" type="text" class="form-control" id="inputPassword3" placeholder="Description">
                 </div>
               </div>
-              <div class="form-group row">
-                <div class="col-sm-12 btn-submit-center">
-                  <button [disabled]="!edit_form.valid" type="submit" class="btn btn-default btn-auth btn-custom">Submit</button>
-                </div>
+              
               </div>
+              <div class="form-group modal-action-row row">
+                  <div class="col-sm-3 btn-with-icon">
+                    <button type="button" class="btn btn-default btn-cancel" (click)="cancel()">
+                    <i class="icon ion-close"></i>
+                    Cancel</button>
+                  </div>
+                  <div class="col-sm-5">
+                       &nbsp;
+                   </div>
+                   <div class="col-sm-1 no-padding">
+                       <span *ngIf="submitLoading" class="loading-container">
+                            <loading-small></loading-small>
+                        </span>
+                   </div>
+                  <div class="col-sm-3 btn-with-icon">
+                    <button type="submit" class="btn btn-default btn-save">
+                    <i class="icon ion-checkmark"></i>
+                        Save
+                    </button>
+                  </div>
+            </div>
             </form>
             </ba-card>
           </div>
