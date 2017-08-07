@@ -63,6 +63,7 @@ export class WorkflowActions {
     public static readonly CLOSE_FOR_CONFIRMATION = 8;
     public static readonly COMPLETE = 9;
     public static readonly RETURN = 10;
+    public static readonly CANCEL_SCHEDULE = 12;
 }
 export class WorkOrderStatuses {
     public static readonly SCHEDULED = 0;
