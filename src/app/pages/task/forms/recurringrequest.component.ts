@@ -462,6 +462,10 @@ export class RecurringRequestComponent {
                 for (var i = 0; i < tmpLstPriorities.length; i++) {
                     var currentItem = { id: tmpLstPriorities[i].woPriorityId, text: tmpLstPriorities[i].name };
                     this.items_priorities.push(currentItem);
+                    if (currentItem.id == this.selectedWO.woPriorityId) {
+                        this.selected_priority.setValue(currentItem);
+                        this._addPrioritySelectBox.active = [currentItem];
+                    }
                 }
             });
 
@@ -474,6 +478,10 @@ export class RecurringRequestComponent {
                 for (var i = 0; i < tmpLstCategories.length; i++) {
                     var currentItem = { id: tmpLstCategories[i].woCategoryId, text: tmpLstCategories[i].name };
                     this.items_categories.push(currentItem);
+                    if (currentItem.id == this.selectedWO.woCategoryId) {
+                        this.selected_category.setValue(currentItem);
+                        this._addCategorySelectBox.active = [currentItem];
+                    }
                 }
             });
 

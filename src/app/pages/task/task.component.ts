@@ -410,9 +410,10 @@ export class TaskComponent implements OnDestroy{
         this.subscription.unsubscribe();
     }
     public exportMyTaskCSV(dataTable: DataTable){
-       
+        let filters: any = this.buildFilter(dataTable);
+        filters.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
         console.log("export CSV");
-        this._taskService.getMyTaskCSV(this.buildFilter(dataTable)).subscribe(
+        this._taskService.getMyTaskCSV(filters).subscribe(
             (data)=>{      
                 console.log("prepared download file ");   
                 this.downloadFileMyTaskToCSV(data);

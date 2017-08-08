@@ -69,7 +69,7 @@ import {MdTabsModule} from '@angular/material';
 import { LoadingSmallComponent } from './loading-small.component';
 import { SpinnerComponent } from './spinner.component';
 import { ResetFilterComponent } from './reset-filter.component';
-
+import { FilterInputComponent } from './filter-input.component';
 @NgModule({
   imports: [CommonModule, NgaModule, routing, SelectModule, Ng2SmartTableModule, ModalModule.forRoot(), ReactiveFormsModule,
            DatePickerModule,
@@ -128,7 +128,9 @@ import { ResetFilterComponent } from './reset-filter.component';
       WorkOrderListReportComponent,
       ConsumptionReportComponent,
       PerformanceReportComponent,
-      SettingsComponent
+      SettingsComponent,
+      // filter component
+      FilterInputComponent,
     ],
 })
 export class PagesModule {
