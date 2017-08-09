@@ -315,7 +315,8 @@ export class PerformanceReportComponent implements OnDestroy {
             sortField: dataTable.sortField,
             sortOrder: dataTable.sortOrder,
             first: dataTable.first,
-            rows: dataTable.rows
+            rows: dataTable.rows,
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
         };
 
         console.log("export CSV");

@@ -147,7 +147,8 @@ export class WorkOrderExpensesComponent {
             amountControl.setValue(expense.amount);
 
             let validationResult: any = CustomValidators.numberOnly(amountControl);
-            return validationResult;
+            if (validationResult == null) return { }
+            else return validationResult;
         }
     }
 

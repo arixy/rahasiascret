@@ -128,7 +128,7 @@ export class OpenWorkOrderCategoryChartComponent implements OnDestroy {
                                 categories: {},
                             }
                             for (let category of this.tempChartBuilderData.categories) {
-                                tmpChartData[priority.id].categories[category.id] = null;
+                                tmpChartData[priority.id].categories[category.id] = 0;
                             }
                         }
                     }

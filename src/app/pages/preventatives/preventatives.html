@@ -23,7 +23,7 @@
             <p-dataTable #dt [value]="myTasks" [lazy]="true" (onLazyLoad)="refresh($event, dt)" [rows]="10" [paginator]="true" [totalRecords]="totalRecords" sortField="dateUpdated" sortOrder="-1" styleClass="custom-filter-datatable">
                 <p-header>
                     <div class="ui-helper-clearfix">
-                    <button type="button" iconPos="left" label="CSV" (click)="dt.exportCSV()" style="float:left" class="btn-export__csv">
+                    <button type="button" iconPos="left" label="CSV" (click)="downloadAllWorkOrdersCSV(dt)" style="float:left" class="btn-export__csv">
                         <i class="icon ion-ios-download-outline"></i>
                     </button>
                         <div class="btn-group" dropdown style="float: right">
@@ -87,7 +87,7 @@
                     <sortable-filter-input #filterWO [dataTable]="dt" field="locationName" [disabled]="isLoadingWOData" (onFilter)="onFilterWO($event)"></sortable-filter-input>
                   </template>
                 </p-column>
-                <p-column field="start" [style]="{'width':'120px'}" header="Start" [sortable]="true" styleClass="top-aligned-table">
+                <p-column [style]="{'width':'120px'}" header="Start" [sortable]="true" styleClass="top-aligned-table">
                   <template pTemplate="header">
                     <span class="ui-column-title">Start</span>
                     <span *ngIf="dt.sortField != 'start'" class="sortable-custom-icon fa fa-sort"></span>
@@ -104,14 +104,14 @@
                      <span class="ui-column-title">Due</span>
                      <sortable-filter-input #filterWO [dataTable]="dt" field="dueDate" [disabled]="isLoadingWOData" (onFilter)="onFilterWO($event)"></sortable-filter-input>
                    </template>
-                   <template pTemplate="body" let-update="rowData">
-                     {{update.dueDate | date: 'y-MM-dd'}}
+                   <template pTemplate="body" let-data="rowData">
+                     {{ data.dueDate | date: 'y-MM-dd'}}
                    </template>
                  </p-column>
-                <p-column field="currentStatusName" [style]="{'width':'110px'}" header="Status" [sortable]="true">
+                <p-column field="statusName" [style]="{'width':'110px'}" header="Status" [sortable]="true">
                   <template pTemplate="header">
                     <span class="ui-column-title">Status</span>
-                    <sortable-filter-input #filterWO [dataTable]="dt" field="currentStatusName" [disabled]="isLoadingWOData" (onFilter)="onFilterWO($event)"></sortable-filter-input>
+                    <sortable-filter-input #filterWO [dataTable]="dt" field="statusName" [disabled]="isLoadingWOData" (onFilter)="onFilterWO($event)"></sortable-filter-input>
                   </template>
                 </p-column>
                 <p-column field="assignee" [style]="{'width':'100px'}" header="Assignee" [sortable]="true">
@@ -133,7 +133,7 @@
       <p-dataTable #dtschedule [value]="maintenances" [lazy]="true" (onLazyLoad)="refreshScheduled($event, dtschedule)" [rows]="10" [paginator]="true" [totalRecords]="totalRecordsScheduled" sortField="dateUpdated" sortOrder="-1" styleClass="custom-filter-datatable">
           <p-header>
             <div class="ui-helper-clearfix">
-                <button type="button" iconPos="left" label="CSV" (click)="dt.exportCSV()" style="float:left" class="btn-export__csv">
+                <button type="button" iconPos="left" label="CSV" (click)="downloadAllScheduleWorkOrdersCSV(dtschedule)" style="float:left" class="btn-export__csv">
                     <i class="icon ion-ios-download-outline"></i>
                 </button>
                 <div class="btn-group" dropdown style="float: right">
@@ -187,19 +187,27 @@
                 <sortable-filter-input #filterSchedule [dataTable]="dtschedule" field="locationName" header="Location" [disabled]="isLoadingScheduleData" (onFilter)="onFilterSchedule($event)"></sortable-filter-input>
               </template>
             </p-column>
-            <p-column field="start" header="Start"></p-column>
+            <p-column field="start" header="Start">
+              <template pTemplate="body" let-data="rowData">
+                {{ data.start | date: 'y-MM-dd HH:mm' }}
+              </template>
+            </p-column>
             <p-column field="due" header="Due"></p-column>
             <p-column field="lastWo" header="Last WO">
               <template pTemplate="body" let-data="rowData">
-                {{ data.lastWo == 'null null' ? '' : data.lastWo }}
+                {{ data.lastWo | date: 'y-MM-dd' }}
               </template>
             </p-column>
             
-            <p-column field="nextWo" header="Next WO"></p-column>
+            <p-column field="nextWo" header="Next WO">
+              <template pTemplate="body" let-data="rowData">
+                {{ data.nextWo | date: 'y-MM-dd HH:mm' }}
+              </template>
+            </p-column>
             
             <p-column styleClass="top-aligned-table" field="dateUpdated" header="Last Updated">
               <template pTemplate="body" let-data="rowData">
-                {{ data.dateUpdated | date: 'y-MM-dd HH:mm:ss' }}
+                {{ data.dateUpdated | date: 'y-MM-dd HH:mm' }}
               </template>
             </p-column>
             

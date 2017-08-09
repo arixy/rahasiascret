@@ -562,7 +562,8 @@ input[disabled], textarea[disabled] {
 .tabpanel-has-error .ui-tabview-title:after {
   content: " !";
 }
-input[disabled].form-control {
+
+input[disabled].form-control, textarea[disabled].form-control {
   border: 1px solid #cfdadd
 }
 /* End Added by Mike */

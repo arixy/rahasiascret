@@ -16,6 +16,7 @@ import { ExpensesComponent } from './component/expenses/expenses.component';
 import { Observable } from 'rxjs/Observable';
 import { Subscription }   from 'rxjs/Subscription';
 import 'rxjs/add/operator/map';
+import { saveAs } from 'file-saver';
 
 // custom components
 //import { AddNewWorkOrderComponent } from './add-wo.component';
@@ -214,9 +215,11 @@ export class Preventatives {
           } else if (event == "addNewModal_btnSaveOnClick_createSuccess") {
               this.addNewModal.hide();
               this.getAllWOs(this.buildFilter(this.taskListsTable, this.filterMasterWO));
+              this.getAllScheduledWOs(this.buildFilter(this.scheduleListsTable, this.filterMasterSchedule));
           } else if (event == "addNewModal_btnSaveOnClick_updateSuccess") {
               this.addNewModal.hide();
               this.getAllWOs(this.buildFilter(this.taskListsTable, this.filterMasterWO));
+              this.getAllScheduledWOs(this.buildFilter(this.scheduleListsTable, this.filterMasterSchedule));
           }
         });
       
@@ -763,7 +766,9 @@ export class Preventatives {
                     this.myTasks[i].actions.unshift({ workflowActionId: -2, name: "View" });
                     this.myTasks[i].actions.push({ workflowActionId: -3, name: "Print" });
                     //this.myTasks[i].actions.push({ workflowActionId: 4, name: "Assign/Reassign" });
-                    this.myTasks[i].dueDate = new Date(this.myTasks[i].dueDate);
+                    if (this.myTasks[i].dueDate != null) {
+                        this.myTasks[i].dueDate = new Date(this.myTasks[i].dueDate);
+                    }
                     this.myTasks[i].dateUpdated = new Date(this.myTasks[i].dateUpdated);
                 }
 
@@ -849,5 +854,25 @@ export class Preventatives {
 
     ngOnDestroy(){
         this.subscription.unsubscribe();
+    }
+
+    private downloadAllWorkOrdersCSV(dt: DataTable) {
+        let filters: any = this.buildFilter(dt, this.filterMasterWO);
+        filters.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+        this.maintenanceService.getAllWorkOrdersCSV(filters).subscribe(response => {
+            let blobData: Blob = new Blob([response.blob()], { type: response.headers.get('Content-Type') });
+            saveAs(blobData, "all_work_order.csv");
+        });
+    }
+
+    private downloadAllScheduleWorkOrdersCSV(dt: DataTable) {
+        let filters: any = this.buildFilter(dt, this.filterMasterSchedule);
+        filters.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+        this.maintenanceService.getAllScheduleWorkOrdersCSV(filters).subscribe(response => {
+            let blobData: Blob = new Blob([response.blob()], { type: response.headers.get('Content-Type') });
+            saveAs(blobData, "all_schedule_work_order.csv");
+        });
     }
 }

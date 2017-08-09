@@ -7,7 +7,8 @@ import { DataTable } from 'primeng/primeng';
 import * as moment from 'moment';
 import { UtilityUomService } from './utility-uom.service';
 import { FilterInputComponent } from '../filter-input.component';
-import { Subscription }   from 'rxjs/Subscription';
+import { Subscription } from 'rxjs/Subscription';
+import { saveAs } from 'file-saver';
 
 @Component({
   selector: 'utility-uom',
@@ -54,7 +55,6 @@ export class UtilityUom {
 	private subscription: Subscription;
 	private viewEditUtilityTittle;
 	private isVisible;
-	private applyReadonly;
 
 
   	constructor(
@@ -73,7 +73,6 @@ export class UtilityUom {
 				}
 
 			});
-			this.applyReadonly=false;
   	}
 	public ngOnInit(){
 		
@@ -127,8 +126,8 @@ export class UtilityUom {
     
     public editUtilityUom(event){
         console.log('editing', event.utilityUomId);
-		this.viewEditUtilityTittle="Edit Utility UOM";
-		this.applyReadonly=false;
+        this.viewEditUtilityTittle = "Edit Utility UOM";
+        this.edit_form.enable();
 
 		this.utility_edit = event.utilityUomId;
 		// Inject Initial Value to the Edit Form
@@ -328,12 +327,11 @@ export class UtilityUom {
 	public viewUtilityUom(values){
 
 		this.viewEditUtilityTittle="View Utility UOM";
-		this.applyReadonly=true;
 		// Inject Initial Value to the Edit Form
         this.edit_form.patchValue({ edit_name: values.name });
 		this.edit_form.patchValue({ edit_description: values.description });
 		this.isVisible=true;
-		// this.edit_form.disable();
+		this.edit_form.disable();
         this.editModal.show();
 	}
 
@@ -341,20 +339,9 @@ export class UtilityUom {
 		let filters: any = this.buildFilter(dataTable,this.filterUtilityUom);
 		filters.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 		console.log("export CSV");
-		this.utilityUomService.getAllUtilityUOM(filters).subscribe(
-			(data)=>{      
-                console.log("prepared download file ");   
-                this.downloadFileUtilityUomToCSV(data);
-                 }
-		);
-	}
-	public downloadFileUtilityUomToCSV(data){
-		var dataCsv= new Blob([data.blob()], {type: 'text/csv;charset=utf-8;'});
-                var urlCsv=window.URL.createObjectURL(dataCsv);
-                var link = document.createElement('a');
-        
-                link.setAttribute('href', urlCsv);
-                link.setAttribute('download', "UtilityUom.csv");
-                link.click();
+        this.utilityUomService.getAllUtilityUOMCSV(filters).subscribe(response => {
+            let blobData: Blob = new Blob([response.blob()], { type: response.headers.get('Content-Type') });
+            saveAs(blobData, "utility_uom.csv");
+        });
 	}
 }  

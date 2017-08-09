@@ -366,7 +366,9 @@ export class TaskComponent implements OnDestroy{
                     this.myTasks[i].actions.unshift({ workflowActionId: -2, name: "View" });
                     this.myTasks[i].actions.push({ workflowActionId: -3, name: "Print" });
                     //this.myTasks[i].actions.push({ workflowActionId: 4, name: "Assign/Reassign" });
-                    this.myTasks[i].dueDate = new Date(this.myTasks[i].dueDate);
+                    if (this.myTasks[i].dueDate != null) {
+                        this.myTasks[i].dueDate = new Date(this.myTasks[i].dueDate);
+                    }
                     this.myTasks[i].dateUpdated = new Date(this.myTasks[i].dateUpdated);
                 }
 

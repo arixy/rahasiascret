@@ -31,7 +31,11 @@ export class FilterInputComponent {
     }
 
     ngOnInit() {
-        this.formControl.valueChanges.debounceTime(800).subscribe(input => {
+        this.formControl.valueChanges
+            .debounceTime(800)
+            .distinctUntilChanged()
+            .subscribe(input => {
+
             let filter: any = {};
             filter["field"] = this.fieldName;
             filter["value"] = {

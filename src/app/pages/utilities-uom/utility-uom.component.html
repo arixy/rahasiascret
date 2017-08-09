@@ -154,7 +154,7 @@
               <div class="form-group row">
                 <div class="col-sm-12">
 					          <label>Name</label>
-				          	<input [formControl]="edit_name" type="text" class="form-control" id="inputEmail3" placeholder="Name" [class.readonly]="applyReadonly">
+				          	<input [formControl]="edit_name" type="text" class="form-control" id="inputEmail3" placeholder="Name">
                     <div *ngIf="edit_form.controls['edit_name'].hasError('required') && edit_form.controls['edit_name'].touched">
                         <div class="error-message col-xg-10" style="padding-top:3px;"> Name is required </div>
                     </div>
@@ -166,7 +166,7 @@
               <div class="form-group row">
                 <div class="col-sm-12">
 				          	<label>Description</label>
-				          	<input [formControl]="edit_description" type="text" class="form-control" id="inputPassword3" placeholder="Description" [class.readonly]="applyReadonly">
+				          	<input [formControl]="edit_description" type="text" class="form-control" id="inputPassword3" placeholder="Description">
                     <div *ngIf="edit_form.controls['edit_description'].hasError('required') && edit_form.controls['edit_description'].touched">
                         <div class="error-message col-xg-10" style="padding-top:3px;"> Description is required </div>
                     </div>

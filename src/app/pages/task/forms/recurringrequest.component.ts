@@ -191,14 +191,14 @@ export class RecurringRequestComponent {
             'contact_number': ['', Validators.compose([CustomValidators.numberOnly])],
             'solution': ['', null],
 
-            'selected_startdate': ['', Validators.compose([Validators.required])],
+            'selected_startdate': ['', Validators.compose([Validators.required, this.validateStartDueDate.bind(this)])],
             'selected_starttime': ['', null],
             'selected_duedate': ['', null],
 
             'selected_repeat': ['', Validators.compose([this.validateRepeat.bind(this)])],
             'repeat_every': ['', Validators.compose([this.validateRepeatEvery.bind(this)])],
             'selected_every_period': ['', Validators.compose([this.validateRepeatEveryPeriod.bind(this)])],
-            'selected_due_period': ['', Validators.compose([Validators.required])],
+            'selected_due_period': ['', Validators.compose([this.validateDuePeriod.bind(this)])],
             'due_after': ['', Validators.compose([Validators.required, CustomValidators.numberOnly])]
         });
         this.wo_number = this.formGroupAdd.controls['wo_number'];
@@ -224,6 +224,15 @@ export class RecurringRequestComponent {
         this.selected_every_period = this.formGroupAdd.controls['selected_every_period'];
         this.selected_due_period = this.formGroupAdd.controls['selected_due_period'];
         this.due_after = this.formGroupAdd.controls['due_after'];
+
+        // bind value changes for date
+        //  used for validation of cross date
+        this.selected_startdate.valueChanges.debounceTime(50).subscribe(data => {
+            this.selected_startdate.updateValueAndValidity();
+        });
+        this.selected_duedate.valueChanges.debounceTime(50).subscribe(data => {
+            this.selected_startdate.updateValueAndValidity();
+        });
 
         if (this.selectedWO != null) {
             this.loadWorkOrderDataAndSetPermission();
@@ -306,18 +315,18 @@ export class RecurringRequestComponent {
             //});
         }
 
-        this.formGroupAdd.valueChanges.subscribe(data => {
+        this.formGroupAdd.valueChanges.debounceTime(50).subscribe(data => {
             if (!this.isSchedule) {
                 // tabs: general, files, expenses
-                if (this.formGroupAdd.valid) {
+                if (this.formGroupAdd.valid && this._generalTab != null) {
                     this._generalTab.headerStyleClass = '';
                 }
 
-                if (this._workOrderFilesComponent.validateFiles() && this._workOrderFilesComponent.validatePhotos()) {
+                if (this._workOrderFilesComponent.validateFiles() && this._workOrderFilesComponent.validatePhotos() && this._filesTab != null) {
                     this._filesTab.headerStyleClass = '';
                 }
 
-                if (this._workOrderExpensesComponent.validateExpenses()) {
+                if (this._workOrderExpensesComponent.validateExpenses() && this._expensesTab != null) {
                     this._expensesTab.headerStyleClass = '';
                 }
             } else {
@@ -339,18 +348,15 @@ export class RecurringRequestComponent {
                 if (this.selected_repeat.valid
                     && this.selected_startdate.valid
                     && this.selected_due_period.valid
-                    && this.due_after.valid) {
+                    && this.due_after.valid
+                    && this.repeat_every.valid
+                    && this.selected_every_period.valid) {
                     isRecurringValid = true;
                 }
 
-                if (this.selected_repeat.value != null && this.selected_repeat.value.id == 6) {
-                    if (this.repeat_every.valid
-                        && this.selected_every_period.valid) {
-                        isRecurringValid = true;
-                    }
+                if (isRecurringValid && this._recurringTab != null) {
+                    this._recurringTab.headerStyleClass = '';
                 }
-
-                if (isRecurringValid) this._recurringTab.headerStyleClass = '';
             }
         });
     }
@@ -396,7 +402,7 @@ export class RecurringRequestComponent {
 
                 // only set selected_duedate when WO is not a schedule
                 this.formGroupAdd.patchValue({
-                    "selected_duedate": new Date(this.selectedWO.dueDate)
+                    "selected_duedate": this.selectedWO.dueDate == null ? null : new Date(this.selectedWO.dueDate)
                 });
             } else {
                 // repeat options
@@ -462,6 +468,7 @@ export class RecurringRequestComponent {
                 for (var i = 0; i < tmpLstPriorities.length; i++) {
                     var currentItem = { id: tmpLstPriorities[i].woPriorityId, text: tmpLstPriorities[i].name };
                     this.items_priorities.push(currentItem);
+
                     if (currentItem.id == this.selectedWO.woPriorityId) {
                         this.selected_priority.setValue(currentItem);
                         this._addPrioritySelectBox.active = [currentItem];
@@ -478,6 +485,7 @@ export class RecurringRequestComponent {
                 for (var i = 0; i < tmpLstCategories.length; i++) {
                     var currentItem = { id: tmpLstCategories[i].woCategoryId, text: tmpLstCategories[i].name };
                     this.items_categories.push(currentItem);
+
                     if (currentItem.id == this.selectedWO.woCategoryId) {
                         this.selected_category.setValue(currentItem);
                         this._addCategorySelectBox.active = [currentItem];
@@ -702,22 +710,24 @@ export class RecurringRequestComponent {
             if (!this.selected_repeat.valid
                 || !this.selected_startdate.valid
                 || !this.selected_due_period.valid
-                || !this.due_after.valid) {
+                || !this.due_after.valid
+                || !this.repeat_every.valid
+                || !this.selected_every_period.valid) {
                 hasError = true;
                 this.markAsTouchedAll();
                 this._recurringTab.headerStyleClass = 'tabpanel-has-error';
             }
 
-            if (this.selected_repeat.value != null && this.selected_repeat.value.id == 6) {
-                console.log('repeat: every');
-                if (!this.repeat_every.valid
-                    || !this.selected_every_period.valid) {
-                    console.log('tidak valid');
-                    hasError = true;
-                    this.markAsTouchedAll();
-                    this._recurringTab.headerStyleClass = 'tabpanel-has-error';
-                }
-            }
+            //if (this.selected_repeat.value != null && this.selected_repeat.value.id == 6) {
+            //    console.log('repeat: every');
+            //    if (!this.repeat_every.valid
+            //        || !this.selected_every_period.valid) {
+            //        console.log('tidak valid');
+            //        hasError = true;
+            //        this.markAsTouchedAll();
+            //        this._recurringTab.headerStyleClass = 'tabpanel-has-error';
+            //    }
+            //}
 
             // general tab
             if (!this.task_name.valid
@@ -758,11 +768,8 @@ export class RecurringRequestComponent {
             locationInfo: this.location_info.value,
             assetId: null,
             currentStatusId: this.selected_status.value == null ? null : this.selected_status.value.id,
-            // TODO: check later
             currentAssigneeId: this.selected_assignee.value == null ? null : this.selected_assignee.value.id,
-            // TODO: check later
             mainPicId: this.selected_assignee.value.id,
-            // TODO: need to change to UTC+0 first
             startDate: this.selected_startdate.value,
             startTime: this.selected_startdate.value,
             repeatOptionId: this.selected_repeat.value == null ? null : this.selected_repeat.value.id,
@@ -770,8 +777,7 @@ export class RecurringRequestComponent {
             everyPeriodId: this.selected_repeat.value.id != 6 ? null : this.selected_every_period.value.id,
             dueAfter: this.due_after.value,
             duePeriodId: this.selected_due_period.value.id,
-            // TODO: need to change to UTC+0 first
-            dueDate: this.selected_duedate.value,
+            dueDate: this.selected_duedate.value == null || this.selected_duedate.value == "" ? null : moment(this.selected_duedate.value).format("YYYY-MM-DD"),
             lastWoDate: null,
             nextWoDate: null,
             completeDateTime: null,
@@ -1055,6 +1061,33 @@ export class RecurringRequestComponent {
                 if (input.value == null || input.value == "" || input.value.id == null) {
                     return { required: true };
                 }
+            }
+        }
+
+        return null;
+    }
+
+    validateDuePeriod(input: FormControl) {
+        if (this.actionType.workflowActionId == WorkflowActions.CREATE
+            || (this.actionType.workflowActionId == WorkflowActions.EDIT && this.isSchedule)) {
+            if (input.value == null || input.value == "" || input.value.id == null) {
+                return { required: true };
+            }
+        }
+
+        return null;
+    }
+
+    validateStartDueDate(input: FormControl) {
+        console.log("validateStartEndDate", this.selected_startdate, this.selected_duedate);
+        if (!this.isSchedule) {
+            if (this.selected_startdate != null && this.selected_duedate != null
+                && this.selected_startdate.value != null && this.selected_startdate.value != ""
+                && this.selected_duedate.value != null && this.selected_duedate.value != "") {
+                let startDate = moment(this.selected_startdate.value).format("YYYY-MM-DD");
+                let dueDate = moment(this.selected_duedate.value).format("YYYY-MM-DD");
+
+                if (startDate > dueDate) return { crossdate: true };
             }
         }
 

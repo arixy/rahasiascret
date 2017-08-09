@@ -11,6 +11,6 @@ export class CustomValidators {
             }
         }
 
-        return { };
+        return null;
     }
 }

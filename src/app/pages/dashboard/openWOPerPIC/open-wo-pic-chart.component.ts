@@ -130,7 +130,7 @@ export class OpenWorkOrderPICChartComponent implements OnDestroy {
                                 users: {},
                             }
                             for (let user of this.tempChartBuilderData.users) {
-                                tmpPICChartData[priority.id].users[user.id] = null;
+                                tmpPICChartData[priority.id].users[user.id] = 0;
                             }
                         }
                     }

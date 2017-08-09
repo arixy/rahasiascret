@@ -3,13 +3,15 @@ import { Http, Response, Headers, RequestOptions, URLSearchParams,ResponseConten
 import { UUID } from 'angular2-uuid';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
-import { Subject }    from 'rxjs/Subject';
+import { Subject } from 'rxjs/Subject';
+
+import { GlobalConfigs } from '../../global.state';
 
 @Injectable()
 export class UtilityUomService{
 	private utility_uom_data: any;
-	redirectUrl: string;
-	private appUrl = 'http://ec2-52-40-147-30.us-west-2.compute.amazonaws.com/api/v1/master/';
+    redirectUrl: string;
+    private appUrl = GlobalConfigs.APP_MASTER_URL+ '/';
 
 
     private eventEmitted = new Subject<string>();
@@ -129,7 +131,7 @@ export class UtilityUomService{
         this.eventEmitted.next(eventName);
     }
 
-    getAllUtilityUOM(filter_data): Observable<any>{
+    getAllUtilityUOMCSV(filter_data): Observable<any>{
         var bearer = "Bearer " + localStorage.getItem('bearer_token');
         var headers=new Headers();
 
@@ -139,7 +141,7 @@ export class UtilityUomService{
         headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
 
         var options = new RequestOptions({ headers: headers, responseType: ResponseContentType.Blob });
-        var load_url=this.appUrl+ '/utility-uom/all/export';
+        var load_url=this.appUrl+ 'utility-uom/all/export';
 
         let formated_object={
                    filters:{},
