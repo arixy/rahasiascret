@@ -6,6 +6,7 @@ import { ModalDirective } from 'ng2-bootstrap';
 import * as moment from 'moment';
 import { ExpenseTypeService } from './expense-type.service';
 import { DataTable } from 'primeng/primeng';
+import { DialogsService } from './../../services/dialog.service';
 
 @Component({
   selector: 'expense-types',
@@ -61,7 +62,8 @@ export class ExpenseType {
   constructor(
     public fb: FormBuilder,
     public cdr: ChangeDetectorRef,
-    public expenseTypeService: ExpenseTypeService
+    public expenseTypeService: ExpenseTypeService,
+    public dialogsService: DialogsService
     ) {
         // Add New Form
         this.form = fb.group({
@@ -190,13 +192,21 @@ export class ExpenseType {
     public deleteExpenseType(event){
 		this.deleteConfirm= event;
 		this.delete_name= event.name;
-		this.deleteModal.show();
+		//this.deleteModal.show();
+        
+        this.dialogsService.confirmDelete(this.delete_name, 'Test').subscribe(
+            (response) => {
+                if(response == true){
+                    this.saveDelete();
+                }
+            }
+        );
 	}
 	public saveDelete(){
 		console.log('test', this.deleteConfirm.userId);	this.expenseTypeService.deleteExpenseType(this.deleteConfirm.expenseTypeId).subscribe(
             (data) => {
                 console.log('Return Data', data);
-                this.ngOnInit();
+                this.refresh(this.filter_master, this.expenseTypesTable);
             }
         );
 		this.deleteModal.hide();
@@ -236,7 +246,7 @@ export class ExpenseType {
 				(data) => {
 					console.log('Return Data test', data);
 					
-					this.ngOnInit();
+					this.refresh(this.filter_master, this.expenseTypesTable);
 				}
 			);
 
@@ -260,7 +270,7 @@ export class ExpenseType {
                     this.editModal.hide();
 
                     // Refresh Data
-                    this.ngOnInit();
+                    this.refresh(this.filter_master, this.expenseTypesTable);
                 }
            );
 		}

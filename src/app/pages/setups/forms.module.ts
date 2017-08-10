@@ -24,6 +24,7 @@ import { WithoutLabelsForm } from './components/locations/components/withoutLabe
 import { DataTableModule,SharedModule } from 'primeng/primeng';
 import { DropdownModule } from 'ng2-bootstrap';
 import { TreeTableModule,TreeNode } from 'primeng/primeng';
+import { ResetFilterModule } from './../reset-filter.module';
 
 @NgModule({
   imports: [
@@ -40,7 +41,8 @@ import { TreeTableModule,TreeNode } from 'primeng/primeng';
     DataTableModule,
     SharedModule,
     DropdownModule.forRoot(),
-    TreeTableModule
+    TreeTableModule,
+    ResetFilterModule
   ],
   declarations: [
     Locations,

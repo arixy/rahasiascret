@@ -25,7 +25,7 @@
                             <reset-filter (click)="resetFilters()">
                             </reset-filter>
 
-                            <button title="Refresh" id="resetFilters" type="button" class="btn-sets-right" (click)="refresh($event)">
+                            <button title="Refresh" id="resetFilters" type="button" class="btn-sets-right" (click)="refresh(filter_master, dt)">
                                 <i class="icon ion-ios-reload"></i>
                             </button>
                         </div>
@@ -72,11 +72,10 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <button class="close" aria-label="Close" (click)="hideChildModal()">
+        <button class="close" aria-label="Close" (click)="cancel()">
           <span aria-hidden="true">&times;</span>
         </button>
         <h4 class="modal-title">ADD NEW {{current_entity_type_name}}</h4>
-         <hr/>
           <div *ngIf="error_from_server" class="error-from-server">
               <i class="fa fa-exclamation-circle"></i> {{error_from_server}}
           </div>
@@ -200,11 +199,10 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <button class="close" aria-label="Close" (click)="hideEditModal()">
+        <button class="close" aria-label="Close" (click)="cancel()">
           <span aria-hidden="true">&times;</span>
         </button>
         <h4 class="modal-title">Edit {{current_entity_type_name}}</h4>
-        <hr/>
       </div>
       <div class="modal-body">
         <div>

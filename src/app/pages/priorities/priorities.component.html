@@ -25,7 +25,7 @@
                             <reset-filter (click)="resetFilters()">
                             </reset-filter>
 
-                            <button title="Refresh" id="resetFilters" type="button" class="btn-sets-right" (click)="refresh($event)">
+                            <button title="Refresh" id="resetFilters" type="button" class="btn-sets-right" (click)="refresh(filter_master, dt)">
                                 <i class="icon ion-ios-reload"></i>
                             </button>
                 </div>
@@ -82,11 +82,10 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <button class="close" aria-label="Close" (click)="hideChildModal()">
+        <button class="close" aria-label="Close" (click)="cancel()">
           <span aria-hidden="true">&times;</span>
         </button>
         <h4 class="modal-title">Add New Priority</h4>
-		<hr/>
        <div *ngIf="error_from_server" class="error-from-server">
               <i class="fa fa-exclamation-circle"></i> {{error_from_server}}
           </div>
@@ -103,17 +102,38 @@
                   	<input [formControl]="name" type="text" class="form-control" id="inputEmail3" placeholder="Name">
                 </div>
               </div>
+              <div class="row error-row">
+                   <div class="col-sm-12">
+                        <div class="error-message col-xg-10" *ngIf="form.get('name').hasError('required') && add_form_submitted">
+                              Name is required
+                        </div>
+                    </div>
+              </div>
               <div class="form-group row" [ngClass]="{'has-error': (!description.valid && description.touched), 'has-success': (description.valid && description.touched)}">
                 <div class="col-sm-12">
 					<label>Description</label>
 					<textarea [formControl]="description" type="text" class="form-control" id="inputPassword3" placeholder="Description" rows="2" cols="2"></textarea>
                 </div>
               </div>
+              <div class="row error-row">
+                   <div class="col-sm-12">
+                        <div class="error-message col-xg-10" *ngIf="form.get('description').hasError('required') && add_form_submitted">
+                              Description is required
+                        </div>
+                    </div>
+              </div>
               <div class="form-group row">
                 <div class="col-sm-12">
 					<label>Escalate After (days)</label>	
                   <input [formControl]="escalationPeriodInDays" type="text" class="form-control" id="inputPassword3" placeholder="Escalate After (days)">
                 </div>
+              </div>
+              <div class="row error-row">
+                   <div class="col-sm-12">
+                        <div class="error-message col-xg-10" *ngIf="form.get('escalationPeriodInDays').hasError('required') && add_form_submitted">
+                              Description is required
+                        </div>
+                    </div>
               </div>
               </div>
               <div class="form-group modal-action-row row">
@@ -148,11 +168,10 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <button class="close" aria-label="Close" (click)="hideChildModalEdit()">
+        <button class="close" aria-label="Close" (click)="cancel()">
           <span aria-hidden="true">&times;</span>
         </button>
         <h4 class="modal-title">Edit Priority</h4>
-        <hr/>
       </div>
       <div class="modal-body">
         <div>
@@ -165,11 +184,25 @@
                   <input [formControl]="edit_name" type="text" class="form-control" id="inputEmail3" placeholder="Name">
                 </div>
               </div>
+              <div class="row error-row">
+                   <div class="col-sm-12">
+                        <div class="error-message col-xg-10" *ngIf="edit_form.get('edit_name').hasError('required') && edit_form_submitted">
+                              Name is required
+                        </div>
+                    </div>
+              </div>
               <div class="form-group row" [ngClass]="{'has-error': (!description.valid && description.touched), 'has-success': (description.valid && description.touched)}">
                <div class="col-sm-12">
 					<label>Description</label>
 					<textarea [formControl]="edit_description" type="text" class="form-control" id="inputPassword3" rows="2" cols="2" placeholder="Description"></textarea>
                 </div>
+              </div>
+              <div class="row error-row">
+                   <div class="col-sm-12">
+                        <div class="error-message col-xg-10" *ngIf="edit_form.get('edit_description').hasError('required') && edit_form_submitted">
+                              Description is required
+                        </div>
+                    </div>
               </div>
               <div class="form-group row">
                 <div class="col-sm-12">
@@ -177,7 +210,13 @@
 					<input [formControl]="edit_escalationPeriodInDays" type="text" class="form-control" id="inputPassword3" placeholder="escalationPeriodInDay">
                 </div>
               </div>
-              
+              <div class="row error-row">
+                   <div class="col-sm-12">
+                        <div class="error-message col-xg-10" *ngIf="edit_form.get('edit_escalationPeriodInDays').hasError('required') && edit_form_submitted">
+                              Escalate After is required
+                        </div>
+                    </div>
+              </div>
               </div>
               <div class="form-group modal-action-row row">
                   <div class="col-sm-3 btn-with-icon">

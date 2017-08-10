@@ -5,6 +5,8 @@ import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/fo
 import { ModalDirective } from 'ng2-bootstrap';
 import * as moment from 'moment';
 import { RoleService } from './role.service';
+import { DataTable } from 'primeng/primeng';
+import { DialogsService } from './../../services/dialog.service';
 
 @Component({
   selector: 'utility-types',
@@ -29,11 +31,13 @@ export class RoleComponent {
     @ViewChild('addNewModal') addNewModal: ModalDirective;
     @ViewChild('editModal') editModal: ModalDirective;
 	@ViewChild('deleteModal') deleteModal: ModalDirective;
+    @ViewChild('dt') rolesTable: DataTable;
 
   constructor(
     public fb: FormBuilder,
     public cdr: ChangeDetectorRef,
-    public roleService: RoleService
+    public roleService: RoleService,
+    public dialogsService: DialogsService
     ) {
         // Add New Form
         this.form = fb.group({

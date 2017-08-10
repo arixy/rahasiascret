@@ -1,0 +1,33 @@
+<!-- <div class="message-delete">
+    <h3>{{ title }} object_name</h3>
+    <h5>{{ message }}</h5>
+</div>
+<div class="form-md-container-button">
+    <button type="button" md-button 
+    (click)="confirmDelete()" class="btn-delete-yes">HAPUS
+    </button>
+    <button type="button" md-button 
+    (click)="cancel()" class="btn-delete-no">BATAL
+    </button>
+</div> -->
+<div class="delete-modal">
+<div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-body">
+		  <div class="content_confirm">
+				<h3>Delete {{title}}?</h3>
+                <i class="icon ion-ios-minus-outline"></i>
+		  </div>
+		  <!-- <p>Please be aware deleted items might not be Recoverable</p> -->
+		  <div class="delete-btn_confirm">
+			  <button (click)="confirmDelete()" class="btn-yes">
+				  Yes
+			  </button>
+			  <button (click)="cancelDelete()" class="btn-no">
+				  No
+			  </button>
+          </div>
+      </div>
+    </div>
+  </div>	
+  </div>

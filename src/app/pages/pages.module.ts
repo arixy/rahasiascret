@@ -68,7 +68,9 @@ import { TreeTableModule, TreeNode, ChartModule } from 'primeng/primeng';
 import {MdTabsModule} from '@angular/material';
 import { LoadingSmallComponent } from './loading-small.component';
 import { SpinnerComponent } from './spinner.component';
-import { ResetFilterComponent } from './reset-filter.component';
+import { ResetFilterModule } from './reset-filter.module';
+import { DialogsService } from './../services/dialog.service';
+import { ConfirmDeleteDialog } from './../confirm-delete.dialog';
 
 @NgModule({
   imports: [CommonModule, NgaModule, routing, SelectModule, Ng2SmartTableModule, ModalModule.forRoot(), ReactiveFormsModule,
@@ -89,8 +91,12 @@ import { ResetFilterComponent } from './reset-filter.component';
       TreeTableModule,
       CheckboxModule,
       PaginatorModule,
-      ChartModule
+      ChartModule,
+      ResetFilterModule
            ],
+    providers: [
+        DialogsService
+    ],
   declarations: [
       Pages, 
       Preventatives, ExpensesComponent, Reports, WOReports, 
@@ -119,17 +125,19 @@ import { ResetFilterComponent } from './reset-filter.component';
       AssetFilesComponent,
       PrintWOComponent,
       SpinnerComponent,
-      ResetFilterComponent,
+      //ResetFilterComponent,
       LoadingSmallComponent,
       UtilityFormComponent,
-      //AddNewWorkOrderComponent,
-      //TabContentRecurringComponent
       // reports
       WorkOrderListReportComponent,
       ConsumptionReportComponent,
       PerformanceReportComponent,
+      ConfirmDeleteDialog,
       SettingsComponent
     ],
+    entryComponents: [
+        ConfirmDeleteDialog
+    ]
 })
 export class PagesModule {
 }

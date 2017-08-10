@@ -6,6 +6,7 @@ import { PriorityService } from './priority.service';
 import { ModalDirective } from 'ng2-bootstrap';
 import { DataTable } from 'primeng/primeng';
 import * as moment from 'moment';
+import { DialogsService } from './../../services/dialog.service';
 
 @Component({
   selector: 'priorities',
@@ -63,13 +64,14 @@ export class Priorities {
   constructor(
     public fb: FormBuilder,
     public cdr: ChangeDetectorRef,
-    public priorityService: PriorityService
+    public priorityService: PriorityService,
+    public dialogsService: DialogsService
     ) {
         // Add New Form
         this.form = fb.group({
           'name': ['', Validators.compose([Validators.required])],
           'description': ['', Validators.compose([Validators.required])],
-          'escalationPeriodInDays': ['']
+          'escalationPeriodInDays': ['', Validators.compose([Validators.required])]
         });
         this.name = this.form.controls['name'];
         this.description = this.form.controls['description'];
@@ -79,7 +81,7 @@ export class Priorities {
         this.edit_form = fb.group({
           'edit_name': ['', Validators.compose([Validators.required])],
           'edit_description': ['', Validators.compose([Validators.required])],
-          'edit_escalationPeriodInDays': ['']
+          'edit_escalationPeriodInDays': ['', Validators.compose([Validators.required])]
         });
         this.edit_name = this.edit_form.controls['edit_name'];
         this.edit_description = this.edit_form.controls['edit_description'];
@@ -201,17 +203,26 @@ export class Priorities {
 	public deleteClose(){
 		this.deleteModal.hide();
 	}
+
 	public deletePriority(event){
 		this.deleteConfirm= event;
-		this.delete_name= event.fullname;
-		this.deleteModal.show();
+		this.delete_name= event.name;
+		//this.deleteModal.show();
+        
+        this.dialogsService.confirmDelete(this.delete_name, 'Test').subscribe(
+            (response) => {
+                if(response == true){
+                    this.saveDelete();
+                }
+            }
+        );
 	
 	}
 	public saveDelete(){
 		console.log('test', this.deleteConfirm.userId);	this.priorityService.deletePriority(this.deleteConfirm.woPriorityId).subscribe(
             (data) => {
                 console.log('Return Data', data);
-                this.ngOnInit();
+                this.refresh(this.filter_master, this.prioritiesTable);
             }
         );
 		this.deleteModal.hide();
@@ -255,13 +266,15 @@ export class Priorities {
 			this.priorityService.addPriority(values).subscribe(
 				(data) => {
 					console.log('Return Data', data);
+                    
+                    // Refresh Data
+                    this.refresh(this.filter_master, this.prioritiesTable);
 				}
 			);
 
 			this.addNewModal.hide();
 
-			// Refresh Data
-			this.ngOnInit();
+			
 		}
 	  }
 
@@ -282,7 +295,7 @@ export class Priorities {
                     this.editModal.hide();
 
                     // Refresh Data
-                    this.ngOnInit();
+                    this.refresh(this.filter_master, this.prioritiesTable);
                 }
            );
 		}    

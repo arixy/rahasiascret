@@ -8,6 +8,7 @@ import { ModalDirective } from 'ng2-bootstrap';
 import { EntityTypeService } from './../../services/entity-type.service';
 import { DataTable } from 'primeng/primeng';
 import * as moment from 'moment';
+import { DialogsService } from './../../services/dialog.service';
 
 @Component({
   selector: 'entities',
@@ -107,7 +108,8 @@ export class Entities {
     public cdr: ChangeDetectorRef,
     public entityService: EntityService,
     public entityTypeService: EntityTypeService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    public dialogsService: DialogsService
     ) {
         // Add New Form
         this.form = fb.group({
@@ -203,14 +205,14 @@ export class Entities {
                        this.items_entity_type = data.data;
                        console.log('Entity Type', this.entity_types);
 
-                       this.items_entity_type = this.items_entity_type.map(
+                       /*this.items_entity_type = this.items_entity_type.map(
                             (entity_type) => {
                                 return Object.assign({}, {
                                    id: entity_type.entityTypeId,
                                     text: entity_type.name
                                 });
                             }
-                        );
+                        );*/
                    } 
                 );
                 
@@ -283,14 +285,21 @@ export class Entities {
     public deleteEntity(event){
 		this.deleteConfirm= event;
 		this.delete_name= event.name;
-		this.deleteModal.show();	
+		//this.deleteModal.show();	
+        
+        this.dialogsService.confirmDelete(this.delete_name, 'Test').subscribe(
+            (response) => {
+                if(response == true){
+                    this.saveDelete();
+                }
+            }
+        );
 	}
 	public saveDelete(){
-		console.log('test', this.deleteConfirm.userId);
 			this.entityService.deleteEntity(this.deleteConfirm.entityId).subscribe(
             (data) => {
                 console.log('Return Data', data);
-                this.ngOnInit();
+                this.refresh(this.filter_master, this.entitiesTable);
             }
         );
 		this.deleteModal.hide();
@@ -308,8 +317,9 @@ export class Entities {
                     if(data.resultCode.code == 0){
                         console.log('Success!');
                         this.addNewModal.hide();
+                        
                         // Refresh Data
-                        this.ngOnInit();
+                        this.refresh(this.filter_master, this.entitiesTable);
                         
                     } else {
                         // Fail
@@ -329,9 +339,9 @@ export class Entities {
         this.editModal.hide();
     }
 	  public editEntity(event){
-        console.log('Priority Edit',event);
+        console.log('Edit Entity', event);
 //        
-		  this.entity_edit = event.priorityId;
+		  this.entity_edit = event.entityId;
 			// Inject Initial Value to the Edit Form
 			this.edit_form.patchValue(
 				{
@@ -349,11 +359,11 @@ export class Entities {
     }
 		public onSubmitEdit(values,event){
 		console.log('edit form',values);
-        
+        //event.preventDefault();
             this.edit_form_submitted = true;
 		if(this.edit_form.valid){
 			 var formatted_object = Object.assign({}, {
-               	id: this.entity_edit.id,
+               	id: this.entity_edit,
                 name: values.edit_name,
                 description: values.edit_description,
                 address1: values.edit_address1,
@@ -368,7 +378,7 @@ export class Entities {
                     this.editModal.hide();
 
                     // Refresh Data
-                    this.ngOnInit();
+                    this.refresh(this.filter_master, this.entitiesTable);
                 }
            );
 		}

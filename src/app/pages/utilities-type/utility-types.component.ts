@@ -7,6 +7,7 @@ import * as moment from 'moment';
 import { UtilityTypesService } from './utility-types.service';
 import { LocalDataSource } from 'ng2-smart-table';
 import { DataTable } from 'primeng/primeng';
+import { DialogsService } from './../../services/dialog.service';
 
 @Component({
   selector: 'utility-types',
@@ -63,7 +64,8 @@ export class UtilityTypes {
   constructor(
     public fb: FormBuilder,
     public cdr: ChangeDetectorRef,
-    public utilityTypesService: UtilityTypesService
+    public utilityTypesService: UtilityTypesService,
+    public dialogsService: DialogsService
     ) {
         // Add New Form
         this.form = fb.group({
@@ -189,19 +191,28 @@ export class UtilityTypes {
     }
 
     public deleteUtilityType(event){
-		this.deleteConfirm= event;
-		this.delete_name= event.name;
-		this.deleteModal.show();
+		this.deleteConfirm = event;
+		this.delete_name = event.name;
+		/*this.deleteModal.show();*/
+        
+        this.dialogsService.confirmDelete('Test', 'Test').subscribe(
+            (response) => {
+                console.log('Response from Delete Modal', response);
+                if(response == true){
+                    this.saveDelete();
+                } 
+            }
+        );
 	}
 	public saveDelete(){
 		console.log('test', this.deleteConfirm.userId);
 			this.utilityTypesService.deleteUtilityType(this.deleteConfirm.utilityTypeId).subscribe(
             (data) => {
                 console.log('Return Data', data);
-                this.ngOnInit();
+                this.refresh(this.filter_master, this.utilityTypesTable);
             }
         );
-		this.deleteModal.hide();
+		//this.deleteModal.hide();
 	}
 
     public addUtilityType(){
@@ -237,6 +248,9 @@ export class UtilityTypes {
 			this.utilityTypesService.addUtilityType(values).subscribe(
 				(data) => {
 					console.log('Return Data', data);
+                    
+                    // Refresh Data 
+                    this.refresh(this.filter_master, this.utilityTypesTable);
 				}
 			);
 			this.form.patchValue(
@@ -247,8 +261,7 @@ export class UtilityTypes {
         	);
 			this.addNewModal.hide();
 		}
-		// Refresh Data
-			this.ngOnInit();
+
 	  }
 
   	public onSubmitEdit(values,event){

@@ -3,7 +3,16 @@
   <div class="row">
     <div class="col-md-12">
      <div class="ui-helper-clearfix add-new-button__container">
-               <button (click)="addRootNode()" class="btn btn-primary" style="float:right">Add New Location</button>
+               <div class="btn-group add-new-dropdown" style="float: right">
+                <button (click)="addRootNode()" type="button" class="btn btn-primary">
+                    
+                    <i class="icon ion-plus-round"></i>
+                    
+                    
+                        New Location
+                </button>
+
+            </div>
            </div>
       <ba-card title="" baCardClass="with-scroll">
            <p-treeTable class="ui-datatable" [value]="treeLocationsWithData">
@@ -13,86 +22,11 @@
                     <i class="icon ion-ios-download-outline"></i>
                 </button>
                 <div class="btn-group" dropdown style="float: right">
-                            <button title="Reset" id="resetFilters" type="button" class="btn-sets-right-filter" (click)="resetFilters()">
-                                <!-- <img class="reset-filter" src="./assets/img/clear-filter.svg" /> -->
-                                <!-- <span>&nbsp;</span>
-                                <object class="reset-filter-object" type="image/svg+xml" data="./assets/img/clear-filter.svg"></object> -->
-                                <svg (click)="resetFilters()"
-                               xmlns:dc="http://purl.org/dc/elements/1.1/"
-                               xmlns:cc="http://creativecommons.org/ns#"
-                               xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-                               xmlns:svg="http://www.w3.org/2000/svg"
-                               xmlns="http://www.w3.org/2000/svg"
-                               xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-                               xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-                               width="40"
-                               height="43"
-                               preserveAspectRatio="xMinYMin meet"
-                                 viewBox="0 0 40 43">
-                                <style type="text/css">
-                                    svg {
-                                        cursor: pointer;
-                                        width: 26px;
-                                        height: 26px;
-                                        position: relative;
-                                        top: 2px;
-                                    }
-                                    svg * {
-                                        transition: all .2s ease-out;
-                                        stroke-width: 1.5 !important;
-                                    }
-                                    svg:hover path {
-                                        stroke: #fff !important;
-                                    }
-                                    .btn-sets-right-filter:hover path {
-                                        stroke: #fff !important;
-                                    }
-                                </style>
-                              <defs
-                                 id="defs4" />
-                              <g
-                                 inkscape:label="Layer 1"
-                                 inkscape:groupmode="layer"
-                                 id="layer1"
-                                 transform="translate(0,-1009.3622)">
-                                <path class="main-line"
-                                   style="fill:none;stroke:#00abff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-                                   d="m 2.8280048,1019.4764 34.7684222,0"
-                                   id="path2985"
-                                   inkscape:connector-curvature="0" />
-                                <path class="main-line"
-                                   inkscape:connector-curvature="0"
-                                   id="path3755"
-                                   d="m 9.8048228,1029.3127 20.8147862,0"
-                                   style="fill:none;stroke:#00abff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
-                                <path class="main-line"
-                                   style="fill:none;stroke:#00abff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-                                   d="m 16.134497,1039.149 8.155438,0"
-                                   id="path3757"
-                                   inkscape:connector-curvature="0" />
-                                <g
-                                   id="layer2"
-                                   transform="matrix(0.7901613,0,0,0.78363052,0.57269904,225.98743)"
-                                   style="stroke:#00abff;stroke-width:1.27082705;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none">
-                                  <path class="main-line"
-                                     inkscape:connector-curvature="0"
-                                     id="path3761"
-                                     d="m 33.303572,1044.3265 9.330357,-9.3304"
-                                     style="fill:none;stroke:#00abff;stroke-width:1.27082705;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
-                                  <path class="main-line"
-                                     style="fill:none;stroke:#00abff;stroke-width:1.27082705;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-                                     d="m 42.633929,1044.3265 -9.330357,-9.3304"
-                                     id="path3763"
-                                     inkscape:connector-curvature="0" />
-                                </g>
-                              </g>
-                            </svg>
-                            </button>
-
-                            <button title="Refresh" id="resetFilters" type="button" class="btn-sets-right" (click)="refresh($event)">
+                            <reset-filter (click)="resetFilters()"></reset-filter>
+                            <button title="Refresh" id="resetFilters" type="button" class="btn-sets-right" (click)="initialRefresh(filter_master)">
                                 <i class="icon ion-ios-reload"></i>
                             </button>
-                        </div>
+                    </div>
             </div>
         </p-header>
                 <!-- TODO: Add Location (Filter) & Date Updated Column --> 
@@ -165,25 +99,25 @@
       </div>
       <div class="modal-body">
         <div>
-            <ba-card title="Add New Location" baCardClass="with-scroll">
+            <ba-card title="" baCardClass="with-scroll custom-card">
               <form [formGroup]="form" (ngSubmit)="onSubmit(form.value)" class="form-horizontal">
+                  <div class="modal-form-container">
               <div class="form-group row" [ngClass]="{'has-error': (!name.valid && name.touched), 'has-success': (name.valid && name.touched)}">
-                <label for="inputEmail3" class="col-sm-2 control-label">Name</label>
-
-                <div class="col-sm-10">
+                <div class="col-sm-12">
+                 <label>Name</label>
                   <input [formControl]="name" type="text" class="form-control" id="inputEmail3" placeholder="Name">
                 </div>
               </div>
               <div class="form-group row" [ngClass]="{'has-error': (!description.valid && description.touched), 'has-success': (description.valid && description.touched)}">
-                <label for="inputPassword3" class="col-sm-2 control-label">Description</label>
+                <div class="col-sm-12">
+                 <label for="inputPassword3">Description</label>
 
-                <div class="col-sm-10">
                   <input [formControl]="description" type="text" class="form-control" id="inputPassword3" placeholder="Description">
                 </div>
               </div>
               <div class="form-group row select-container">
-                 <label for="selectlocation" class="col-sm-2 control-label">Parent Location</label>
                  <div class="col-sm-10">
+                     <label>Parent Location</label>
                       <ng-select #addSelectBox
                                  [allowClear]="true"
                                   [items]="items_location"
@@ -195,11 +129,28 @@
                       </ng-select>
                   </div>
               </div>
-              <div class="form-group row">
-                <div class="offset-sm-2 col-sm-10">
-                  <button [disabled]="!form.valid" type="submit" class="btn btn-default btn-auth">Submit</button>
-                </div>
               </div>
+              <div class="form-group modal-action-row row">
+                  <div class="col-sm-3 btn-with-icon">
+                    <button type="button" class="btn btn-default btn-cancel" (click)="cancel()">
+                    <i class="icon ion-close"></i>
+                    Cancel</button>
+                  </div>
+                  <div class="col-sm-5">
+                       &nbsp;
+                   </div>
+                   <div class="col-sm-1 no-padding">
+                       <span *ngIf="submitLoading" class="loading-container">
+                            
+                        </span>
+                   </div>
+                  <div class="col-sm-3 btn-with-icon">
+                    <button type="submit" class="btn btn-default btn-save">
+                    <i class="icon ion-checkmark"></i>
+                        Save
+                    </button>
+                  </div>
+            </div>
             </form>
             </ba-card>
           </div>

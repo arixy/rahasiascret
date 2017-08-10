@@ -58,6 +58,33 @@ export class RoleService{
 		return this.http.get(load_url, 	options).map(this.extractData);
 	}
 	
+    getRolesFilter(filter_data){
+        var headers = new Headers();
+        headers.append('Content-Type', 'application/json');
+        var bearer = "Bearer " + localStorage.getItem('bearer_token');
+
+        headers.append('Authorization', bearer);
+        headers.append('Access-Control-Allow-Origin', '*');
+        headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
+
+        var options = new RequestOptions({headers: headers});
+        var load_url = this.appUrl + 'role/all';
+        
+        let formatted_object = {
+                filters: {},
+                first: 0,
+                rows: 10,
+                globalFilter: '',
+                multiSortMeta: null,
+                sortField: 'dateUpdated',
+                sortOrder: -1
+        };
+        if(filter_data){
+           formatted_object = filter_data; 
+        }
+        console.log('Formatted_Object', formatted_object);
+        return this.http.post(load_url, formatted_object, options).map(this.extractData);
+    }
   private extractData(res: Response){
     let body = res.json();
     console.debug(body);
