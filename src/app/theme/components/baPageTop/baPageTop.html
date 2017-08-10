@@ -74,8 +74,8 @@
         <div class="col-md-3" *ngIf="configurationPerm.configurations.isCanShow()">
          <ul class="dropdown-menu__">
             <h5>Configurations</h5>
-            <li *ngIf="configurationPerm.configurations.Location"><i class="fa fa-angle-right"></i><a routerLink="/pages/setups/locations">{{ sitemap.Location.name }}</a></li>
-            <li *ngIf="configurationPerm.configurations.WOCategory"><i class="fa fa-angle-right"></i><a routerLink="/pages/setups/work-orders">{{ sitemap.WOCategory.name }}</a></li>
+            <li *ngIf="configurationPerm.configurations.Location"><i class="fa fa-angle-right"></i><a routerLink="/pages/setups/locations">{{ sitemap.Location != null ? sitemap.Location.name : '' }}</a></li>
+            <li *ngIf="configurationPerm.configurations.WOCategory"><i class="fa fa-angle-right"></i><a routerLink="/pages/setups/work-orders">{{ sitemap.WOCategory != null ? sitemap.WOCategory.name : '' }}</a></li>
             <!-- By Mike: Hide weekends and holidays -->
             <!--<li><i class="fa fa-angle-right"></i><a routerLink="/pages/weekends">Weekends &amp; Holidays</a></li>-->
         </ul>

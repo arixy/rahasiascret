@@ -72,6 +72,8 @@ import { ResetFilterModule } from './reset-filter.module';
 import { DialogsService } from './../services/dialog.service';
 import { ConfirmDeleteDialog } from './../confirm-delete.dialog';
 
+import { FilterInputComponent } from './filter-input.component';
+
 @NgModule({
   imports: [CommonModule, NgaModule, routing, SelectModule, Ng2SmartTableModule, ModalModule.forRoot(), ReactiveFormsModule,
            DatePickerModule,
@@ -133,7 +135,9 @@ import { ConfirmDeleteDialog } from './../confirm-delete.dialog';
       ConsumptionReportComponent,
       PerformanceReportComponent,
       ConfirmDeleteDialog,
-      SettingsComponent
+      SettingsComponent,
+      // filter component
+      FilterInputComponent
     ],
     entryComponents: [
         ConfirmDeleteDialog

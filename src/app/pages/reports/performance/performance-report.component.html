@@ -2,7 +2,7 @@
   <ba-card baCardClass="with-scroll">
     <div class="ui-helper-clearfix">
       <div class="alert alert-danger" *ngIf="errMsg.length > 0">
-        <ul style="margin-bottom: 0px;">
+        <ul style="margin-bottom: 0px;" class="lst-error">
           <li *ngFor="let err of errMsg">
             {{err}}
           </li>

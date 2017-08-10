@@ -1,4 +1,4 @@
-﻿import { Component, Input, Output, ChangeDetectorRef, ViewChild, ViewEncapsulation } from '@angular/core';
+﻿import { Component, Input, Output, ChangeDetectorRef, ViewChild, ViewEncapsulation, EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import { FormGroup, AbstractControl, FormBuilder, Validators, ValidatorFn } from '@angular/forms';
@@ -19,8 +19,7 @@ import { WorkflowActions, WorkOrderStatuses } from '../../../../global.state';
 
 @Component({
     selector: 'wo-files',
-    templateUrl: './workorder-files.component.html',
-    providers: [TaskService]
+    templateUrl: './workorder-files.component.html'
 })
 export class WorkOrderFilesComponent {
     @Input('existingFiles')
@@ -46,6 +45,9 @@ export class WorkOrderFilesComponent {
 
     @Input('isCanEdit')
     private isCanEdit = true;
+
+    @Output('changes')
+    private changes = new EventEmitter<string>();
 
     constructor(private _taskService: TaskService) {
         
@@ -77,6 +79,7 @@ export class WorkOrderFilesComponent {
 
     removeFile(file) {
         file.isActive = false;
+        this.changes.emit("fileRemoved");
     }
 
     onSelectPhoto(event) {
@@ -168,5 +171,45 @@ export class WorkOrderFilesComponent {
         switch (field) {
             case 'noteTouched': marker.noteTouched = true; break;
         }
+
+        this.changes.emit("noteTouched");
+    }
+
+    public markAsTouchedAll() {
+        for (let file of this.existingFiles) {
+            file.noteTouched = true;
+        }
+
+        for (let photo of this.existingPhotos) {
+            photo.noteTouched = true;
+        }
+    }
+
+    // validate files
+    public validateFiles() {
+        for (let file of this.existingFiles) {
+            if (file.isActive) {
+                if (file.notes.trim().length == 0) {
+                    // notes must be filled
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    // validate photos
+    public validatePhotos() {
+        for (let photo of this.existingPhotos) {
+            if (photo.isActive) {
+                if (photo.notes.trim().length == 0) {
+                    // notes must be filled
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 }

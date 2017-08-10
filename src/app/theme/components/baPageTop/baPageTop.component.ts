@@ -105,14 +105,16 @@ export class BaPageTop {
 
       this.sitemap = JSON.parse(localStorage.getItem("sitemaps"));
 
-      for(let auth in this.configurationPerm){
-          if(this.configurationPerm.hasOwnProperty(auth)){
-              if(typeof this.configurationPerm[auth] != "function"){
-                  for(let menu in this.configurationPerm[auth]){
-                      if(this.configurationPerm[auth].hasOwnProperty(menu)){
-                          if(typeof this.configurationPerm[auth][menu] != "function"){
-                              if (authorizedSitemaps[menu] != null) {
-                                  this.configurationPerm[auth][menu] = authorizedSitemaps[menu].allowAccessOrView || authorizedSitemaps[menu].allowAdd || authorizedSitemaps[menu].allowDelete || authorizedSitemaps[menu].allowUpdate;
+      if (authorizedSitemaps != null && this.sitemap != null) {
+          for (let auth in this.configurationPerm) {
+              if (this.configurationPerm.hasOwnProperty(auth)) {
+                  if (typeof this.configurationPerm[auth] != "function") {
+                      for (let menu in this.configurationPerm[auth]) {
+                          if (this.configurationPerm[auth].hasOwnProperty(menu)) {
+                              if (typeof this.configurationPerm[auth][menu] != "function") {
+                                  if (authorizedSitemaps[menu] != null) {
+                                      this.configurationPerm[auth][menu] = authorizedSitemaps[menu].allowAccessOrView || authorizedSitemaps[menu].allowAdd || authorizedSitemaps[menu].allowDelete || authorizedSitemaps[menu].allowUpdate;
+                                  }
                               }
                           }
                       }

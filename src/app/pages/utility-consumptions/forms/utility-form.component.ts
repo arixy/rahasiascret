@@ -47,6 +47,8 @@ export class UtilityFormComponent {
     private lstExclusions;
     private lstDeletedExclusions;
 
+    // error
+    private errMsg = [];
     // select box by directives
     @ViewChild("utilityTypesSelectBox") utilityTypesSelectBox: SelectComponent;
     @ViewChild("uomSelectBox") uomSelectBox: SelectComponent;
@@ -59,7 +61,6 @@ export class UtilityFormComponent {
 
     // others
     private _yearRange = GlobalConfigs.yearRange;
-    private errMsgServer = "";
     private isBtnSaveClicked = false;
 
     constructor(
@@ -337,7 +338,8 @@ export class UtilityFormComponent {
                         this._utilityConsumptionService.announceEvent("utilityConsumptions_btnSaveOnSuccess");
                     } else {
                         // show error message?
-                        this.errMsgServer = response.resultCode.message;
+                        this.errMsg = [];
+                        this.errMsg = this.errMsg.concat(response.resultCode.message);
                     }
                 });
             } else {
@@ -348,7 +350,8 @@ export class UtilityFormComponent {
                     } else {
                         console.log("error?");
                         // show error message?
-                        this.errMsgServer = response.resultCode.message;
+                        this.errMsg = [];
+                        this.errMsg = this.errMsg.concat(response.resultCode.message);
                     }
                 });
             }

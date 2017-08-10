@@ -1,4 +1,4 @@
-import { Component, ViewChild, ViewContainerRef, ChangeDetectorRef, ComponentFactoryResolver, ComponentRef, OnDestroy, Input, ViewEncapsulation } from '@angular/core';
+﻿import { Component, ViewChild, ViewChildren, ViewContainerRef, ChangeDetectorRef, ComponentFactoryResolver, ComponentRef, OnDestroy, Input, ViewEncapsulation, QueryList } from '@angular/core';
 import { LocalDataSource } from 'ng2-smart-table';
 import { ModalDirective } from 'ng2-bootstrap';
 import { FormGroup, AbstractControl, FormBuilder, Validators, FormControl } from '@angular/forms';
@@ -16,6 +16,7 @@ import { ExpensesComponent } from './component/expenses/expenses.component';
 import { Observable } from 'rxjs/Observable';
 import { Subscription }   from 'rxjs/Subscription';
 import 'rxjs/add/operator/map';
+import { saveAs } from 'file-saver';
 
 // custom components
 //import { AddNewWorkOrderComponent } from './add-wo.component';
@@ -29,6 +30,8 @@ import { PreventiveRequestComponent } from './../task/forms/preventiverequest.co
 import { GlobalState, WorkOrderStatuses, WorkflowActions } from '../../global.state';
 
 import { ActivatedRoute, Router } from '@angular/router';
+
+import { FilterInputComponent } from '../filter-input.component';
 
 @Component({
   selector: 'preventatives',
@@ -145,9 +148,15 @@ export class Preventatives {
 
     // print related
     private selPrintWOId;
+
     // delete
     private deleteWO;
     private errDelete;
+
+    // loading flag
+    private isLoadingWOData: boolean = true;
+    private isLoadingScheduleData: boolean = true;
+
     @ViewChild('addNewModal') addNewModal: ModalDirective;
     @ViewChild('editModal') editModal: ModalDirective;
     @ViewChild('deleteModal') deleteModal: ModalDirective;
@@ -156,7 +165,14 @@ export class Preventatives {
     //@Input() public source: LocalDataSource = new LocalDataSource();
 
     //@ViewChild('dynamicModalContent', {read: ViewContainerRef}) viewAddNewModal: ViewContainerRef;
-    @ViewChild('dynamicModalBody', {read: ViewContainerRef}) viewModalBody: ViewContainerRef;
+    @ViewChild('dynamicModalBody', { read: ViewContainerRef }) viewModalBody: ViewContainerRef;
+
+
+    // filters
+    private filterMasterWO: any = {};
+    private filterMasterSchedule: any = {};
+    @ViewChildren('filterWO') woFilters: QueryList<FilterInputComponent>;
+    @ViewChildren('filterSchedule') scheduleFilters: QueryList<FilterInputComponent>;
 
   @Input() public source: LocalDataSource = new LocalDataSource();
 
@@ -180,7 +196,7 @@ export class Preventatives {
     public activatedRoute: ActivatedRoute
   ) {
       this.deleteWO = {};
-      
+
       // hardcoded wo type list
       this.woTypes = [{ id: 1, label: "Preventive Maintenance"},
                         {id: 2, label: "Recurring Request"},
@@ -198,10 +214,12 @@ export class Preventatives {
             this.addNewModal.hide();
           } else if (event == "addNewModal_btnSaveOnClick_createSuccess") {
               this.addNewModal.hide();
-              this.getAllWOs(this.buildFilter(this.taskListsTable));
+              this.getAllWOs(this.buildFilter(this.taskListsTable, this.filterMasterWO));
+              this.getAllScheduledWOs(this.buildFilter(this.scheduleListsTable, this.filterMasterSchedule));
           } else if (event == "addNewModal_btnSaveOnClick_updateSuccess") {
               this.addNewModal.hide();
-              this.getAllWOs(this.buildFilter(this.taskListsTable));
+              this.getAllWOs(this.buildFilter(this.taskListsTable, this.filterMasterWO));
+              this.getAllScheduledWOs(this.buildFilter(this.scheduleListsTable, this.filterMasterSchedule));
           }
         });
       
@@ -327,37 +345,37 @@ export class Preventatives {
     ngAfterViewInit(){
         // See if there is any parameter
         //let request_type = this.activatedRoute.snapshot.params['request_type'];
+        
         this.activatedRoute.params.subscribe(
             (params) => {
                 let request_type = params['request_type'];
-                if(request_type){
-                    // Open Particular Modal Based on Selected Type
-                    if(request_type == 'single'){
-                        console.log('Single!!');
-                        this.createNewWorkOrder({
-                            id: 3, label: 'Single Request'
-                        });
-                    } else if(request_type == 'recurring'){
-                        console.log('Recurring!');
-                        this.createNewWorkOrder({
-                           id: 2, label: 'Recurring Request' 
-                        });
-                    } else if(request_type == 'preventive'){
-                        this.createNewWorkOrder({
-                            id: 1, label: 'Preventive Maintenance'   
-                        });
-                    } else if(request_type == 'tenant'){
-                        this.createNewWorkOrder(this.woTypes[3]);
-                    } else if(request_type == 'guest'){
-                        this.createNewWorkOrder(this.woTypes[4]);
-                    } else if(request_type == 'owner'){
-                        this.createNewWorkOrder(this.woTypes[5]);
-                    }
-                }
+        if(request_type){
+            // Open Particular Modal Based on Selected Type
+            if(request_type == 'single'){
+                console.log('Single!!');
+                this.createNewWorkOrder({
+                    id: 3, label: 'Single Request'
+                });
+            } else if(request_type == 'recurring'){
+                console.log('Recurring!');
+                this.createNewWorkOrder({
+                   id: 2, label: 'Recurring Request' 
+                });
+            } else if(request_type == 'preventive'){
+                this.createNewWorkOrder({
+                    id: 1, label: 'Preventive Maintenance'   
+                });
+            } else if(request_type == 'tenant'){
+                this.createNewWorkOrder(this.woTypes[3]);
+            } else if(request_type == 'guest'){
+                this.createNewWorkOrder(this.woTypes[4]);
+            } else if(request_type == 'owner'){
+                this.createNewWorkOrder(this.woTypes[5]);
+            }
+        }
             }
         );
         console.log('Activated Route', this.activatedRoute.snapshot);
-        
     }
     createNewWorkOrder(selectedType){
         console.log(selectedType);
@@ -462,6 +480,7 @@ export class Preventatives {
 
         this.selPrintWOId = modelData.workOrderId;
         this.cdr.detectChanges();
+
         if (selectedAction.workflowActionId == WorkflowActions.PRINT) {
             this._taskService.announceEvent("printWO");
             return;
@@ -470,6 +489,7 @@ export class Preventatives {
             this.deleteModal.show();
             return;
         }
+
         this.viewModalBody.clear();
         if (modelData.woTypeId == this.SINGLE_TIME_REQUEST) {
             this.currentOpenModal = this.createNewSingleRequestComponent(this.viewModalBody, SingleRequestComponent);
@@ -509,7 +529,7 @@ export class Preventatives {
             }
         }
         // end set modal title
-
+        
         this.currentOpenModal.instance.actionType = selectedAction;
         this.currentOpenModal.instance.selectedWO = modelData;
         this.addNewModal.show();
@@ -663,35 +683,47 @@ export class Preventatives {
         console.log($event);
         console.log(table);
 
-        this.getAllWOs(this.buildFilter(table));
+        this.getAllWOs(this.buildFilter(table, this.filterMasterWO));
     }
 
-    refreshScheduled($event, table){
-        this.getAllScheduledWOs(this.buildFilter(table));
+    refreshScheduled($event, table) {
+        this.getAllScheduledWOs(this.buildFilter(table, this.filterMasterSchedule));
     }
 
     resetFilters(table : DataTable){
         console.log("resetFilters");
         console.log(table);
 
-        table.filters = {};
-        table.globalFilter = "";
+        this.woFilters.forEach(item => {
+            item.resetFilter();
+        });
 
-        this.getAllWOs(this.buildFilter(table));
+        //table.filters = {};
+        //table.globalFilter = "";
+
+        this.filterMasterWO = {};
+
+        this.getAllWOs(this.buildFilter(table, this.filterMasterWO));
     }
 
     resetFiltersScheduled(table: DataTable) {
         console.log("resetFilters");
         console.log(table);
 
-        table.filters = {};
-        table.globalFilter = "";
+        this.scheduleFilters.forEach(item => {
+            item.resetFilter();
+        });
 
-        this.getAllScheduledWOs(this.buildFilter(table));
+        //table.filters = {};
+        //table.globalFilter = "";
+
+        this.filterMasterSchedule = {};
+
+        this.getAllScheduledWOs(this.buildFilter(table, this.filterMasterSchedule));
     }
 
 
-    private buildFilter(table : DataTable){
+    private buildFilter(table: DataTable, filterMaster: any) {
         if(table == null){
             return {
                 "filters": {},
@@ -705,7 +737,8 @@ export class Preventatives {
         }
         else{
             return {
-                "filters": table.filters,
+                //"filters": table.filters,
+                "filters": filterMaster,
                 "first": table.first,
                 "rows": table.rows,
                 "globalFilter": table.globalFilter,
@@ -716,7 +749,8 @@ export class Preventatives {
         }
     }
 
-    private getAllWOs(filters){
+    private getAllWOs(filters) {
+        this.isLoadingWOData = true;
         this.maintenanceService.getAllWOs(filters).subscribe(
             (response)=>{
                 console.log("Response Data");
@@ -732,7 +766,9 @@ export class Preventatives {
                     this.myTasks[i].actions.unshift({ workflowActionId: -2, name: "View" });
                     this.myTasks[i].actions.push({ workflowActionId: -3, name: "Print" });
                     //this.myTasks[i].actions.push({ workflowActionId: 4, name: "Assign/Reassign" });
-                    this.myTasks[i].dueDate = new Date(this.myTasks[i].dueDate);
+                    if (this.myTasks[i].dueDate != null) {
+                        this.myTasks[i].dueDate = new Date(this.myTasks[i].dueDate);
+                    }
                     this.myTasks[i].dateUpdated = new Date(this.myTasks[i].dateUpdated);
                 }
 
@@ -740,11 +776,14 @@ export class Preventatives {
                     this.totalRecords = response.paging.total;
                 else
                     this.totalRecords = 0;
+
+                this.isLoadingWOData = false;
             }
         );
     }
 
-    private getAllScheduledWOs(filters){
+    private getAllScheduledWOs(filters) {
+        this.isLoadingScheduleData = true;
         this.maintenanceService.getScheduledWOs(filters).subscribe(
             (response)=>{
                 console.log("Response Data");
@@ -768,6 +807,7 @@ export class Preventatives {
                     this.totalRecordsScheduled = response.paging.total;
                 else
                     this.totalRecordsScheduled = 0;
+                this.isLoadingScheduleData = false;
             }
         );
     }
@@ -776,21 +816,63 @@ export class Preventatives {
     onCancel(){
         this.addNewModal.hide();
     }
+
     cancelDelete() {
         this.deleteModal.hide();
     }
+
     saveDelete() {
         this._taskService.deleteWorkOrder(this.deleteWO.workOrderId).subscribe(response => {
             if (response.resultCode.code == "0") {
                 this.deleteModal.hide();
                 this.refresh("delete_success", this.taskListsTable);
+
                 this.refreshScheduled("delete_success", this.scheduleListsTable);
             } else {
                 this.errDelete = response.resultCode.message;
             }
+
         });
     }
+
+    // onFilter event
+    onFilterWO(event) {
+        console.log("onFilter event", event);
+
+        this.filterMasterWO[event.field] = event.value;
+
+        this.refresh(event, this.taskListsTable);
+    }
+
+    onFilterSchedule(event) {
+        console.log("onFilterSchedule event", event);
+
+        this.filterMasterSchedule[event.field] = event.value;
+
+        this.refreshScheduled(event, this.scheduleListsTable);
+    }
+
     ngOnDestroy(){
         this.subscription.unsubscribe();
+    }
+
+    private downloadAllWorkOrdersCSV(dt: DataTable) {
+        let filters: any = this.buildFilter(dt, this.filterMasterWO);
+        filters.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+        this.maintenanceService.getAllWorkOrdersCSV(filters).subscribe(response => {
+            let blobData: Blob = new Blob([response.blob()], { type: response.headers.get('Content-Type') });
+            saveAs(blobData, "all_work_order.csv");
+        });
+    }
+
+    private downloadAllScheduleWorkOrdersCSV(dt: DataTable) {
+        let filters: any = this.buildFilter(dt, this.filterMasterSchedule);
+        filters.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+        this.maintenanceService.getAllScheduleWorkOrdersCSV(filters).subscribe(response => {
+            let blobData: Blob = new Blob([response.blob()], { type: response.headers.get('Content-Type') });
+            saveAs(blobData, "all_schedule_work_order.csv");
+        });
     }
 }

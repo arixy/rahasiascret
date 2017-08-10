@@ -1,4 +1,4 @@
-<div class="widgets">
+﻿<div class="widgets">
 <div class="row">
    <div class="ui-helper-clearfix">
             <div class="btn-group add-new-dropdown" dropdown style="float: right">
@@ -19,96 +19,15 @@
         </div>
     
     <ba-card title="Work Orders" baCardClass="with-scroll">
-            <p-dataTable #dt [value]="myTasks" [lazy]="true" (onLazyLoad)="refresh($event, dt)" [rows]="10" [paginator]="true" [totalRecords]="totalRecords" sortField="dateUpdated" sortOrder="-1">
+      <spinner *ngIf="isLoadingWOData"></spinner> 
+            <p-dataTable #dt [value]="myTasks" [lazy]="true" (onLazyLoad)="refresh($event, dt)" [rows]="10" [paginator]="true" [totalRecords]="totalRecords" sortField="dateUpdated" sortOrder="-1" styleClass="custom-filter-datatable">
                 <p-header>
                     <div class="ui-helper-clearfix">
-                    <button type="button" iconPos="left" label="CSV" (click)="dt.exportCSV()" style="float:left" class="btn-export__csv">
+                    <button type="button" iconPos="left" label="CSV" (click)="downloadAllWorkOrdersCSV(dt)" style="float:left" class="btn-export__csv">
                         <i class="icon ion-ios-download-outline"></i>
                     </button>
                         <div class="btn-group" dropdown style="float: right">
-                            <button title="Reset" id="resetFilters" type="button" class="btn-sets-right-filter" (click)="resetFilters(dt)">
-                                <!-- <img class="reset-filter" src="./assets/img/clear-filter.svg" /> -->
-                                <!-- <span>&nbsp;</span>
-                                <object class="reset-filter-object" type="image/svg+xml" data="./assets/img/clear-filter.svg"></object> -->
-                                <svg (click)="resetFilters(dt)"
-                               xmlns:dc="http://purl.org/dc/elements/1.1/"
-                               xmlns:cc="http://creativecommons.org/ns#"
-                               xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-                               xmlns:svg="http://www.w3.org/2000/svg"
-                               xmlns="http://www.w3.org/2000/svg"
-                               xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-                               xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-                               width="40"
-                               height="43"
-                               preserveAspectRatio="xMinYMin meet"
-                                 viewBox="0 0 40 43">
-                                <style type="text/css">
-                                    svg {
-                                        cursor: pointer;
-                                        width: 26px;
-                                        height: 26px;
-                                        position: relative;
-                                        top: 2px;
-                                    }
-                                    svg * {
-                                        transition: all .2s ease-out;
-                                        stroke-width: 1.5 !important;
-                                        stroke: #fff !important;
-                                    }
-                                    svg path {
-                                        stroke: #fff !important;
-                                    }
-                                    svg:hover path {
-                                        stroke: #fff !important;
-                                    }
-                                    .btn-sets-right-filter:hover path {
-                                        stroke: #fff !important;
-                                    }
-                                    .btn-sets-right-filter path{
-                                        stroke: #fff !important;
-                                    }
-                                </style>
-                              <defs
-                                 id="defs4" />
-                              <g
-                                 inkscape:label="Layer 1"
-                                 inkscape:groupmode="layer"
-                                 id="layer1"
-                                 transform="translate(0,-1009.3622)">
-                                <path class="main-line"
-                                   style="fill:none;stroke:#00abff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-                                   d="m 2.8280048,1019.4764 34.7684222,0"
-                                   id="path2985"
-                                   inkscape:connector-curvature="0" />
-                                <path class="main-line"
-                                   inkscape:connector-curvature="0"
-                                   id="path3755"
-                                   d="m 9.8048228,1029.3127 20.8147862,0"
-                                   style="fill:none;stroke:#00abff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
-                                <path class="main-line"
-                                   style="fill:none;stroke:#00abff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-                                   d="m 16.134497,1039.149 8.155438,0"
-                                   id="path3757"
-                                   inkscape:connector-curvature="0" />
-                                <g
-                                   id="layer2"
-                                   transform="matrix(0.7901613,0,0,0.78363052,0.57269904,225.98743)"
-                                   style="stroke:#00abff;stroke-width:1.27082705;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none">
-                                  <path class="main-line"
-                                     inkscape:connector-curvature="0"
-                                     id="path3761"
-                                     d="m 33.303572,1044.3265 9.330357,-9.3304"
-                                     style="fill:none;stroke:#00abff;stroke-width:1.27082705;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
-                                  <path class="main-line"
-                                     style="fill:none;stroke:#00abff;stroke-width:1.27082705;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-                                     d="m 42.633929,1044.3265 -9.330357,-9.3304"
-                                     id="path3763"
-                                     inkscape:connector-curvature="0" />
-                                </g>
-                              </g>
-                            </svg>
-                            </button>
-
+                            <reset-filter (click)="resetFilters(dt)"></reset-filter>
                             <button title="Refresh" id="resetFilters" type="button" class="btn-sets-right" (click)="refresh($event, dt)">
                                 <i class="icon ion-ios-reload"></i>
                             </button>
@@ -132,121 +51,98 @@
                                 </div>
                         </template>
                 </p-column>
-                <p-column [style]="{'width':'120px'}" field="woNumber" header="WO #" [sortable]="true" [filter]="true"></p-column>
-                <p-column field="woCategoryName" [style]="{'width':'110px'}" header="Category" [sortable]="true" [filter]="true"></p-column>
-                <p-column field="woPriorityName" header="Priority" [sortable]="true" [style]="{'width':'90px'}" [filter]="true"></p-column>
-                <p-column field="taskName" [style]="{'width':'120px'}" header="Task" [sortable]="true" [filter]="true"></p-column>
-                <p-column field="assetName" [style]="{'width':'110px'}" header="Asset" [sortable]="true" [filter]="true"></p-column>
-                <p-column field="locationName" header="Location" [sortable]="true" [style]="{'width':'120px'}" [filter]="true"></p-column>
-                <p-column field="start" [style]="{'width':'120px'}" header="Start" [sortable]="true" styleClass="top-aligned-table">
+                <p-column [style]="{'width':'120px'}" field="woNumber" header="WO #" [sortable]="true">
+                  <template pTemplate="header">
+                    <span class="ui-column-title">WO #</span>
+                    <sortable-filter-input #filterWO [dataTable]="dt" field="woNumber" [disabled]="isLoadingWOData" (onFilter)="onFilterWO($event)"></sortable-filter-input>
+                  </template>
+                </p-column>
+                <p-column field="woCategoryName" [style]="{'width':'110px'}" header="Category" [sortable]="true">
+                  <template pTemplate="header">
+                    <span class="ui-column-title">Category</span>
+                    <sortable-filter-input #filterWO [dataTable]="dt" field="woCategoryName" [disabled]="isLoadingWOData" (onFilter)="onFilterWO($event)"></sortable-filter-input>
+                  </template>
+                </p-column>
+                <p-column field="woPriorityName" header="Priority" [sortable]="true" [style]="{'width':'90px'}">
+                  <template pTemplate="header">
+                    <span class="ui-column-title">Priority</span>
+                    <sortable-filter-input #filterWO [dataTable]="dt" field="woPriorityName" [disabled]="isLoadingWOData" (onFilter)="onFilterWO($event)"></sortable-filter-input>
+                  </template>
+                </p-column>
+                <p-column field="taskName" [style]="{'width':'120px'}" header="Task" [sortable]="true">
+                  <template pTemplate="header">
+                    <span class="ui-column-title">Task</span>
+                    <sortable-filter-input #filterWO [dataTable]="dt" field="taskName" [disabled]="isLoadingWOData" (onFilter)="onFilterWO($event)"></sortable-filter-input>
+                  </template>
+                </p-column>
+                <p-column field="assetName" [style]="{'width':'110px'}" header="Asset" [sortable]="true">
+                  <template pTemplate="header">
+                    <span class="ui-column-title">Asset</span>
+                    <sortable-filter-input #filterWO [dataTable]="dt" field="assetName" [disabled]="isLoadingWOData" (onFilter)="onFilterWO($event)"></sortable-filter-input>
+                  </template>
+                </p-column>
+                <p-column field="locationName" header="Location" [sortable]="true" [style]="{'width':'120px'}">
+                  <template pTemplate="header">
+                    <span class="ui-column-title">Location</span>
+                    <sortable-filter-input #filterWO [dataTable]="dt" field="locationName" [disabled]="isLoadingWOData" (onFilter)="onFilterWO($event)"></sortable-filter-input>
+                  </template>
+                </p-column>
+                <p-column [style]="{'width':'120px'}" header="Start" [sortable]="true" styleClass="top-aligned-table">
+                  <template pTemplate="header">
+                    <span class="ui-column-title">Start</span>
+                    <span *ngIf="dt.sortField != 'start'" class="sortable-custom-icon fa fa-sort"></span>
+                    <span *ngIf="dt.sortOrder == 1 && dt.sortField == 'start'" class="sortable-custom-icon fa fa-sort-asc"></span>
+                    <span *ngIf="dt.sortOrder == -1 && dt.sortField == 'start'" class="sortable-custom-icon fa fa-sort-desc"></span>
+                  </template>
                   <template pTemplate="body" let-data="rowData">
-                    {{ data.start | date: 'y-MM-dd HH:mm:ss' }}
+                    {{ data.startDate | date: 'y-MM-dd HH:mm' }}
                   </template>
                 </p-column>
 
-                 <p-column [filter]="true" [style]="{'width':'110px'}" field="dueDate" header="Due" [sortable]="true">
-                   <template pTemplate="body" let-update="rowData">
-                     {{update.dueDate | date: 'y-MM-dd'}}
+                 <p-column [style]="{'width':'110px'}" field="dueDate" header="Due" [sortable]="true">
+                   <template pTemplate="header">
+                     <span class="ui-column-title">Due</span>
+                     <sortable-filter-input #filterWO [dataTable]="dt" field="dueDate" [disabled]="isLoadingWOData" (onFilter)="onFilterWO($event)"></sortable-filter-input>
+                   </template>
+                   <template pTemplate="body" let-data="rowData">
+                     {{ data.dueDate | date: 'y-MM-dd'}}
                    </template>
                  </p-column>
-                <p-column field="currentStatusName" [style]="{'width':'110px'}" header="Status" [sortable]="true" [filter]="true"></p-column>
-                <p-column field="assignee" [style]="{'width':'100px'}" header="Assignee" [sortable]="true" [filter]="true"></p-column>
-                <p-column [field]="true" [style]="{'width':'140px'}" field="dateUpdated" header="Last Updated" styleClass="top-aligned-table" [sortable]="true">
+                <p-column field="statusName" [style]="{'width':'110px'}" header="Status" [sortable]="true">
+                  <template pTemplate="header">
+                    <span class="ui-column-title">Status</span>
+                    <sortable-filter-input #filterWO [dataTable]="dt" field="statusName" [disabled]="isLoadingWOData" (onFilter)="onFilterWO($event)"></sortable-filter-input>
+                  </template>
+                </p-column>
+                <p-column field="assignee" [style]="{'width':'100px'}" header="Assignee" [sortable]="true">
+                  <template pTemplate="header">
+                    <span class="ui-column-title">Assignee</span>
+                    <sortable-filter-input #filterWO [dataTable]="dt" field="assignee" [disabled]="isLoadingWOData" (onFilter)="onFilterWO($event)"></sortable-filter-input>
+                  </template>
+                </p-column>
+                <p-column [style]="{'width':'140px'}" field="dateUpdated" header="Last Updated" styleClass="top-aligned-table" [sortable]="true">
                     <template pTemplate="body" let-update="rowData">
-                        {{update.dateUpdated | date: 'y-MM-dd HH:mm:ss'}}
+                        {{update.dateUpdated | date: 'y-MM-dd HH:mm'}}
                     </template>
                 </p-column>
             </p-dataTable>
         
     </ba-card>
     <ba-card title="Schedule" baCardClass="with-scroll">
-      <p-dataTable #dtschedule [value]="maintenances" [lazy]="true" (onLazyLoad)="refreshScheduled($event, dtschedule)" [rows]="10" [paginator]="true" [totalRecords]="totalRecordsScheduled" sortField="dateUpdated" sortOrder="-1">
+      <spinner *ngIf="isLoadingScheduleData"></spinner> 
+      <p-dataTable #dtschedule [value]="maintenances" [lazy]="true" (onLazyLoad)="refreshScheduled($event, dtschedule)" [rows]="10" [paginator]="true" [totalRecords]="totalRecordsScheduled" sortField="dateUpdated" sortOrder="-1" styleClass="custom-filter-datatable">
           <p-header>
             <div class="ui-helper-clearfix">
-                <button type="button" iconPos="left" label="CSV" (click)="dt.exportCSV()" style="float:left" class="btn-export__csv">
+                <button type="button" iconPos="left" label="CSV" (click)="downloadAllScheduleWorkOrdersCSV(dtschedule)" style="float:left" class="btn-export__csv">
                     <i class="icon ion-ios-download-outline"></i>
                 </button>
                 <div class="btn-group" dropdown style="float: right">
-                            <button title="Reset" id="resetFilters" type="button" class="btn-sets-right-filter" (click)="resetFiltersScheduled(dtschedule)">
-                                <!-- <img class="reset-filter" src="./assets/img/clear-filter.svg" /> -->
-                                <!-- <span>&nbsp;</span>
-                                <object class="reset-filter-object" type="image/svg+xml" data="./assets/img/clear-filter.svg"></object> -->
-                                <svg (click)="resetFiltersScheduled(dt)"
-                               xmlns:dc="http://purl.org/dc/elements/1.1/"
-                               xmlns:cc="http://creativecommons.org/ns#"
-                               xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-                               xmlns:svg="http://www.w3.org/2000/svg"
-                               xmlns="http://www.w3.org/2000/svg"
-                               xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-                               xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-                               width="40"
-                               height="43"
-                               preserveAspectRatio="xMinYMin meet"
-                                 viewBox="0 0 40 43">
-                                <style type="text/css">
-                                    svg {
-                                        cursor: pointer;
-                                        width: 26px;
-                                        height: 26px;
-                                        position: relative;
-                                        top: 2px;
-                                    }
-                                    svg * {
-                                        transition: all .2s ease-out;
-                                        stroke-width: 1.5 !important;
-                                    }
-                                    svg:hover path {
-                                        stroke: #fff !important;
-                                    }
-                                    .btn-sets-right-filter:hover path {
-                                        stroke: #fff !important;
-                                    }
-                                </style>
-                              <defs
-                                 id="defs4" />
-                              <g
-                                 inkscape:label="Layer 1"
-                                 inkscape:groupmode="layer"
-                                 id="layer1"
-                                 transform="translate(0,-1009.3622)">
-                                <path class="main-line"
-                                   style="fill:none;stroke:#00abff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-                                   d="m 2.8280048,1019.4764 34.7684222,0"
-                                   id="path2985"
-                                   inkscape:connector-curvature="0" />
-                                <path class="main-line"
-                                   inkscape:connector-curvature="0"
-                                   id="path3755"
-                                   d="m 9.8048228,1029.3127 20.8147862,0"
-                                   style="fill:none;stroke:#00abff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
-                                <path class="main-line"
-                                   style="fill:none;stroke:#00abff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-                                   d="m 16.134497,1039.149 8.155438,0"
-                                   id="path3757"
-                                   inkscape:connector-curvature="0" />
-                                <g
-                                   id="layer2"
-                                   transform="matrix(0.7901613,0,0,0.78363052,0.57269904,225.98743)"
-                                   style="stroke:#00abff;stroke-width:1.27082705;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none">
-                                  <path class="main-line"
-                                     inkscape:connector-curvature="0"
-                                     id="path3761"
-                                     d="m 33.303572,1044.3265 9.330357,-9.3304"
-                                     style="fill:none;stroke:#00abff;stroke-width:1.27082705;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
-                                  <path class="main-line"
-                                     style="fill:none;stroke:#00abff;stroke-width:1.27082705;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-                                     d="m 42.633929,1044.3265 -9.330357,-9.3304"
-                                     id="path3763"
-                                     inkscape:connector-curvature="0" />
-                                </g>
-                              </g>
-                            </svg>
-                            </button>
+                    <reset-filter (click)="resetFiltersScheduled(dtschedule)"></reset-filter>
 
-                            <button title="Refresh" id="resetFilters" type="button" class="btn-sets-right" (click)="refreshScheduled($event, dtschedule)">
-                                <i class="icon ion-ios-reload"></i>
-                            </button>
-                        </div>
+                    <button title="Refresh" id="resetFilters" type="button" class="btn-sets-right" (click)="refreshScheduled($event, dtschedule)">
+                        <i class="icon ion-ios-reload"></i>
+                    </button>
+                </div>
             </div>
         </p-header>
           <p-column [style]="{'width':'110px'}" styleClass="col-button">
@@ -266,24 +162,52 @@
                             </div>
                     </template>
             </p-column>
-           <p-column field="woCategoryName" header="Category" [sortable]="true" [filter]="true"></p-column>
-           <p-column field="woPriorityName" header="Priority" [sortable]="true" [filter]="true"></p-column>
-           <p-column field="taskName" header="Task" [sortable]="true" [filter]="true"></p-column>
-            <p-column field="assetName" header="Asset" [sortable]="true" [filter]="true"></p-column>
-            <p-column field="locationName" header="Location" [sortable]="true" [filter]="true"></p-column>
-            <p-column field="start" header="Start"></p-column>
+           <p-column field="woCategoryName" header="Category" [sortable]="true">
+             <template pTemplate="header">
+               <sortable-filter-input #filterSchedule [dataTable]="dtschedule" field="woCategoryName" header="Category" [disabled]="isLoadingScheduleData" (onFilter)="onFilterSchedule($event)"></sortable-filter-input>
+             </template>
+           </p-column>
+           <p-column field="woPriorityName" header="Priority" [sortable]="true">
+             <template pTemplate="header">
+               <sortable-filter-input #filterSchedule [dataTable]="dtschedule" field="woPriorityName" header="Priority" [disabled]="isLoadingScheduleData" (onFilter)="onFilterSchedule($event)"></sortable-filter-input>
+             </template>
+           </p-column>
+           <p-column field="taskName" header="Task" [sortable]="true">
+             <template pTemplate="header">
+               <sortable-filter-input #filterSchedule [dataTable]="dtschedule" field="taskName" header="Task" [disabled]="isLoadingScheduleData" (onFilter)="onFilterSchedule($event)"></sortable-filter-input>
+             </template>
+           </p-column>
+            <p-column field="assetName" header="Asset" [sortable]="true">
+              <template pTemplate="header">
+                <sortable-filter-input #filterSchedule [dataTable]="dtschedule" field="assetName" header="Asset" [disabled]="isLoadingScheduleData" (onFilter)="onFilterSchedule($event)"></sortable-filter-input>
+              </template>
+            </p-column>
+            <p-column field="locationName" header="Location" [sortable]="true">
+              <template pTemplate="header">
+                <sortable-filter-input #filterSchedule [dataTable]="dtschedule" field="locationName" header="Location" [disabled]="isLoadingScheduleData" (onFilter)="onFilterSchedule($event)"></sortable-filter-input>
+              </template>
+            </p-column>
+            <p-column field="start" header="Start">
+              <template pTemplate="body" let-data="rowData">
+                {{ data.start | date: 'y-MM-dd HH:mm' }}
+              </template>
+            </p-column>
             <p-column field="due" header="Due"></p-column>
             <p-column field="lastWo" header="Last WO">
               <template pTemplate="body" let-data="rowData">
-                {{ data.lastWo == 'null null' ? '' : data.lastWo }}
+                {{ data.lastWo | date: 'y-MM-dd' }}
               </template>
             </p-column>
             
-            <p-column field="nextWo" header="Next WO"></p-column>
+            <p-column field="nextWo" header="Next WO">
+              <template pTemplate="body" let-data="rowData">
+                {{ data.nextWo | date: 'y-MM-dd HH:mm' }}
+              </template>
+            </p-column>
             
             <p-column styleClass="top-aligned-table" field="dateUpdated" header="Last Updated">
               <template pTemplate="body" let-data="rowData">
-                {{ data.dateUpdated | date: 'y-MM-dd HH:mm:ss' }}
+                {{ data.dateUpdated | date: 'y-MM-dd HH:mm' }}
               </template>
             </p-column>
             
@@ -499,10 +423,12 @@
     </div>
   </div>
 </div>
+
 <div bsModal #deleteModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
+
       </div>
       <div class="modal-body">
         <div class="content_confirm">
@@ -521,6 +447,7 @@
     </div>
   </div>
 </div>
+
 <div style="display: none">
   <print-wo [workOrderId]="selPrintWOId"></print-wo>
 </div>

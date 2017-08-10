@@ -2,14 +2,10 @@
   vertical-align: top;
 }
 
-.tabpanel-has-error .ui-tabview-title{
+/*.tabpanel-has-error .ui-tabview-title{
   color: red;
 }
 
-/*.tabpanel-has-error .ui-tabview-title:before{
-  content: "! ";
-}*/
-
 .tabpanel-has-error .ui-tabview-title:after{
   content: " !";
-}
+}*/

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Http, Response, Headers, RequestOptions } from '@angular/http';
+import { Http, Response, Headers, RequestOptions, ResponseContentType } from '@angular/http';
 import { UUID } from 'angular2-uuid';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
@@ -194,6 +194,64 @@ export class MaintenanceService{
         }
 
         return this.http.post(load_url, filters, options).map(this.extractData);
+    }
+
+    public getAllWorkOrdersCSV(filters): Observable<any> {
+        var bearer = "Bearer " + localStorage.getItem('bearer_token');
+        var headers = new Headers();
+
+        headers.append("Accept", "application/octet-stream");
+        headers.append('Authorization', bearer);
+        headers.append('Access-Control-Allow-Origin', '*');
+        headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
+
+        var options = new RequestOptions({ headers: headers, responseType: ResponseContentType.Blob });
+        var load_url = this.appUrl + '/work-order/all-without-schedule/export';
+
+        let formated_object = {
+            filters: {},
+            first: 0,
+            rows: 9999,
+            globalFilter: '',
+            multiSortMeta: null,
+            sortField: 'dateUpdated',
+            sortOrder: -1
+        };
+        console.log("filter_data ", filters);
+        if (filters) {
+            formated_object = filters;
+        }
+
+        return this.http.post(load_url, formated_object, options);
+    }
+
+    public getAllScheduleWorkOrdersCSV(filters): Observable<any> {
+        var bearer = "Bearer " + localStorage.getItem('bearer_token');
+        var headers = new Headers();
+
+        headers.append("Accept", "application/octet-stream");
+        headers.append('Authorization', bearer);
+        headers.append('Access-Control-Allow-Origin', '*');
+        headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
+
+        var options = new RequestOptions({ headers: headers, responseType: ResponseContentType.Blob });
+        var load_url = this.appUrl + '/work-order/all-with-schedule/export';
+
+        let formated_object = {
+            filters: {},
+            first: 0,
+            rows: 9999,
+            globalFilter: '',
+            multiSortMeta: null,
+            sortField: 'dateUpdated',
+            sortOrder: -1
+        };
+
+        if (filters) {
+            formated_object = filters;
+        }
+
+        return this.http.post(load_url, formated_object, options);
     }
     
 }

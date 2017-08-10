@@ -1,0 +1,5 @@
+﻿<span class="ui-column-title">{{ header }}</span>
+<span *ngIf="dt.sortField != fieldName" class="sortable-custom-icon fa fa-sort"></span>
+<span *ngIf="dt.sortOrder == 1 && dt.sortField == fieldName" class="sortable-custom-icon fa fa-sort-asc"></span>
+<span *ngIf="dt.sortOrder == -1 && dt.sortField == fieldName" class="sortable-custom-icon fa fa-sort-desc"></span>
+<input class="ui-column-filter ui-inputtext ui-corner-all ui-widget" type="text" [formControl]="formControl" [readonly]="disabled"/>

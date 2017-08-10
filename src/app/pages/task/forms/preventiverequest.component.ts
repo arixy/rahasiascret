@@ -7,6 +7,10 @@ import { ModalDirective } from 'ng2-bootstrap';
 import { DatePickerOptions } from 'ng2-datepicker';
 import { SelectComponent, SelectItem } from 'ng2-select';
 import * as moment from 'moment';
+import { TabPanel } from 'primeng/primeng';
+
+import { WorkOrderFilesComponent } from './subforms/workorder-files.component';
+import { WorkOrderExpensesComponent } from './subforms/workorder-expenses.component';
 
 import { TaskService } from '../task.service';
 import { LocationService } from '../../../services/location.service';
@@ -112,6 +116,9 @@ export class PreventiveRequestComponent {
         location: null,
     };
 
+    // form error messages
+    private errMsg = [];
+
     public _defFieldPermissions = {
         // just put fields that is different from other select box
         // show, hidden, disabled
@@ -142,6 +149,16 @@ export class PreventiveRequestComponent {
     @ViewChild("addRepeatSelectBox") _addRepeatSelectBox: SelectComponent;
     @ViewChild("addRepeatPeriodSelectBox") _addRepeatPeriodSelectBox: SelectComponent;
     @ViewChild("addDuePeriodSelectBox") _addDuePeriodSelectBox: SelectComponent;
+
+    // child component
+    @ViewChild(WorkOrderFilesComponent) _workOrderFilesComponent: WorkOrderFilesComponent;
+    @ViewChild(WorkOrderExpensesComponent) _workOrderExpensesComponent: WorkOrderExpensesComponent;
+
+    // Tab Panels
+    @ViewChild("generalTab") _generalTab: TabPanel;
+    @ViewChild("filesTab") _filesTab: TabPanel;
+    @ViewChild("expensesTab") _expensesTab: TabPanel;
+    @ViewChild("recurringTab") _recurringTab: TabPanel;
 
     constructor(
         public fb: FormBuilder,
@@ -177,14 +194,14 @@ export class PreventiveRequestComponent {
             'contact_number': ['', Validators.compose([CustomValidators.numberOnly])],
             'solution': ['', null],
 
-            'selected_startdate': ['', Validators.compose([Validators.required])],
+            'selected_startdate': ['', Validators.compose([Validators.required, this.validateStartDueDate.bind(this)])],
             //'selected_starttime': ['', null],
             'selected_duedate': ['', null],
 
             'selected_repeat': ['', Validators.compose([this.validateRepeat.bind(this)])],
             'repeat_every': ['', Validators.compose([this.validateRepeatEvery.bind(this)])],
             'selected_every_period': ['', Validators.compose([this.validateRepeatEveryPeriod.bind(this)])],
-            'selected_due_period': ['', Validators.compose([Validators.required])],
+            'selected_due_period': ['', Validators.compose([this.validateDuePeriod.bind(this)])],
             'due_after': ['', Validators.compose([Validators.required, CustomValidators.numberOnly])]
         });
         this.wo_number = this.formGroupAdd.controls['wo_number'];
@@ -211,6 +228,15 @@ export class PreventiveRequestComponent {
         this.selected_every_period = this.formGroupAdd.controls['selected_every_period'];
         this.selected_due_period = this.formGroupAdd.controls['selected_due_period'];
         this.due_after = this.formGroupAdd.controls['due_after'];
+
+        // bind value changes for date
+        //  used for validation of cross date
+        this.selected_startdate.valueChanges.debounceTime(50).subscribe(data => {
+            this.selected_startdate.updateValueAndValidity();
+        });
+        this.selected_duedate.valueChanges.debounceTime(50).subscribe(data => {
+            this.selected_startdate.updateValueAndValidity();
+        });
 
         if (this.selectedWO != null) {
             this.loadWorkOrderDataAndSetPermission();
@@ -302,6 +328,52 @@ export class PreventiveRequestComponent {
             //    console.log("list assignees", this.items_assignees);
             //});
         }
+
+        this.formGroupAdd.valueChanges.debounceTime(50).subscribe(data => {
+            if (!this.isSchedule) {
+                // tabs: general, files, expenses
+                if (this.formGroupAdd.valid) {
+                    this._generalTab.headerStyleClass = '';
+                }
+
+                if (this._workOrderFilesComponent.validateFiles() && this._workOrderFilesComponent.validatePhotos()) {
+                    this._filesTab.headerStyleClass = '';
+                }
+
+                if (this._workOrderExpensesComponent.validateExpenses()) {
+                    this._expensesTab.headerStyleClass = '';
+                }
+            } else {
+                // general tab
+                if (this.task_name.valid
+                    && this.task_desc.valid
+                    && this.selected_category.valid
+                    && this.selected_priority.valid
+                    && this.selected_location.valid
+                    && this.location_info.valid
+                    && this.contact_person.valid
+                    && this.contact_number.valid
+                    && this.selected_asset.valid) {
+                    this._generalTab.headerStyleClass = '';
+                }
+
+                let isRecurringValid = false
+
+                // recurring tab
+                if (this.selected_repeat.valid
+                    && this.selected_startdate.valid
+                    && this.selected_due_period.valid
+                    && this.due_after.valid
+                    && this.repeat_every.valid
+                    && this.selected_every_period.valid) {
+                    isRecurringValid = true;
+                }
+
+                if (isRecurringValid && this._recurringTab != null) {
+                    this._recurringTab.headerStyleClass = '';
+                }
+            }
+        });
     }
 
     private loadWorkOrderDataAndSetPermission() {
@@ -347,7 +419,7 @@ export class PreventiveRequestComponent {
 
                 // only set selected_duedate when WO is not a schedule
                 this.formGroupAdd.patchValue({
-                    "selected_duedate": new Date(this.selectedWO.dueDate)
+                    "selected_duedate": this.selectedWO.dueDate == null ? null : new Date(this.selectedWO.dueDate)
                 });
             } else {
                 // repeat options
@@ -409,6 +481,11 @@ export class PreventiveRequestComponent {
                 for (var i = 0; i < tmpLstPriorities.length; i++) {
                     var currentItem = { id: tmpLstPriorities[i].woPriorityId, text: tmpLstPriorities[i].name };
                     this.items_priorities.push(currentItem);
+
+                    if (currentItem.id == this.selectedWO.woPriorityId) {
+                        this.selected_priority.setValue(currentItem);
+                        this._addPrioritySelectBox.active = [currentItem];
+                    }
                 }
             });
 
@@ -421,6 +498,11 @@ export class PreventiveRequestComponent {
                 for (var i = 0; i < tmpLstCategories.length; i++) {
                     var currentItem = { id: tmpLstCategories[i].woCategoryId, text: tmpLstCategories[i].name };
                     this.items_categories.push(currentItem);
+
+                    if (currentItem.id == this.selectedWO.woCategoryId) {
+                        this.selected_category.setValue(currentItem);
+                        this._addCategorySelectBox.active = [currentItem];
+                    }
                 }
             });
 
@@ -554,7 +636,12 @@ export class PreventiveRequestComponent {
 
             } else if (this.actionType.workflowActionId == WorkflowActions.CANCEL
                 || this.actionType.workflowActionId == WorkflowActions.PENDING
-                || this.actionType.workflowActionId == WorkflowActions.IN_PROGRESS) {
+                || this.actionType.workflowActionId == WorkflowActions.IN_PROGRESS
+                || this.actionType.workflowActionId == WorkflowActions.CANCEL_SCHEDULE) {
+                if (this.selectedWO != null && this.selectedWO.currentStatusId == WorkOrderStatuses.SCHEDULED) {
+                    this.isSchedule = true;
+                }
+
                 // disable all
                 this.disabled = true;
                 this.isCanEditExpenses = false;
@@ -620,115 +707,183 @@ export class PreventiveRequestComponent {
     public onSubmit(formValue) {
         console.log("onSubmit", formValue);
 
-        try {
-            if (this.formGroupAdd.valid) {
-                console.log("valid");
+        this._generalTab.headerStyleClass = '';
+        var hasError = false;
 
-                // handle manual validation
-
-                // manual validation VALID
-
-                var workorder_object = Object.assign({}, {
-                    workOrderId: this.selectedWO == null ? null : this.selectedWO.workOrderId,
-                    woNumber: this.wo_number.value,
-                    woTypeId: this.selectedWO == null ? this.selectedWoType.id : this.selectedWO.woTypeId,
-                    taskName: this.task_name.value,
-                    description: this.task_desc.value,
-                    woCategoryId: this.selected_category.value == null ? null : this.selected_category.value.id,
-                    woPriorityId: this.selected_priority.value == null ? null : this.selected_priority.value.id,
-                    entityId: null, // ?
-                    locationId: this.selected_location.value == null ? null : this.selected_location.value.id,
-                    locationInfo: this.location_info.value,
-                    assetId: this.selected_asset.value == null ? null : this.selected_asset.value.id,
-                    currentStatusId: this.selected_status.value == null ? null : this.selected_status.value.id,
-                    // TODO: check later
-                    currentAssigneeId: this.selected_assignee.value == null ? null : this.selected_assignee.value.id,
-                    // TODO: check later
-                    mainPicId: this.selected_assignee.value.id,
-                    // TODO: need to change to UTC+0 first
-                    startDate: this.selected_startdate.value,
-                    startTime: this.selected_startdate.value,
-                    repeatOptionId: this.selected_repeat.value == null ? null : this.selected_repeat.value.id,
-                    every: this.selected_repeat.value.id != 6 ? null : this.repeat_every.value,
-                    everyPeriodId: this.selected_repeat.value.id != 6 ? null : this.selected_every_period.value.id,
-                    dueAfter: this.due_after.value,
-                    duePeriodId: this.selected_due_period.value.id,
-                    // TODO: need to change to UTC+0 first
-                    dueDate: this.selected_duedate.value,
-                    lastWoDate: null,
-                    nextWoDate: null,
-                    completeDateTime: null,
-                    completionHours: null,
-                    pendingHours: null,
-                    isComplete: false,
-                    workflowId: this.selectedWO == null ? null : this.selectedWO.workflowId,
-                    contactPerson: this.contact_person.value,
-                    contactNumber: this.contact_number.value,
-                    solution: this.solution.value,
-                    vendor: this.selected_vendor.value == null ? null : this.selected_vendor.value.id
-                });
-
-                var formatted_object = {
-                    workOrder: workorder_object,
-                    action: {
-                        actionId: this.actionType.workflowActionId,
-                        actionName: this.actionType.name
-                    },
-                    expenses: this.readyExpenses(),
-                    deletedExpenses: this.readyDeletedExpenses(),
-                    files: this.readyFilesData(),
-                    deletedFiles: this.readyDeletedFilesData(),
-                    photos: this.readyPhotosData(),
-                    deletedPhotos: this.readyDeletedPhotosData(),
-                };
-
-                let formData: FormData = new FormData();
-                formData.append("params", JSON.stringify(formatted_object));
-
-                // TODO: Loop through newlyAddedFiles
-                for (var i = 0; i < this.existingFiles.length; i++) {
-                    if (this.existingFiles[i].isActive == false) continue;
-                    
-                    if (this.existingFiles[i].isActive && this.existingFiles[i].workOrderFileId == null) {
-                        let actualFile: File = this.existingFiles[i].actualFile;
-                        formData.append("files", actualFile);
-                    }
-                }
-
-                for (var i = 0; i < this.existingPhotos.length; i++) {
-                    if (this.existingPhotos[i].isActive == false) continue;
-                    
-                    if (this.existingPhotos[i].isActive && this.existingPhotos[i].workOrderPhotoId == null) {
-                        let actualFile: File = this.existingPhotos[i].actualFile;
-                        formData.append("photos", actualFile);
-                    }
-                }
-
-                console.log("To Send", formatted_object);
-
-                // TODO: change function name and maybe location?
-                if (this.actionType.workflowActionId == WorkflowActions.CREATE) {
-                    this._taskService.addNewWorkOrder(formData).subscribe((response) => {
-                        console.log("save response", response);
-                        if (response.resultCode.code == 0) {
-                            this._taskService.announceEvent("addNewModal_btnSaveOnClick_createSuccess");
-                        } else {
-                            // an error occured
-                        }
-                    });
-                } else {
-                    this._taskService.updateWorkOrder(formData).subscribe((response) => {
-                        console.log("update response", response);
-                        if (response.resultCode.code == 0) {
-                            this._taskService.announceEvent("addNewModal_btnSaveOnClick_updateSuccess");
-                        } else {
-                            // an error occured
-                        }
-                    });
-                }
+        if (!this.isSchedule) {
+            this._filesTab.headerStyleClass = '';
+            this._expensesTab.headerStyleClass = '';
+            console.log("not isschedule");
+            if (!this.formGroupAdd.valid) {
+                this.markAsTouchedAll();
+                this._generalTab.headerStyleClass = 'tabpanel-has-error';
+                hasError = true;
             }
-        } catch (e) {
-            console.log("ERROR", e);
+
+            if (!this._workOrderFilesComponent.validateFiles() || !this._workOrderFilesComponent.validatePhotos()) {
+                this._workOrderFilesComponent.markAsTouchedAll();
+                this._filesTab.headerStyleClass = 'tabpanel-has-error';
+                hasError = true;
+            }
+
+            if (!this._workOrderExpensesComponent.validateExpenses()) {
+                this._workOrderExpensesComponent.markAsTouchedAll();
+                this._expensesTab.headerStyleClass = 'tabpanel-has-error';
+                hasError = true;
+            }
+        } else {
+            this._recurringTab.headerStyleClass = '';
+            console.log("isschedule");
+            // recurring tab
+            if (!this.selected_repeat.valid
+                || !this.selected_startdate.valid
+                || !this.selected_due_period.valid
+                || !this.due_after.valid
+                || !this.repeat_every.valid
+                || !this.selected_every_period.valid) {
+                hasError = true;
+                this.markAsTouchedAll();
+                this._recurringTab.headerStyleClass = 'tabpanel-has-error';
+            }
+
+            //if (this.selected_repeat.value != null && this.selected_repeat.value.id == 6) {
+            //    console.log('repeat: every');
+            //    if (!this.repeat_every.valid
+            //        || !this.selected_every_period.valid) {
+            //        console.log('tidak valid');
+            //        hasError = true;
+            //        this.markAsTouchedAll();
+            //        this._recurringTab.headerStyleClass = 'tabpanel-has-error';
+            //    }
+            //}
+
+            // general tab
+            if (!this.task_name.valid
+                || !this.task_desc.valid
+                || !this.selected_category.valid
+                || !this.selected_priority.valid
+                || !this.selected_location.valid
+                || !this.location_info.valid
+                || !this.contact_person.valid
+                || !this.contact_number.valid
+                || !this.selected_asset.valid) {
+                hasError = true;
+                this.markAsTouchedAll();
+                this._generalTab.headerStyleClass = 'tabpanel-has-error';
+            }
+        }
+
+        if (hasError) {
+            console.log("not valid");
+            return;
+        }
+        console.log("valid");
+
+        // handle manual validation
+
+        // manual validation VALID
+
+        var workorder_object = Object.assign({}, {
+            workOrderId: this.selectedWO == null ? null : this.selectedWO.workOrderId,
+            woNumber: this.wo_number.value,
+            woTypeId: this.selectedWO == null ? this.selectedWoType.id : this.selectedWO.woTypeId,
+            taskName: this.task_name.value,
+            description: this.task_desc.value,
+            woCategoryId: this.selected_category.value == null ? null : this.selected_category.value.id,
+            woPriorityId: this.selected_priority.value == null ? null : this.selected_priority.value.id,
+            entityId: null, // ?
+            locationId: this.selected_location.value == null ? null : this.selected_location.value.id,
+            locationInfo: this.location_info.value,
+            assetId: this.selected_asset.value == null ? null : this.selected_asset.value.id,
+            currentStatusId: this.selected_status.value == null ? null : this.selected_status.value.id,
+            // TODO: check later
+            currentAssigneeId: this.selected_assignee.value == null ? null : this.selected_assignee.value.id,
+            // TODO: check later
+            mainPicId: this.selected_assignee.value.id,
+            // TODO: need to change to UTC+0 first
+            startDate: this.selected_startdate.value,
+            startTime: this.selected_startdate.value,
+            repeatOptionId: this.selected_repeat.value == null ? null : this.selected_repeat.value.id,
+            every: this.selected_repeat.value.id != 6 ? null : this.repeat_every.value,
+            everyPeriodId: this.selected_repeat.value.id != 6 ? null : this.selected_every_period.value.id,
+            dueAfter: this.due_after.value,
+            duePeriodId: this.selected_due_period.value.id,
+            // TODO: need to change to UTC+0 first
+            dueDate: this.selected_duedate.value == null || this.selected_duedate.value == "" ? null : moment(this.selected_duedate.value).format("YYYY-MM-DD"),
+            lastWoDate: null,
+            nextWoDate: null,
+            completeDateTime: null,
+            completionHours: null,
+            pendingHours: null,
+            isComplete: false,
+            workflowId: this.selectedWO == null ? null : this.selectedWO.workflowId,
+            contactPerson: this.contact_person.value,
+            contactNumber: this.contact_number.value,
+            solution: this.solution.value,
+            vendor: this.selected_vendor.value == null ? null : this.selected_vendor.value.id
+        });
+
+        var formatted_object = {
+            workOrder: workorder_object,
+            action: {
+                actionId: this.actionType.workflowActionId,
+                actionName: this.actionType.name
+            },
+            expenses: this.readyExpenses(),
+            deletedExpenses: this.readyDeletedExpenses(),
+            files: this.readyFilesData(),
+            deletedFiles: this.readyDeletedFilesData(),
+            photos: this.readyPhotosData(),
+            deletedPhotos: this.readyDeletedPhotosData(),
+        };
+
+        let formData: FormData = new FormData();
+        formData.append("params", JSON.stringify(formatted_object));
+
+        // TODO: Loop through newlyAddedFiles
+        for (var i = 0; i < this.existingFiles.length; i++) {
+            if (this.existingFiles[i].isActive == false) continue;
+                    
+            if (this.existingFiles[i].isActive && this.existingFiles[i].workOrderFileId == null) {
+                let actualFile: File = this.existingFiles[i].actualFile;
+                formData.append("files", actualFile);
+            }
+        }
+
+        for (var i = 0; i < this.existingPhotos.length; i++) {
+            if (this.existingPhotos[i].isActive == false) continue;
+                    
+            if (this.existingPhotos[i].isActive && this.existingPhotos[i].workOrderPhotoId == null) {
+                let actualFile: File = this.existingPhotos[i].actualFile;
+                formData.append("photos", actualFile);
+            }
+        }
+
+        console.log("To Send", formatted_object);
+
+        // TODO: change function name and maybe location?
+        if (this.actionType.workflowActionId == WorkflowActions.CREATE) {
+            this._taskService.addNewWorkOrder(formData).subscribe((response) => {
+                console.log("save response", response);
+                if (response.resultCode.code == 0) {
+                    this._taskService.announceEvent("addNewModal_btnSaveOnClick_createSuccess");
+                } else {
+                    // an error occured
+                    this.errMsg = [];
+                    this.errMsg = this.errMsg.concat(response.resultCode.message);
+                }
+            });
+        } else {
+            this._taskService.updateWorkOrder(formData).subscribe((response) => {
+                console.log("update response", response);
+                if (response.resultCode.code == 0) {
+                    this._taskService.announceEvent("addNewModal_btnSaveOnClick_updateSuccess");
+                } else {
+                    // an error occured
+                    this.errMsg = [];
+                    this.errMsg = this.errMsg.concat(response.resultCode.message);
+                }
+            });
         }
 
         return false;
@@ -938,6 +1093,33 @@ export class PreventiveRequestComponent {
         return null;
     }
 
+    validateDuePeriod(input: FormControl) {
+        if (this.actionType.workflowActionId == WorkflowActions.CREATE
+            || (this.actionType.workflowActionId == WorkflowActions.EDIT && this.isSchedule)) {
+            if (input.value == null || input.value == "" || input.value.id == null) {
+                return { required: true };
+            }
+        }
+
+        return null;
+    }
+
+    validateStartDueDate(input: FormControl) {
+        console.log("validateStartEndDate", this.selected_startdate, this.selected_duedate);
+        if (!this.isSchedule) {
+            if (this.selected_startdate != null && this.selected_duedate != null
+                && this.selected_startdate.value != null && this.selected_startdate.value != ""
+                && this.selected_duedate.value != null && this.selected_duedate.value != "") {
+                let startDate = moment(this.selected_startdate.value).format("YYYY-MM-DD");
+                let dueDate = moment(this.selected_duedate.value).format("YYYY-MM-DD");
+
+                if (startDate > dueDate) return { crossdate: true };
+            }
+        }
+
+        return null;
+    }
+
     isExpensesFormValid() {
         //console.log("validateExpenses", this.wo_expenses);
 
@@ -989,5 +1171,24 @@ export class PreventiveRequestComponent {
         }
 
         return true;
+    }
+
+    onChangesFiles() {
+        console.log("changes on notes files detected");
+        if (this._workOrderFilesComponent.validateFiles() && this._workOrderFilesComponent.validatePhotos()) {
+            this._filesTab.headerStyleClass = '';
+        }
+    }
+
+    onChangesExpenses() {
+        if (this._workOrderExpensesComponent.validateExpenses()) {
+            this._expensesTab.headerStyleClass = '';
+        }
+    }
+
+    markAsTouchedAll() {
+        Object.keys(this.formGroupAdd.controls).forEach(key => {
+            this.formGroupAdd.controls[key].markAsTouched();
+        });
     }
 }

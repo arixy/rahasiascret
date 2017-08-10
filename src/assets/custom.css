@@ -631,4 +631,32 @@ input[disabled], textarea[disabled] {
 .ui-fileupload-choose[disabled]{
   display: none !important;
 }
+
+.btn-print {
+  transform: initial !important;
+  background: #27c24c !important;
+  color: #fff !important;
+  width: 100% !important;
+}
+
+.ui-select-container .btn {
+  border: 1px solid #d4d4d4;
+  border-radius: 2px;
+}
+
+.ui-select-container .btn:hover {
+  transform: scale(1.0) !important;
+}
+
+.tabpanel-has-error .ui-tabview-title {
+  color: red;
+}
+
+.tabpanel-has-error .ui-tabview-title:after {
+  content: " !";
+}
+
+input[disabled].form-control, textarea[disabled].form-control {
+  border: 1px solid #cfdadd
+}
 /* End Added by Mike */
