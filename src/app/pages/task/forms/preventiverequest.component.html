@@ -436,13 +436,13 @@
       &nbsp;
     </div>
     <div class="col-sm-3 btn-with-icon">
-      <button type="button" class="btn btn-print" (click)="onPrint()" *ngIf="actionType != null && actionType.workflowActionId != -1">
+      <button type="button" class="btn btn-print" (click)="onPrint()" *ngIf="actionType != null && actionType.workflowActionId != -1 && !isSchedule">
         <i class="icon ion-printer"></i>
         Print
       </button>
     </div>
     <div class="col-sm-3 btn-with-icon" *ngIf="_defFieldPermissions.btn_submit != 'hide'">
-      <button type="submit" class="btn btn-default btn-save" (click)="onSubmit(formGroupAdd.value)">
+      <button type="button" class="btn btn-default btn-save" (click)="onSubmit(formGroupAdd.value)">
         <i class="icon ion-checkmark"></i>
         Save
       </button>

@@ -56,6 +56,16 @@ export class PerformanceReportComponent implements OnDestroy {
 	// data model
     private lstPerformances = [];
 
+    // loading state
+    private loadingState = {
+        isLoading: (): boolean => {
+            return this.loadingState.pic || this.loadingState.woCategory || this.loadingState.woType || this.loadingState.reportResult;
+        },
+        pic: true,
+        woType: true,
+        woCategory: true,
+        reportResult: false
+    }
     // View Childs
     @ViewChild("selectDateType") _lsbSelectDateType: SelectComponent;
     @ViewChild("selectWOType") _lsbSelectWOType: SelectComponent;
@@ -73,7 +83,8 @@ export class PerformanceReportComponent implements OnDestroy {
     }
 
     ngOnInit() {
-        // set default filter
+        // category
+        this.loadingState.woCategory = true;
         this._lsbSelectWOCategory.active = [{ id: -1, text: "All" }];
         this.filterModel.woCategory = [{ id: -1, text: "All" }];
         this._woCategoryService.getWOs().subscribe(response => {
@@ -87,8 +98,13 @@ export class PerformanceReportComponent implements OnDestroy {
             } else {
                 this.errMsg = this.errMsg.concat(response.resultCode.message);
             }
+            this.loadingState.woCategory = false;
         });
 
+        // type
+        this.loadingState.woType = true;
+        this._lsbSelectWOType.active = [{ id: -1, text: "All" }];
+        this.filterModel.woType = [{ id: -1, text: "All" }];
         this._woTypeService.getAllWorkOrderTypes().subscribe(response => {
             if (response.resultCode.code == "0") {
                 let __responseData = response.data;
@@ -98,15 +114,15 @@ export class PerformanceReportComponent implements OnDestroy {
                 }
                 this.filterModel._itemsWOTypes = __woTypes;
 
-                // set default filter work order type
-                this._lsbSelectWOType.active = [__woTypes[0]];
-                this.filterModel.woType = [__woTypes[0]];
+                
             } else {
                 this.errMsg = this.errMsg.concat(response.resultCode.message);
             }
+            this.loadingState.woType = false;
         });
 
         // get list of PIC
+        this.loadingState.pic = true;
         this._userService.getAssigneeByTypeId("User", 1).subscribe(response => {
             if (response.resultCode.code == "0") {
                 let __responseData = response.data;
@@ -119,6 +135,7 @@ export class PerformanceReportComponent implements OnDestroy {
             } else {
                 this.errMsg = this.errMsg.concat(response.resultCode.message);
             }
+            this.loadingState.pic = false;
         });
 
         // set default filter
@@ -192,6 +209,7 @@ export class PerformanceReportComponent implements OnDestroy {
         console.log("paramToSend", paramToSend);
 
         // request API
+        this.loadingState.reportResult = true;
         this._performanceReportService.getPerformancesAsReport(paramToSend).subscribe(response => {
             if (response.resultCode.code == "0") {
                 this.lstPerformances = response.data;
@@ -199,6 +217,7 @@ export class PerformanceReportComponent implements OnDestroy {
             } else {
                 this.errMsg = this.errMsg.concat(response.resultCode.message);
             }
+            this.loadingState.reportResult = false;
         });
 
         //this._pnlFilter.collapse(new Event("click"));

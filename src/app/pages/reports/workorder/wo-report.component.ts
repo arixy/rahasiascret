@@ -55,37 +55,17 @@ export class WorkOrderListReportComponent implements OnDestroy {
 
 	// data model
     private lstWorkOrders = [];
-    //private lstWorkOrders = [{
-    //    woNumber: "WO1707000001",
-    //    woCategoryName: "Customer Complaints",
-    //    woPriorityName: "High",
-    //    assetName: "Air Conditioner",
-    //    locationName: "L3 West Wing",
-    //    start: "2017-07-04 13:00",
-    //    dueDate: "2017-07-05",
-    //    currentStatusName: "In Progress",
-    //    assignee: "Hadi",
-    //    lastUpdated: "2017-07-04 13:00",
-    //    completedDate: null,
-    //    onTime: null,
-    //    totalHours: null,
-    //    totalExpenses: null
-    //}, {
-    //    woNumber: "WO1707000002",
-    //    woCategoryName: "Customer Complaints",
-    //    woPriorityName: "High",
-    //    assetName: "Escalator",
-    //    locationName: "L2 Central Area",
-    //    start: "2017-07-04 15:40",
-    //    dueDate: "2017-07-06",
-    //    currentStatusName: "In Progress",
-    //    assignee: "Ari",
-    //    lastUpdated: "2017-07-04 15:54",
-    //    completedDate: null,
-    //    onTime: null,
-    //    totalHours: null,
-    //    totalExpenses: null
-    //    }];
+
+    // loading state
+    private loadingState = {
+        isLoading: (): boolean => {
+            return this.loadingState.woStatus || this.loadingState.woCategory || this.loadingState.woType || this.loadingState.reportResult;
+        },
+        woStatus: true,
+        woType: true,
+        woCategory: true,
+        reportResult: false
+    }
 
     // View Childs
     @ViewChild("selectDateType") _lsbSelectDateType: SelectComponent;
@@ -103,6 +83,9 @@ export class WorkOrderListReportComponent implements OnDestroy {
     }
 
     ngOnInit() {
+        this.loadingState.woStatus = true;
+        this._lsbSelectStatus.active = [{ id: -1, text: "All" }];
+        this.filterModel.woCategory = [{ id: -1, text: "All" }];
         this._statusService.getWorkOrderStatuses().subscribe(response => {
             if (response.resultCode.code == "0") {
                 let __responseData = response.data;
@@ -118,9 +101,11 @@ export class WorkOrderListReportComponent implements OnDestroy {
             } else {
                 this.errMsg = this.errMsg.concat(response.resultCode.message);
             }
+            this.loadingState.woStatus = false;
         });
 
         // set default filter
+        this.loadingState.woCategory = true;
         this._lsbSelectWOCategory.active = [{ id: -1, text: "All" }];
         this.filterModel.woCategory = [{ id: -1, text: "All" }];
         this._woCategoryService.getWOs().subscribe(response => {
@@ -134,8 +119,12 @@ export class WorkOrderListReportComponent implements OnDestroy {
             } else {
                 this.errMsg = this.errMsg.concat(response.resultCode.message);
             }
+            this.loadingState.woCategory = false;
         });
 
+        this.loadingState.woType = true;
+        this._lsbSelectWOType.active = [{ id: -1, text: "All" }];
+        this.filterModel.woType = [{ id: -1, text: "All" }];
         this._woTypeService.getAllWorkOrderTypes().subscribe(response => {
             if (response.resultCode.code == "0") {
                 let __responseData = response.data;
@@ -151,6 +140,7 @@ export class WorkOrderListReportComponent implements OnDestroy {
             } else {
                 this.errMsg = this.errMsg.concat(response.resultCode.message);
             }
+            this.loadingState.woType = false;
         });
 
         // set default filter
@@ -224,6 +214,7 @@ export class WorkOrderListReportComponent implements OnDestroy {
         console.log("paramToSend", paramToSend);
 
         // table
+        this.loadingState.reportResult = true;
         this._workOrderReportService.getWorkOrdersAsReport(paramToSend).subscribe(response => {
             if (response.resultCode.code == "0") {
                 this.lstWorkOrders = response.data;
@@ -233,7 +224,7 @@ export class WorkOrderListReportComponent implements OnDestroy {
                 this.errMsg = [];
                 this.errMsg = this.errMsg.concat(response.resultCode.message);
             }
-
+            this.loadingState.reportResult = false;
         });
 
         //this._pnlFilter.collapse(new Event("click"));

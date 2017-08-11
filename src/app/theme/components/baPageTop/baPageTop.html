@@ -89,10 +89,10 @@
         <div class="col-md-3" *ngIf="configurationPerm.administration.isCanShow()">
          <ul class="dropdown-menu__">
             <h5>Administration</h5>
-            <li *ngIf="configurationPerm.administration.User"><i class="fa fa-angle-right"></i><a (click)="goToUsers()">{{ sitemap.User.name }}</a></li>
-            <li *ngIf="configurationPerm.administration.Role"><i class="fa fa-angle-right"></i><a (click)="goToRoles()">{{sitemap.Role.name}}</a></li>
-            <li *ngIf="configurationPerm.administration.AccessRights"><i class="fa fa-angle-right"></i><a (click)="goToAccessRights()">{{sitemap.AccessRights.name}}</a></li>
-           <li *ngIf="configurationPerm.administration.SystemSetting"><i class="fa fa-angle-right"></i><a routerLink="/pages/settings">{{sitemap.SystemSetting.name}}</a></li>
+            <li *ngIf="configurationPerm.administration.User"><i class="fa fa-angle-right"></i><a (click)="goToUsers()">{{ sitemap.User != null ? sitemap.User.name : '' }}</a></li>
+            <li *ngIf="configurationPerm.administration.Role"><i class="fa fa-angle-right"></i><a (click)="goToRoles()">{{ sitemap.Role != null ? sitemap.Role.name : ''}}</a></li>
+            <li *ngIf="configurationPerm.administration.AccessRights"><i class="fa fa-angle-right"></i><a (click)="goToAccessRights()">{{ sitemap.AccessRights != null ? sitemap.AccessRights.name : '' }}</a></li>
+           <li *ngIf="configurationPerm.administration.SystemSetting"><i class="fa fa-angle-right"></i><a routerLink="/pages/settings">{{ sitemap.SystemSetting != null ? sitemap.SystemSetting.name : ''}}</a></li>
             <!-- <li><i class="fa fa-angle-right"></i><a href="#">Redirect Tasks(Reassign)</a></li> -->
         </ul>
         </div>
@@ -114,26 +114,58 @@
       </div>
       <div class="modal-body">
         <div>
-            <ba-card title="Change Password" baCardClass="with-scroll">
-              <div class="form-group row">
-                <label for="inputPassword3" class="col-sm-2 control-label">Old Password</label>
-
-                <div class="col-sm-10">
-                  <input [(ngModel)]="oldpassword" type="password" class="form-control" id="inputPassword3" placeholder="Old Password">
-                </div>
+            <ba-card title="" baCardClass="with-scroll">
+              <div class="alert alert-danger" *ngIf="errMsgChangePw.length > 0">
+                <ul style="margin-bottom: 0px;" class="lst-error">
+                  <li *ngFor="let err of errMsgChangePw">
+                    {{err}}
+                  </li>
+                </ul>
               </div>
-			  <div class="form-group row">
-                <label for="inputPassword3" class="col-sm-2 control-label">New Password</label>
-
-                <div class="col-sm-10">
-                  <input [(ngModel)]="newpassword" type="password" class="form-control" id="inputPassword3" placeholder="New Password">
+              <form class="form-horizontal" [formGroup]="formGroupChangePw" onsubmit="return false;">
+                <div class="formfix" style="margin-left: 24px; margin-right: 24px;">
+                  <div class="form-group row">
+                    <div class="col-sm-12">
+                      <label for="inputEmail3" class="control-label">Old Password</label><br />
+                      <input [formControl]="formGroupChangePw.controls['oldPassword']" type="password" class="form-control" id="inputPassword3" placeholder="Old Password">
+                    </div>
+                  </div>
+                  <div class="row error-row">
+                    <div class="col-sm-12">
+                      <div class="col-xg-2 line-height-zero">&nbsp;</div>
+                      <div class="error-message col-xg-10"
+                           *ngIf="formGroupChangePw.get('oldPassword').hasError('required') && formGroupChangePw.get('oldPassword').touched">
+                        Old Password is required
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <div class="col-sm-12">
+                      <label for="inputEmail3" class="control-label">New Password</label><br />
+                      <input [formControl]="formGroupChangePw.controls['newPassword']" type="password" class="form-control" id="inputPassword3" placeholder="New Password">
+                    </div>
+                  </div>
+                  <div class="row error-row">
+                    <div class="col-sm-12">
+                      <div class="col-xg-2 line-height-zero">&nbsp;</div>
+                      <div class="error-message col-xg-10"
+                           *ngIf="formGroupChangePw.get('newPassword').hasError('required') && formGroupChangePw.get('newPassword').touched">
+                        New Password is required
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div class="form-group row">
-                <div class="offset-sm-2 col-sm-10">
-                  <button (click)="submitPassword()" class="btn btn-default btn-auth">Submit</button>
+                <div class="form-group modal-action-row row">
+                  <div class="col-sm-12">
+                    <div class="offset-sm-9 col-sm-3 btn-with-icon">
+                      <button type="button" class="btn btn-default btn-save" (click)="submitPassword()">
+                        <i class="icon ion-checkmark"></i>
+                        Save
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              </form>
             </ba-card>
           </div>
       </div>

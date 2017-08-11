@@ -91,6 +91,7 @@ export class UtilityConsumptions implements OnDestroy {
         }
 
         this.isLoadingData = true;
+        this.errMsg = [];
         this._utilityConsumptionService.getUtilityConsumptions(filters).subscribe(response => {
             if (response.resultCode.code == "0") {
                 this.lstUtilityConsumptions = response.data;
@@ -188,7 +189,9 @@ export class UtilityConsumptions implements OnDestroy {
 
     downloadCSV(dataTable: DataTable) {
         console.log("export CSV");
-        this._utilityConsumptionService.exportAllUtilityConsumptions(this.buildFilter(dataTable)).subscribe(response => {
+        let filters: any = this.buildFilter(dataTable);
+        filters.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        this._utilityConsumptionService.exportAllUtilityConsumptions(filters).subscribe(response => {
             console.log("export CSV", response);
             let blobData: Blob = new Blob([response.blob()], { type: response.headers.get('Content-Type') });
             saveAs(blobData, "consumptions.csv");

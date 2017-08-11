@@ -1,5 +1,6 @@
 import { Component, ViewChild, ViewEncapsulation, ElementRef } from '@angular/core';
 import { Http, Response, Headers, RequestOptions, URLSearchParams } from '@angular/http';
+import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 
@@ -84,14 +85,20 @@ export class BaPageTop {
   }
 
   private sitemap;
+  // end configuration
 
+  // change password related
+  private errMsgChangePw = [];
+  private formGroupChangePw: FormGroup;
+  // end change password related
   @ViewChild('changeModal') changeModal: ModalDirective;
 
   constructor(private _state:GlobalState,
              public authService: AuthenticationService,
              public router: Router,
              private _eref: ElementRef,
-             private http: Http) {
+             private http: Http,
+             private fb: FormBuilder) {
     this._state.subscribe('menu.isCollapsed', (isCollapsed) => {
       this.isMenuCollapsed = isCollapsed;
     });
@@ -124,6 +131,11 @@ export class BaPageTop {
       }
 
       console.log("config perms:", this.configurationPerm); 
+      // create form group
+      this.formGroupChangePw = this.fb.group({
+          'oldPassword': ['', Validators.compose([Validators.required])],
+          'newPassword': ['', Validators.compose([Validators.required])]
+      });
   }
 
   public toggleMenu() {
@@ -149,42 +161,65 @@ export class BaPageTop {
       this.changeModal.hide();
   }
   public changePassword(){
+      this.errMsgChangePw = [];
+      this.formGroupChangePw.reset()
+      Object.keys(this.formGroupChangePw.controls).forEach(key => {
+          this.formGroupChangePw.controls[key].markAsUntouched();
+      });
       this.changeModal.show();
       
   }
 
-    public submitPassword(){
-        var headers = new Headers();
-      headers.append('Content-Type', 'application/x-www-form-urlencoded');
-      headers.append('Authorization', 'Bearer ' + localStorage.getItem('bearer_token'));
-      headers.append('Access-Control-Allow-Origin', '*');
-      headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
-      
-      var options = new RequestOptions({
-          headers: headers
-      });
-      
-      var add_url = this.appUrl + 'change-password';
-      
-      // To Change the JSON object to urlencoded
-      let url_search_params = new URLSearchParams();
-      
-      url_search_params.append('oldPassword', this.oldpassword);
-      url_search_params.append('newPassword', this.newpassword);
-      
-      let cp_body = url_search_params.toString();
-      console.log('Location Body URL encode', cp_body);
-      
-      this.http.post(add_url, cp_body, options).map(
-          res => {
-              return res.json()
+  public submitPassword() {
+      this.errMsgChangePw = [];
+
+      console.log("form submit", this.formGroupChangePw);
+
+      if (this.formGroupChangePw.valid) {
+
+          // send request change password to server
+          var headers = new Headers();
+          headers.append('Content-Type', 'application/x-www-form-urlencoded');
+          headers.append('Authorization', 'Bearer ' + localStorage.getItem('bearer_token'));
+          headers.append('Access-Control-Allow-Origin', '*');
+          headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
+
+          var options = new RequestOptions({
+              headers: headers
+          });
+
+          var add_url = this.appUrl + 'change-password';
+
+          // To Change the JSON object to urlencoded
+          let url_search_params = new URLSearchParams();
+
+          url_search_params.append('oldPassword', this.formGroupChangePw.get('oldPassword').value);
+          url_search_params.append('newPassword', this.formGroupChangePw.get('newPassword').value);
+
+          let cp_body = url_search_params.toString();
+          console.log('Location Body URL encode', cp_body);
+
+          this.http.post(add_url, cp_body, options).map(
+              res => {
+                  return res.json()
           }).subscribe(
-            response => {
-                console.log('Response from server', response);
-                this.hideChangeModal();
-            }
-      );
-    }
+              response => {
+                  console.log('Response from server', response);
+                  if (response.resultCode.code == "0") {
+                      this.hideChangeModal();
+                  } else {
+                      this.errMsgChangePw = [];
+                      this.errMsgChangePw = this.errMsgChangePw.concat(response.resultCode.message);
+                  }
+              }
+           );
+      } else {
+          console.log("not valid");
+          Object.keys(this.formGroupChangePw.controls).forEach(key => {
+              this.formGroupChangePw.controls[key].markAsTouched();
+          });
+      }
+  }
   public logout(){
       this.authService.postLogout();
       let redirect = '/login';
