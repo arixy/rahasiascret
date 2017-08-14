@@ -7,17 +7,9 @@
     <div class="col-md-12">
       <ba-card title="Reports" baCardClass="with-scroll">
        <div class="row">
-            <div class="col-md-4">
-                <h3><a routerLink="/pages/wo-report">Work Order Report</a></h3>
-                <p>View Reports related to Work Orders</p>
-            </div>
-            <div class="col-md-4">
-                <h3><a routerLink="/pages/consumption-report">Consumption Report</a></h3>
-                <p>View Reports related to Consumption</p>
-            </div>
-            <div class="col-md-4">
-              <h3><a routerLink="/pages/performance-report">Performance Report</a></h3>
-              <p>View Reports related to individual Performance</p>
+            <div class="col-md-4" *ngFor="let item of menuModel">
+                <h3><a [routerLink]="item.route">{{ item.name }}</a></h3>
+                <p>{{ item.description }}</p>
             </div>
             <!--<div class="col-md-4">
                 <h3>Completed Task</h3>

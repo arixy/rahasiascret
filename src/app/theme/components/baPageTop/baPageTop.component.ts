@@ -87,6 +87,19 @@ export class BaPageTop {
   private sitemap;
   // end configuration
 
+  // to hide new button and its child
+  private newMenu = {
+      isCanShow: () => {
+          return this.newMenu.buildingManagement.length > 0
+              || this.newMenu.assets.length > 0
+              || this.newMenu.ownerTenants.length > 0
+              || this.newMenu.utilities.length > 0;
+      },
+      buildingManagement: [],
+      assets: [],
+      ownerTenants: [],
+      utilities: []
+  };
   // change password related
   private errMsgChangePw = [];
   private formGroupChangePw: FormGroup;
@@ -136,6 +149,61 @@ export class BaPageTop {
           'oldPassword': ['', Validators.compose([Validators.required])],
           'newPassword': ['', Validators.compose([Validators.required])]
       });
+      //============================
+      // New Menu authorization
+      //
+      //    Building Management
+      if (authorizedSitemaps['SingleWorkOrder'] != null
+          && authorizedSitemaps['SingleWorkOrder'].allowAccessOrView) {
+          let sitemap = this.sitemap['SingleWorkOrder'];
+          sitemap.route = '/pages/transactions/workorders/single';
+          this.newMenu.buildingManagement.push(sitemap);
+      }
+
+      if (authorizedSitemaps['RecurringWorkOrder'] != null
+          && authorizedSitemaps['RecurringWorkOrder'].allowAccessOrView) {
+          let sitemap = this.sitemap['RecurringWorkOrder'];
+          sitemap.route = '/pages/transactions/workorders/recurring';
+          this.newMenu.buildingManagement.push(sitemap);
+      }
+
+      //    Assets
+      if (authorizedSitemaps['PreventiveWorkOrder'] != null
+          && authorizedSitemaps['PreventiveWorkOrder'].allowAccessOrView) {
+          let sitemap = this.sitemap['PreventiveWorkOrder'];
+          sitemap.route = '/pages/transactions/workorders/preventive';
+          this.newMenu.assets.push(sitemap);
+      }
+
+      //    Owner & Tenants
+      if (authorizedSitemaps['OwnerWorkOrder'] != null
+          && authorizedSitemaps['OwnerWorkOrder'].allowAccessOrView) {
+          let sitemap = this.sitemap['OwnerWorkOrder'];
+          sitemap.route = '/pages/transactions/workorders/owner';
+          this.newMenu.ownerTenants.push(sitemap);
+      }
+
+      if (authorizedSitemaps['TenantWorkOrder'] != null
+          && authorizedSitemaps['TenantWorkOrder'].allowAccessOrView) {
+          let sitemap = this.sitemap['TenantWorkOrder'];
+          sitemap.route = '/pages/transactions/workorders/tenant';
+          this.newMenu.ownerTenants.push(sitemap);
+      }
+
+      if (authorizedSitemaps['GuestWorkOrder'] != null
+          && authorizedSitemaps['GuestWorkOrder'].allowAccessOrView) {
+          let sitemap = this.sitemap['GuestWorkOrder'];
+          sitemap.route = '/pages/transactions/workorders/guest';
+          this.newMenu.ownerTenants.push(sitemap);
+      }
+
+      //    Utility Consumption
+      if (authorizedSitemaps['UtilityConsumption'] != null
+          && authorizedSitemaps['UtilityConsumption'].allowAccessOrView) {
+          let sitemap = this.sitemap['UtilityConsumption'];
+          sitemap.route = '/pages/transactions/consumptions';
+          this.newMenu.utilities.push(sitemap);
+      }
   }
 
   public toggleMenu() {

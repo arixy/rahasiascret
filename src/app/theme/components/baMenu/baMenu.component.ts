@@ -26,6 +26,8 @@ export class BaMenu {
   protected _onRouteChange: Subscription;
   public outOfArea: number = -200;
 
+  private showMenuItems = [];
+
   constructor(private _router: Router, private _service: BaMenuService, private _state: GlobalState) {
   }
 
@@ -35,17 +37,75 @@ export class BaMenu {
   }
 
   public selectMenuAndNotify(): void {
+      console.log("selectMenuAndNotify", this.menuItems, this._router);
     if (this.menuItems) {
-      this.menuItems = this._service.selectMenuItem(this.menuItems);
-      this._state.notifyDataChanged('menu.activeLink', this._service.getCurrentItem());
+        this.menuItems = this._service.selectMenuItem(this.menuItems);
+        this.showMenuItems = this.filterMenu(this.menuItems);
+        console.log("after service.selectMenuItem", this.menuItems);
+        this._state.notifyDataChanged('menu.activeLink', this._service.getCurrentItem());
     }
+  }
+
+  filterMenu(menuItems) {
+      let items = [];
+      menuItems.forEach((item) => {
+          if (item.children && item.children.length > 0) {
+              //console.log("menu has child", item);
+              item.children = this.filterMenu(item.children);
+
+              // by mike
+              if (item.children.length == 0) {
+                  return;
+              }
+              // end of by mike
+          }
+
+          if (item.children == null || item.children.length == 0) {
+
+              if (item.route && item.route.data && item.route.data.menuId) {
+                  let menuAuthorization = JSON.parse(localStorage.getItem('sitemaps'))[item.route.data.menuId];
+
+                  if (menuAuthorization) {
+                      item.title = menuAuthorization.name;
+                  }
+
+                  // if is Report (custom id)
+                  if (item.route.data.menuId === '_MAINREPORT') {
+                      let authorizedSitemaps = JSON.parse(localStorage.getItem('authorizedSitemaps'));
+                      if ((authorizedSitemaps['ReportWorkOrder'] && authorizedSitemaps['ReportWorkOrder'].allowAccessOrView)
+                          || (authorizedSitemaps['ReportPerformance'] && authorizedSitemaps['ReportPerformance'].allowAccessOrView)
+                          || (authorizedSitemaps['ReportConsumption'] && authorizedSitemaps['ReportConsumption'].allowAccessOrView)) {
+                          items.push(item);
+                      }
+                  } else {
+                      //console.log("menu <hidden: false>, <children: no children>", item);
+                      if (item.route.data.menuId) {
+                          let menuAuthorization = JSON.parse(localStorage.getItem('authorizedSitemaps'))[item.route.data.menuId];
+                          if (menuAuthorization != null && menuAuthorization.allowAccessOrView) {
+                              //console.log("added menu by checking authorization", item);
+                              items.push(item);
+                          } else {
+                              console.error("authorization menu", item, menuAuthorization);
+                          }
+                      }
+                  }
+              }
+          } else {
+              //console.log("added menu", item);
+              items.push(item);
+          }
+      });
+
+      return items;
   }
 
   public ngOnInit(): void {
     this._onRouteChange = this._router.events.subscribe((event) => {
 
       if (event instanceof NavigationEnd) {
+        console.log("baMenu ngOnInit", this.menuItems, this._router);
         if (this.menuItems) {
+
           this.selectMenuAndNotify();
         } else {
           // on page load we have to wait as event is fired before menu elements are prepared
