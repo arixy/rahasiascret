@@ -1,16 +1,20 @@
 import { Injectable } from '@angular/core';
-import { Http, Response, Headers, RequestOptions, URLSearchParams } from '@angular/http';
+import { Http, Response, Headers, RequestOptions, URLSearchParams,ResponseContentType } from '@angular/http';
 import { UUID } from 'angular2-uuid';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
-
+import { Subject }    from 'rxjs/Subject';
 import { GlobalConfigs  } from '../../global.state';
 @Injectable()
 export class RoleService{
 	private role_data: any;
 	redirectUrl: string;
     //private appUrl = 'http://ec2-52-40-147-30.us-west-2.compute.amazonaws.com/api/v1/admin/';
-    private appUrl = GlobalConfigs.APP_BASE_URL + '/admin/';
+	private appUrl = GlobalConfigs.APP_BASE_URL + '/admin/';
+	private appUrlRoleType=GlobalConfigs.APP_BASE_URL+'/lookup/';
+	private eventEmitted = new Subject<string>();
+	
+	public eventEmitted$ = this.eventEmitted.asObservable();
 
   constructor(private http: Http){
 //    this.role_data = [
@@ -58,33 +62,6 @@ export class RoleService{
 		return this.http.get(load_url, 	options).map(this.extractData);
 	}
 	
-    getRolesFilter(filter_data){
-        var headers = new Headers();
-        headers.append('Content-Type', 'application/json');
-        var bearer = "Bearer " + localStorage.getItem('bearer_token');
-
-        headers.append('Authorization', bearer);
-        headers.append('Access-Control-Allow-Origin', '*');
-        headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
-
-        var options = new RequestOptions({headers: headers});
-        var load_url = this.appUrl + 'role/all';
-        
-        let formatted_object = {
-                filters: {},
-                first: 0,
-                rows: 10,
-                globalFilter: '',
-                multiSortMeta: null,
-                sortField: 'dateUpdated',
-                sortOrder: -1
-        };
-        if(filter_data){
-           formatted_object = filter_data; 
-        }
-        console.log('Formatted_Object', formatted_object);
-        return this.http.post(load_url, formatted_object, options).map(this.extractData);
-    }
   private extractData(res: Response){
     let body = res.json();
     console.debug(body);
@@ -107,7 +84,8 @@ export class RoleService{
       
       // To Change the JSON object to urlencoded
       let url_search_params = new URLSearchParams();
-      
+	  
+	  url_search_params.append('roleTypeId', new_role.roleTypeId);
       url_search_params.append('name', new_role.name);
       url_search_params.append('description', new_role.description);
 	  
@@ -133,7 +111,8 @@ export class RoleService{
       	// To Change the JSON object to urlencoded
       	let url_search_params = new URLSearchParams();
       
-      	url_search_params.append('roleId', update_role.id);
+		url_search_params.append('roleId', update_role.roleId);
+		url_search_params.append('roleTypeId', update_role.roleTypeId);
       	url_search_params.append('name', update_role.name);
       	url_search_params.append('description', update_role.description);
       
@@ -166,5 +145,97 @@ export class RoleService{
     
     getRoleNormal(){
         return this.role_data;
-    }
+	}
+	
+	getRoleByFilter(filters:any){
+		var headers=new Headers();
+		headers.append('Content-type','application/json');
+		var bearer = "Bearer " + localStorage.getItem('bearer_token');
+		
+		headers.append('Authorization', bearer);
+		headers.append('Access-Control-Allow-Origin', '*');
+		headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
+
+		var options = new RequestOptions({headers: headers});
+		var load_url = this.appUrl + 'role/all';
+		console.log('Options ', options);
+		if(filters == null){
+			filters= {
+				"filters": {
+				}, 
+				"first": 0, 
+				"globalFilter": '',
+				"multiSortMeta": "undefined", 
+				"rows": 10, 
+				"sortField": "name", 
+				"sortOrder": -1
+			};
+		}
+
+		return this.http.post(load_url, filters, options).map(this.extractData);
+	}
+	
+	public getDownloadCSV(filter_data):Observable<any>{
+		var bearer = "Bearer " + localStorage.getItem('bearer_token');
+        var headers=new Headers();
+
+        headers.append("Accept", "application/octet-stream");
+        headers.append('Authorization', bearer);
+        headers.append('Access-Control-Allow-Origin', '*');
+        headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
+
+        var options = new RequestOptions({ headers: headers, responseType: ResponseContentType.Blob });
+        var load_url=this.appUrl+ 'role/all/export';
+
+        let formated_object={
+                   filters:{},
+                   first:0,
+                   rows:9999,
+                   globalFilter:'',
+                   multiSortMeta:null,
+                   sortField:'dateUpdated',
+                   sortOrder:-1
+        };
+        console.log("filter_data ",filter_data);
+        if(filter_data){
+            formated_object=filter_data;
+        }
+        
+		return this.http.post(load_url,formated_object,options);
+	}
+
+	public announceEvent(eventName:string){
+        this.eventEmitted.next(eventName);
+	}
+	
+	getRoleById(id: number){
+		var headers = new Headers();
+		headers.append('Content-Type', 'application/json');
+		var bearer = "Bearer " + localStorage.getItem('bearer_token');
+  
+		headers.append('Authorization', bearer);
+		headers.append('Access-Control-Allow-Origin', '*');
+		headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
+  
+		var options = new RequestOptions({ headers: headers });
+		var load_url = this.appUrl + '/role/get/' + id;
+		console.log('Options ', options);
+  
+		return this.http.get(load_url, options).map(this.extractData);
+	}
+	getAllRoleTypes(): Observable<any>{
+		var headers = new Headers();
+        headers.append('Content-Type', 'application/json');
+        var bearer = "Bearer " + localStorage.getItem('bearer_token');
+
+        headers.append('Authorization', bearer);
+        headers.append('Access-Control-Allow-Origin', '*');
+        headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
+
+        var options = new RequestOptions({ headers: headers });
+        var load_url = this.appUrlRoleType + '/role-type/all';
+        console.log('Options ', options);
+
+        return this.http.get(load_url, options).map(this.extractData);
+	}
 }
