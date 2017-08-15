@@ -71,11 +71,11 @@ export class RoleComponent {
     private subscription: Subscription;
 
     private totalRecords;
-    public roleType: Observable<any>;
+    public roleType$: Observable<any>;
 
     public selected_typeid = null;
     public selected_typeid_edit = null;
-    public selectedRoleFc;
+    
 
 
 
@@ -98,13 +98,11 @@ export class RoleComponent {
 
         this.form = this.fb.group({
             'name': ['', [Validators.required, Validators.minLength(2)]],
-            'description': ['', [Validators.required, Validators.minLength(2)]],
-            'selectedRoleFc': ['', Validators.compose([Validators.required])]
+			'description': ['', [Validators.required, Validators.minLength(2)]]
 		  });
           this.name = this.form.controls['name'];
 		  this.description = this.form.controls['description'];
-          this.selectedRoleFc = this.form.controls['selectedRoleFc'];
-
+          
 		  this.edit_form = this.fb.group({
               'edit_name' : ['', [Validators.required,Validators.minLength(2)]],
               'edit_description' : ['', [Validators.required,Validators.minLength(2)]]
@@ -127,8 +125,8 @@ export class RoleComponent {
     public ngOnInit(){
 		
 		
-         this.roleType=this.roleService.getAllRoleTypes(); 
-         this.roleType.subscribe(
+         this.roleType$=this.roleService.getAllRoleTypes(); 
+         this.roleType$.subscribe(
             (data) => {
                 this.items_roletype = data.data;
                 this.items_roletype = this.items_roletype.map(
@@ -310,10 +308,8 @@ export class RoleComponent {
 
     public markAsTouchAll(){
 		Object.keys(this.form.controls).forEach(key => {
-            this.form.controls[key].markAsTouched();
-            
-        });
-        
+			this.form.controls[key].markAsTouched();
+		});
     }
     public cancel(){
 		this.hideModal();
@@ -326,7 +322,7 @@ export class RoleComponent {
     
     public editRole(event){
     
-        this.viewTittle="Edit Role Type";
+        this.viewTittle="Edit Utility UOM";
         this.edit_form.enable();
 
         this.utilityRoleId = event.roleId;
@@ -350,6 +346,7 @@ export class RoleComponent {
                     }
                     this.selected_typeid_edit=typeId;
                     this.editRoleTypeSelectBox.active = [{id: typeId,text: name}];
+                    this.editRoleTypeSelectBox.ngOnInit();
             }
 
             }else{
@@ -365,7 +362,7 @@ export class RoleComponent {
 
     public onSubmitEdit(values,event){
 		console.log('edit form',values)
-		this.viewTittle="Edit Role Type";
+		this.viewTittle="Edit Utility UOM";
 		  var hasError=false;
 		  if(!this.edit_form.valid){
 		 	    this.markAsTouchAllFormEdit();
@@ -415,7 +412,7 @@ export class RoleComponent {
     
     public viewRole(event){
         
-		this.viewTittle="View Role Type";
+		this.viewTittle="View Utility UOM";
 		this.edit_form.disable();
 		
         this.utilityRoleId = event.roleId;
@@ -476,12 +473,10 @@ export class RoleComponent {
     public selectedRoleType(value: any){
         console.log('Selected value:', value);
         this.selected_typeid = value;
-        this.selectedRoleFc.setValue(value);
     }
 	
 	  public removedWOCategory(value: any){
         this.selected_typeid = value;
-        this.selectedRoleFc.setValue(value);
  
     }
 	
