@@ -79,7 +79,7 @@
             <span aria-hidden="true">&times;</span>
           </button>
           <h4 class="modal-title">Add New Role</h4>
-          <hr/>
+          
         </div>
         <div class="modal-body">
           <div>
@@ -107,8 +107,13 @@
                                          (typed)="typed($event)"
                                          placeholder="No Role Type selected">
                              </ng-select>
+                             <div *ngIf="form.get('selectedRoleFc').hasError('required') && form.get('selectedRoleFc').touched">
+                               <div class="error-message col-xg-10" style="padding-top:3px;"> Role Type is required </div>
+                             </div>
                             
                          </div>
+                    
+                     
                      </div>
                 
 
@@ -171,7 +176,7 @@
               <span aria-hidden="true">&times;</span>
             </button>
             <h4 class="modal-title">{{viewTittle}}</h4>
-            <hr/>
+            
           </div>
           <div class="modal-body">
             <div>
