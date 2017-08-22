@@ -39,7 +39,7 @@ import { GlobalState, WorkOrderStatuses, WorkflowActions } from '../../global.st
 @Component({
   selector: 'my-task',
   templateUrl: './task.component.html',
-  styleUrls: ['./../styles/basic-theme.scss', './../styles/primeng.min.css', './../styles/modals.scss','./task.component.css'],
+  //styleUrls: ['./../styles/basic-theme.scss', './../styles/primeng.min.css', './../styles/modals.scss','./task.component.css'],
   //styleUrls: ['../preventatives/modals.scss', '../preventatives/tablestyle.scss', '../preventatives/purple-green.scss'],
   encapsulation: ViewEncapsulation.None,
   providers: [TaskService, LocationService],
@@ -113,15 +113,6 @@ export class TaskComponent implements OnDestroy{
     private _taskService: TaskService,
     private _locationService: LocationService
     ) {
-      // hardcoded wo type list
-      this.woTypes = [{ id: 1, label: "Preventive Maintenance"},
-                        {id: 2, label: "Recurring Request"},
-                        {id: 3, label: "Single Request"},
-                        {id: 4, label: "Tenant Request"},
-                        {id: 5, label: "Guest Request"},
-                        {id: 6, label: "Owner Request"},
-      ];
-
       this.deleteWO = {};
 
       this.subscription = this._taskService.eventEmitted$.subscribe(event => {
@@ -141,7 +132,27 @@ export class TaskComponent implements OnDestroy{
   	}
 
 	ngOnInit(){
-        //this.getAllMyTasks(this.buildFilter(this.taskListsTable));
+        // master wo list
+        let woTypesMaster = [{ id: 1, label: "Preventive Maintenance", menuId: 'PreventiveWorkOrder' },
+        { id: 2, label: "Recurring Request", menuId: 'RecurringWorkOrder' },
+        { id: 3, label: "Single Request", menuId: 'SingleWorkOrder' },
+        { id: 4, label: "Tenant Request", menuId: 'TenantWorkOrder' },
+        { id: 5, label: "Guest Request", menuId: 'GuestWorkOrder' },
+        { id: 6, label: "Owner Request", menuId: 'OwnerWorkOrder' },
+        ];
+
+        // build creatable WO Type button
+        this.woTypes = [];
+
+        let sitemaps = JSON.parse(localStorage.getItem('sitemaps'));
+        let authorizedSitemaps = JSON.parse(localStorage.getItem('authorizedSitemaps'));
+        for (let master of woTypesMaster) {
+            if (authorizedSitemaps[master.menuId] != null && authorizedSitemaps[master.menuId].allowAccessOrView) {
+                let sitemap = sitemaps[master.menuId];
+                this.woTypes.push({ id: master.id, label: sitemap.name });
+            }
+        }
+
 	}
 
     // btn Add New Work Order Listener

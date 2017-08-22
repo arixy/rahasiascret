@@ -34,28 +34,28 @@
       <p-column field="allowAccessOrView" header="Allow Access">
         <template pTemplate="body" let-data="rowData">
           <div style="text-align: center">
-            <p-checkbox binary="true" [(ngModel)]="data.allowAccessOrView" (click)="setHasChanges(true)"></p-checkbox>
+            <p-checkbox binary="true" [(ngModel)]="data.allowAccessOrView" (click)="setHasChanges(true)" [disabled]="!data.accessCheckable"></p-checkbox>
           </div>
         </template>
       </p-column>
       <p-column field="allowAdd" header="Allow Add">
         <template pTemplate="body" let-data="rowData">
           <div style="text-align: center">
-            <p-checkbox binary="true" [(ngModel)]="data.allowAdd" (click)="setHasChanges(true)"></p-checkbox>
+            <p-checkbox binary="true" [(ngModel)]="data.allowAdd" (click)="setHasChanges(true)" [disabled]="!data.addCheckable"></p-checkbox>
           </div>
         </template>
       </p-column>
       <p-column field="allowUpdate" header="Allow Update">
         <template pTemplate="body" let-data="rowData">
           <div style="text-align: center">
-            <p-checkbox binary="true" [(ngModel)]="data.allowUpdate" (click)="setHasChanges(true)"></p-checkbox>
+            <p-checkbox binary="true" [(ngModel)]="data.allowUpdate" (click)="setHasChanges(true)" [disabled]="!data.updateCheckable"></p-checkbox>
           </div>
         </template>
       </p-column>
       <p-column field="allowDelete" header="Allow Delete">
         <template pTemplate="body" let-data="rowData">
           <div style="text-align: center">
-            <p-checkbox binary="true" [(ngModel)]="data.allowDelete" (click)="setHasChanges(true)"></p-checkbox>
+            <p-checkbox binary="true" [(ngModel)]="data.allowDelete" (click)="setHasChanges(true)" [disabled]="!data.deleteCheckable"></p-checkbox>
           </div>
         </template>
       </p-column>

@@ -11,7 +11,8 @@ export const PAGES_MENU = [
             selected: false,
             expanded: false,
             order: 0
-          }
+            },
+            menuId: 'Dashboard'
         }
       },
     /* {
@@ -35,7 +36,8 @@ export const PAGES_MENU = [
                 selected: false,
                 expanded: false,
                 order: 176
-            }
+            },
+            menuId: 'MyTask'
         }
     },
     {
@@ -47,7 +49,7 @@ export const PAGES_MENU = [
                 selected: false,
                 expanded: false,
                 order: 176
-            }
+            },
         },
         pathMatch: 'prefix',
         children: [
@@ -67,7 +69,8 @@ export const PAGES_MENU = [
                 data: {
                     menu: {
                     title: 'Work Orders',
-                    }
+                    },
+                    menuId: 'WorkOrderList'
                 },
             },
             {
@@ -75,7 +78,8 @@ export const PAGES_MENU = [
                 data: {
                   menu: {
                     title: 'Consumptions',
-                  }
+                    },
+                  menuId: 'UtilityConsumption'
                 }
             }
           
@@ -90,7 +94,8 @@ export const PAGES_MENU = [
                 selected: false,
                 expanded: false,
                 order: 176
-            }
+            },
+            menuId: 'Asset'
         }
     },
       {
@@ -102,7 +107,8 @@ export const PAGES_MENU = [
                   selected: false,
                   expanded: false,
                   order: 177
-              }
+              },
+              menuId: '_MAINREPORT'
           }
       },
     {
@@ -153,7 +159,7 @@ export const PAGES_MENU = [
                     menu: {
                         title: 'Vendors',
                         hidden: true
-                    }
+          }
                 },
             },
             {
@@ -292,7 +298,8 @@ export const PAGES_MENU = [
                   title: 'Reports - Work Order Report',
                   pathMatch: 'prefix',
                   hidden: true
-              }
+              },
+              menuId: 'ReportWorkOrder'
           }
       },
       {
@@ -302,7 +309,8 @@ export const PAGES_MENU = [
                   title: 'Reports - Consumption Report',
                   pathMatch: 'prefix',
                   hidden: true
-              }
+              },
+              menuId: 'ReportConsumption'
           }
       },
       {
@@ -312,7 +320,8 @@ export const PAGES_MENU = [
                   title: 'Reports - Performance Report',
                   pathMatch: 'prefix',
                   hidden: true
-              }
+              },
+              menuId: 'ReportPerformance'
           }
       },
       {

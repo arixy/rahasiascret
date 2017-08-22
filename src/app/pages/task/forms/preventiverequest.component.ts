@@ -123,6 +123,7 @@ export class PreventiveRequestComponent {
         // just put fields that is different from other select box
         // show, hidden, disabled
         default: "show",
+        btn_submit: "show"
         //selected_assignee: "show",
         //selected_starttime: "show",
         //selected_startdate: "show",
@@ -609,6 +610,7 @@ export class PreventiveRequestComponent {
                 this.isCanEditFiles = false;
                 this.selected_assignee.disable();
                 //this._defFieldPermissions.selected_assignee = "disabled";
+                this._defFieldPermissions.btn_submit = "hide";
             } else if (this.actionType.workflowActionId == WorkflowActions.ASSIGN_REASSIGN
                 || this.actionType.workflowActionId == WorkflowActions.RETURN) {
                 // do not use FormGroup.disable() because FormGroup.valid will always FALSE

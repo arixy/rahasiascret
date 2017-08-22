@@ -61,11 +61,11 @@ export class WorkOrderWeeklyChartComponent implements OnDestroy {
                 }
             }]
         },
-        //elements: {
-        //    line: {
-        //        tension: 0,
-        //    }
-        //}
+        elements: {
+            line: {
+                tension: 0,
+            }
+        }
     };
 
 

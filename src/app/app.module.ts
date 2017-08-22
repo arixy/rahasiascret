@@ -57,6 +57,7 @@ import { GlobalState } from './global.state';
 import { NgaModule } from './theme/nga.module';
 import { PagesModule } from './pages/pages.module';
 
+import { RoutingGuard } from './pages/routing-guard';
 // Application wide providers
 const APP_PROVIDERS = [
   AppState,
@@ -129,7 +130,9 @@ export function httpFactory(backend: XHRBackend, options: RequestOptions) {
       WorkOrderReportService,
       PerformanceReportService,
       PrintWOService,
-      SettingsService
+      SettingsService,
+      // guard
+      RoutingGuard
   ]
 })
 

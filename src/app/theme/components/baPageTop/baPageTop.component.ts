@@ -1,5 +1,6 @@
 import { Component, ViewChild, ViewEncapsulation, ElementRef } from '@angular/core';
 import { Http, Response, Headers, RequestOptions, URLSearchParams } from '@angular/http';
+import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 
@@ -84,14 +85,33 @@ export class BaPageTop {
   }
 
   private sitemap;
+  // end configuration
 
+  // to hide new button and its child
+  private newMenu = {
+      isCanShow: () => {
+          return this.newMenu.buildingManagement.length > 0
+              || this.newMenu.assets.length > 0
+              || this.newMenu.ownerTenants.length > 0
+              || this.newMenu.utilities.length > 0;
+      },
+      buildingManagement: [],
+      assets: [],
+      ownerTenants: [],
+      utilities: []
+  };
+  // change password related
+  private errMsgChangePw = [];
+  private formGroupChangePw: FormGroup;
+  // end change password related
   @ViewChild('changeModal') changeModal: ModalDirective;
 
   constructor(private _state:GlobalState,
              public authService: AuthenticationService,
              public router: Router,
              private _eref: ElementRef,
-             private http: Http) {
+             private http: Http,
+             private fb: FormBuilder) {
     this._state.subscribe('menu.isCollapsed', (isCollapsed) => {
       this.isMenuCollapsed = isCollapsed;
     });
@@ -124,6 +144,66 @@ export class BaPageTop {
       }
 
       console.log("config perms:", this.configurationPerm); 
+      // create form group
+      this.formGroupChangePw = this.fb.group({
+          'oldPassword': ['', Validators.compose([Validators.required])],
+          'newPassword': ['', Validators.compose([Validators.required])]
+      });
+      //============================
+      // New Menu authorization
+      //
+      //    Building Management
+      if (authorizedSitemaps['SingleWorkOrder'] != null
+          && authorizedSitemaps['SingleWorkOrder'].allowAccessOrView) {
+          let sitemap = this.sitemap['SingleWorkOrder'];
+          sitemap.route = '/pages/transactions/workorders/single';
+          this.newMenu.buildingManagement.push(sitemap);
+      }
+
+      if (authorizedSitemaps['RecurringWorkOrder'] != null
+          && authorizedSitemaps['RecurringWorkOrder'].allowAccessOrView) {
+          let sitemap = this.sitemap['RecurringWorkOrder'];
+          sitemap.route = '/pages/transactions/workorders/recurring';
+          this.newMenu.buildingManagement.push(sitemap);
+      }
+
+      //    Assets
+      if (authorizedSitemaps['PreventiveWorkOrder'] != null
+          && authorizedSitemaps['PreventiveWorkOrder'].allowAccessOrView) {
+          let sitemap = this.sitemap['PreventiveWorkOrder'];
+          sitemap.route = '/pages/transactions/workorders/preventive';
+          this.newMenu.assets.push(sitemap);
+      }
+
+      //    Owner & Tenants
+      if (authorizedSitemaps['OwnerWorkOrder'] != null
+          && authorizedSitemaps['OwnerWorkOrder'].allowAccessOrView) {
+          let sitemap = this.sitemap['OwnerWorkOrder'];
+          sitemap.route = '/pages/transactions/workorders/owner';
+          this.newMenu.ownerTenants.push(sitemap);
+      }
+
+      if (authorizedSitemaps['TenantWorkOrder'] != null
+          && authorizedSitemaps['TenantWorkOrder'].allowAccessOrView) {
+          let sitemap = this.sitemap['TenantWorkOrder'];
+          sitemap.route = '/pages/transactions/workorders/tenant';
+          this.newMenu.ownerTenants.push(sitemap);
+      }
+
+      if (authorizedSitemaps['GuestWorkOrder'] != null
+          && authorizedSitemaps['GuestWorkOrder'].allowAccessOrView) {
+          let sitemap = this.sitemap['GuestWorkOrder'];
+          sitemap.route = '/pages/transactions/workorders/guest';
+          this.newMenu.ownerTenants.push(sitemap);
+      }
+
+      //    Utility Consumption
+      if (authorizedSitemaps['UtilityConsumption'] != null
+          && authorizedSitemaps['UtilityConsumption'].allowAccessOrView) {
+          let sitemap = this.sitemap['UtilityConsumption'];
+          sitemap.route = '/pages/transactions/consumptions';
+          this.newMenu.utilities.push(sitemap);
+      }
   }
 
   public toggleMenu() {
@@ -149,42 +229,65 @@ export class BaPageTop {
       this.changeModal.hide();
   }
   public changePassword(){
+      this.errMsgChangePw = [];
+      this.formGroupChangePw.reset()
+      Object.keys(this.formGroupChangePw.controls).forEach(key => {
+          this.formGroupChangePw.controls[key].markAsUntouched();
+      });
       this.changeModal.show();
       
   }
 
-    public submitPassword(){
-        var headers = new Headers();
-      headers.append('Content-Type', 'application/x-www-form-urlencoded');
-      headers.append('Authorization', 'Bearer ' + localStorage.getItem('bearer_token'));
-      headers.append('Access-Control-Allow-Origin', '*');
-      headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
-      
-      var options = new RequestOptions({
-          headers: headers
-      });
-      
-      var add_url = this.appUrl + 'change-password';
-      
-      // To Change the JSON object to urlencoded
-      let url_search_params = new URLSearchParams();
-      
-      url_search_params.append('oldPassword', this.oldpassword);
-      url_search_params.append('newPassword', this.newpassword);
-      
-      let cp_body = url_search_params.toString();
-      console.log('Location Body URL encode', cp_body);
-      
-      this.http.post(add_url, cp_body, options).map(
-          res => {
-              return res.json()
+  public submitPassword() {
+      this.errMsgChangePw = [];
+
+      console.log("form submit", this.formGroupChangePw);
+
+      if (this.formGroupChangePw.valid) {
+
+          // send request change password to server
+          var headers = new Headers();
+          headers.append('Content-Type', 'application/x-www-form-urlencoded');
+          headers.append('Authorization', 'Bearer ' + localStorage.getItem('bearer_token'));
+          headers.append('Access-Control-Allow-Origin', '*');
+          headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
+
+          var options = new RequestOptions({
+              headers: headers
+          });
+
+          var add_url = this.appUrl + 'change-password';
+
+          // To Change the JSON object to urlencoded
+          let url_search_params = new URLSearchParams();
+
+          url_search_params.append('oldPassword', this.formGroupChangePw.get('oldPassword').value);
+          url_search_params.append('newPassword', this.formGroupChangePw.get('newPassword').value);
+
+          let cp_body = url_search_params.toString();
+          console.log('Location Body URL encode', cp_body);
+
+          this.http.post(add_url, cp_body, options).map(
+              res => {
+                  return res.json()
           }).subscribe(
-            response => {
-                console.log('Response from server', response);
-                this.hideChangeModal();
-            }
-      );
-    }
+              response => {
+                  console.log('Response from server', response);
+                  if (response.resultCode.code == "0") {
+                      this.hideChangeModal();
+                  } else {
+                      this.errMsgChangePw = [];
+                      this.errMsgChangePw = this.errMsgChangePw.concat(response.resultCode.message);
+                  }
+              }
+           );
+      } else {
+          console.log("not valid");
+          Object.keys(this.formGroupChangePw.controls).forEach(key => {
+              this.formGroupChangePw.controls[key].markAsTouched();
+          });
+      }
+  }
   public logout(){
       this.authService.postLogout();
       let redirect = '/login';

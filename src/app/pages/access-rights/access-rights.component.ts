@@ -122,7 +122,11 @@ export class AccessRightsComponent implements OnDestroy {
                                         allowAccessOrView: false,
                                         allowAdd: false,
                                         allowUpdate: false,
-                                        allowDelete: false
+                                        allowDelete: false,
+                                        accessCheckable: this.lstMenus[i].isAllowAccessOrView,
+                                        addChechkable: this.lstMenus[i].isAllowAdd,
+                                        updateCheckable: this.lstMenus[i].isAllowUpdate,
+                                        deleteCheckable: this.lstMenus[i].isAllowDelete
                                     };
 
                                     for (var j = 0; j < responseData.length; j++) {

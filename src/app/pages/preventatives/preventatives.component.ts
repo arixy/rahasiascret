@@ -196,15 +196,6 @@ export class Preventatives {
     public activatedRoute: ActivatedRoute
   ) {
       this.deleteWO = {};
-
-      // hardcoded wo type list
-      this.woTypes = [{ id: 1, label: "Preventive Maintenance"},
-                        {id: 2, label: "Recurring Request"},
-                        {id: 3, label: "Single Request"},
-                        {id: 4, label: "Tenant Request"},
-                        {id: 5, label: "Guest Request"},
-                        {id: 6, label: "Owner Request"},
-                       ];
       
       this.subscription = this._taskService.eventEmitted$.subscribe(event => {
           console.log("event: " + event);
@@ -339,7 +330,26 @@ export class Preventatives {
   }
 
     ngOnInit(){
-        
+        // master wo list
+        let woTypesMaster = [{ id: 1, label: "Preventive Maintenance", menuId: 'PreventiveWorkOrder' },
+        { id: 2, label: "Recurring Request", menuId: 'RecurringWorkOrder' },
+        { id: 3, label: "Single Request", menuId: 'SingleWorkOrder' },
+        { id: 4, label: "Tenant Request", menuId: 'TenantWorkOrder' },
+        { id: 5, label: "Guest Request", menuId: 'GuestWorkOrder' },
+        { id: 6, label: "Owner Request", menuId: 'OwnerWorkOrder' },
+        ];
+
+        // build creatable WO Type button
+        this.woTypes = [];
+
+        let sitemaps = JSON.parse(localStorage.getItem('sitemaps'));
+        let authorizedSitemaps = JSON.parse(localStorage.getItem('authorizedSitemaps'));
+        for (let master of woTypesMaster) {
+            if (authorizedSitemaps[master.menuId] != null && authorizedSitemaps[master.menuId].allowAccessOrView) {
+                let sitemap = sitemaps[master.menuId];
+                this.woTypes.push({ id: master.id, label: sitemap.name });
+            }
+        }
     }
      
     ngAfterViewInit(){

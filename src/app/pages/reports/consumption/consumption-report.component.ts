@@ -67,6 +67,15 @@ export class ConsumptionReportComponent implements OnDestroy {
 	// data model
     private lstConsumptions = [];
 
+    // loading state
+    private loadingState = {
+        isLoading: (): boolean => {
+            return this.loadingState.utilityType || this.loadingState.reportResult || this.loadingState.reportChart;
+        },
+        utilityType: true,
+        reportResult: false,
+        reportChart: false
+    }
     // View Childs
     @ViewChild("selectDateType") _lsbSelectDateType: SelectComponent;
     @ViewChild("selectUtilityType") _lsbUtilityType: SelectComponent;
@@ -85,6 +94,7 @@ export class ConsumptionReportComponent implements OnDestroy {
 
     ngOnInit() {
         // load utility types
+        this.loadingState.utilityType = true;
         this._utilityTypeService.getUtilities().subscribe(response => {
             if (response.resultCode.code == "0") {
                 let __responseData = response.data;
@@ -101,6 +111,7 @@ export class ConsumptionReportComponent implements OnDestroy {
                 this.errMsg = [];
                 this.errMsg.push(response.resultCode.message);
             }
+            this.loadingState.utilityType = false;
         });
         this._lsbUtilityType.active = [{ id: -1, text: "All" }];
         this.filterModel.utilityType = [{ id: -1, text: "All" }];
@@ -173,6 +184,7 @@ export class ConsumptionReportComponent implements OnDestroy {
         //this._pnlFilter.collapse(new Event("click"));
 
         // table
+        this.loadingState.reportResult = true;
         this._consumptionReportService.getUtilityConsumptionsAsReport(paramToSend).subscribe(response => {
             if (response.resultCode.code == "0") {
                 this.lstConsumptions = response.data;
@@ -184,10 +196,11 @@ export class ConsumptionReportComponent implements OnDestroy {
                 this.errMsg = [];
                 this.errMsg = this.errMsg.concat(response.resultCode.message);
             }
-            
+            this.loadingState.reportResult = false;
         });
 
         // chart
+        this.loadingState.reportChart = true;
         this._consumptionReportService.getUtilityConsumptionsAsChart(paramToSend).subscribe(response => {
             if (response.resultCode.code == "0") {
                 let tmpChartResponseData = response.data;
@@ -296,6 +309,7 @@ export class ConsumptionReportComponent implements OnDestroy {
                 this.errMsg = [];
                 this.errMsg = this.errMsg.concat(response.resultCode.message);
             }
+            this.loadingState.reportChart = false;
         });
     }
 
