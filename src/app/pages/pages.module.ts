@@ -67,12 +67,13 @@ import { TreeTableModule, TreeNode, ChartModule } from 'primeng/primeng';
 
 import {MdTabsModule} from '@angular/material';
 import { LoadingSmallComponent } from './loading-small.component';
-import { SpinnerComponent } from './spinner.component';
+import { SpinnerModule } from './spinner.module';
 import { ResetFilterModule } from './reset-filter.module';
 import { DialogsService } from './../services/dialog.service';
 import { ConfirmDeleteDialog } from './../confirm-delete.dialog';
 
 import { FilterInputComponent } from './filter-input.component';
+import { AccessDenied } from './access-denied/access-denied.component';
 
 @NgModule({
   imports: [CommonModule, NgaModule, routing, SelectModule, Ng2SmartTableModule, ModalModule.forRoot(), ReactiveFormsModule,
@@ -94,7 +95,8 @@ import { FilterInputComponent } from './filter-input.component';
       CheckboxModule,
       PaginatorModule,
       ChartModule,
-      ResetFilterModule
+      ResetFilterModule,
+      SpinnerModule
            ],
     providers: [
         DialogsService
@@ -126,7 +128,7 @@ import { FilterInputComponent } from './filter-input.component';
       WorkOrderFilesComponent,
       AssetFilesComponent,
       PrintWOComponent,
-      SpinnerComponent,
+      //SpinnerComponent,
       //ResetFilterComponent,
       LoadingSmallComponent,
       UtilityFormComponent,
@@ -137,7 +139,8 @@ import { FilterInputComponent } from './filter-input.component';
       ConfirmDeleteDialog,
       SettingsComponent,
       // filter component
-      FilterInputComponent
+      FilterInputComponent,
+      AccessDenied
     ],
     entryComponents: [
         ConfirmDeleteDialog

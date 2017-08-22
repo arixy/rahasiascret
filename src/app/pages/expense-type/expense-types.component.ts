@@ -203,7 +203,7 @@ export class ExpenseType {
         );
 	}
 	public saveDelete(){
-		console.log('test', this.deleteConfirm.userId);	this.expenseTypeService.deleteExpenseType(this.deleteConfirm.expenseTypeId).subscribe(
+		console.log('test', this.deleteConfirm.expenseTypeId);	this.expenseTypeService.deleteExpenseType(this.deleteConfirm.expenseTypeId).subscribe(
             (data) => {
                 console.log('Return Data', data);
                 this.refresh(this.filter_master, this.expenseTypesTable);

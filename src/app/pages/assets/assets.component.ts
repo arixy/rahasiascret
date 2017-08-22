@@ -365,6 +365,8 @@ export class Assets {
     }
     
     public initialRefresh(filter_master){
+        
+        // So that Dropdown for parent is still correct
         this.dataLoading = true;
         var formatted_object = {
             filters : filter_master,
@@ -601,6 +603,7 @@ export class Assets {
 
     public addRootNode(){
         this.add_form_submitted = false;
+        this.disabled = false;
         this.childModal.show();
     }
 

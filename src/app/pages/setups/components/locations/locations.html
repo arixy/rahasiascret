@@ -15,6 +15,7 @@
             </div>
            </div>
       <ba-card title="" baCardClass="with-scroll">
+          <spinner *ngIf="dataLoading"></spinner>
            <p-treeTable class="ui-datatable" [value]="treeLocationsWithData">
                <p-header>
             <div class="ui-helper-clearfix">
@@ -169,20 +170,21 @@
       </div>
       <div class="modal-body">
         <div>
-            <ba-card title="Edit Location" baCardClass="with-scroll">
+            <ba-card title="" baCardClass="with-scroll custom-card">
               <form [formGroup]="editForm" (ngSubmit)="onSubmitEdit(editForm.value, $event)" class="form-horizontal">
+              <div class="modal-form-container">
               <div class="form-group row" [ngClass]="{'has-error': (!name.valid && name.touched), 'has-success': name.valid}">
                 <label for="inputEmail3" class="col-sm-2 control-label">Name</label>
 
                 <div class="col-sm-10">
-                  <input [formControl]="edit_name" value="{{ location_edit.name}}" type="text" class="form-control" id="inputEmail3" placeholder="Name">
+                  <input [formControl]="edit_name" type="text" class="form-control" id="inputEmail3" placeholder="Name">
                 </div>
               </div>
               <div class="form-group row" [ngClass]="{'has-error': (!description.valid && description.touched), 'has-success': description.valid}">
                 <label for="inputPassword3" class="col-sm-2 control-label">Description</label>
 
                 <div class="col-sm-10">
-                  <input [formControl]="edit_description" value="{{location_edit.description}}" type="text" class="form-control" id="inputPassword3" placeholder="Description">
+                  <input [formControl]="edit_description"  type="text" class="form-control" id="inputPassword3" placeholder="Description">
                 </div>
               </div>
               <div class="form-group row select-container">
@@ -199,13 +201,54 @@
                       </ng-select>
                   </div>
               </div>
-              <div class="form-group row">
-                <div class="offset-sm-2 col-sm-10">
-                  <button type="submit" class="btn btn-default btn-auth">Submit</button>
-                </div>
               </div>
+              <div class="form-group modal-action-row row">
+                  <div class="col-sm-3 btn-with-icon">
+                    <button type="button" class="btn btn-default btn-cancel" (click)="cancel()">
+                    <i class="icon ion-close"></i>
+                    Cancel</button>
+                  </div>
+                  <div class="col-sm-5">
+                       &nbsp;
+                   </div>
+                   <div class="col-sm-1 no-padding">
+                       <span *ngIf="submitLoading" class="loading-container">
+                            
+                        </span>
+                   </div>
+                  <div class="col-sm-3 btn-with-icon">
+                    <button type="submit" class="btn btn-default btn-save">
+                    <i class="icon ion-checkmark"></i>
+                        Save
+                    </button>
+                  </div>
+            </div>
             </form>
             </ba-card>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div bsModal #deleteModal="bs-modal" class="modal delete-modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+     
+      </div>
+      <div class="modal-body">
+		  <div class="content_confirm">
+				<h3>Delete {{delete_name}}?</h3>
+                <i class="icon ion-ios-minus-outline"></i>
+		  </div>
+		  <!-- <p>Please be aware deleted items might not be Recoverable</p> -->
+		  <div class="delete-btn_confirm">
+			  <button (click)="saveDelete()" class="btn-yes">
+				  Yes
+			  </button>
+			  <button (click)="deleteClose()" class="btn-no">
+				  No
+			  </button>
           </div>
       </div>
     </div>

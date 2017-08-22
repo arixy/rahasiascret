@@ -125,13 +125,33 @@ export class Locations {
   public value;
   public treeLocations = null;
   public treeLocationsWithData = null;
+  deleteConfirm;
+  delete_name;
 
-  public location_edit = {
+  add_form_submitted = false;
+  edit_form_submitted = false;
+
+  // Loading State
+  public dataLoading = false;
+  public submitLoading = false;
+
+  public location_edit = null /*{
     id: null,
     name: '',
     description: '',
     parent_location_id: null,
     selected_location: null
+  };*/
+
+  public filter_master = {
+      "name": {
+        "matchMode": "undefined",
+        "value": ""
+        },
+      "description": {
+        "matchMode": "undefined",
+        "value": ""
+        }
   };
   
   @ViewChild('editSelectBox') editSelectBox: SelectComponent;
@@ -140,6 +160,7 @@ export class Locations {
   @ViewChild('addSelectBox') addSelectBox: SelectComponent;
   @ViewChild(TreeComponent)
   private locations_tree: TreeComponent;
+  @ViewChild('deleteModal') deleteModal: ModalDirective;
 
   constructor(
     public locationService: LocationService,
@@ -170,6 +191,10 @@ export class Locations {
   }
 
   public ngOnInit() {
+      
+      //BUG on SERVER
+      //this.dataLoading = true;
+      //this.initialRefresh(this.filter_master);
       this.locations$ = this.locationService.getLocations();
       this.locations$.subscribe(
         (data) => {
@@ -207,7 +232,95 @@ export class Locations {
       );
   }
 
+    public initialRefresh(filter_master){
+        
+        // So that Dropdown for parent is still correct
+        this.dataLoading = true;
+        var formatted_object = {
+            filters : filter_master,
+            first: 0,
+            rows: 9999,
+            globalFilter: '',
+            multiSortMeta: null,
+            sortField: 'name',
+            sortOrder: -1
+        }
+        console.log('Shoot Refresh', formatted_object);
+        this.locationService.getLocationsFilter(formatted_object).subscribe(
+            (data) => {
+                this.dataLoading = false;
+                console.log('Refresh Data', data);
+                
+                this.locations = data.data;
+                this.items_location = data.data;
+
+                this.items_location = this.items_location.map(
+                    (asset_object) => {
+                        return Object.assign({}, {
+                           id: asset_object.locationId,
+                            text: asset_object.name
+                        });
+                    }
+                );
+                var locations_with_data = this.locations.map(
+                    (location) => {
+                        return Object.assign({}, {
+                           data: location 
+                        });
+                    }
+                );
+                
+                console.log('Location with Data', locations_with_data);
+                this.treeLocationsWithData = convertToTreeData(locations_with_data);
+                console.log('Tree Location with Data', this.treeLocationsWithData);
+
+                var temp_locations = JSON.parse(JSON.stringify(this.locations));
+                this.treeLocations = convertToTree(temp_locations);
+
+                this.treeLocations = transformLocationIdToId(this.treeLocations);
+                console.log('Locations Tree', this.treeLocations);
+            }
+        );
+    }
     
+    public refresh(filter_master){
+        this.dataLoading = true;
+        var formatted_object = {
+            filters : filter_master,
+            first: 0,
+            rows: 9999,
+            globalFilter: '',
+            multiSortMeta: null,
+            sortField: 'dateUpdated',
+            sortOrder: -1
+        }
+        console.log('Shoot Refresh', formatted_object);
+        this.locationService.getLocationsFilter(formatted_object).subscribe(
+            (data) => {
+                this.dataLoading = false;
+                console.log('Refresh Data', data);
+                this.locations = data.data;
+
+                var locations_with_data = this.locations.map(
+                    (location) => {
+                        return Object.assign({}, {
+                           data: location 
+                        });
+                    }
+                );
+                console.log('Location with Data', locations_with_data);
+                this.treeLocationsWithData = convertToTreeData(locations_with_data);
+                console.log('Tree Location with Data', this.treeLocationsWithData);
+
+                var temp_locations = JSON.parse(JSON.stringify(this.locations));
+                this.treeLocations = convertToTree(temp_locations);
+
+                this.treeLocations = transformLocationIdToId(this.treeLocations);
+                console.log('Locations Tree', this.treeLocations);
+            }
+        );
+    }
+
     public selectedLocation(value: any){
         console.log('Selected Value:', value);
         this.selected_location = value;
@@ -227,10 +340,11 @@ export class Locations {
     public onSubmitEdit(values,event) {
         //event.preventDefault();
         console.log('EditForm:', values);
+        console.log('Location Edit', this.location_edit);
         if(this.editForm.valid){
             
             var formatted_object = Object.assign({}, {
-               id: this.location_edit.id,
+               id: this.location_edit.data.locationId,
                 name: values.edit_name,
                 description: values.edit_description,
                 parent_location_id: null
@@ -317,20 +431,28 @@ export class Locations {
     public addRootNode(){
         this.childModal.show();
     }
-    public editThisNode(event){
+    public editLocation(event){
         console.log('Tree Edit Node Click', event);
         this.location_edit = event;
         
         // Inject Initial Value to the Edit Form
-        this.editForm.patchValue({ edit_name: event.name });
-        this.editForm.patchValue({ edit_description: event.description });
+        this.editForm.patchValue({ edit_name: event.data.name });
+        this.editForm.patchValue({ edit_description: event.data.description });
         
-        if(event.parent_location_id != null){
+        if(event.data.parentLocationId != null){
             if (this.editSelectBox) {
-              let location_found = this.locationService.get(event.parent_location_id);
+                
+              let locations_data = this.locations;    
+              let location_found = locations_data.filter(
+                (locations_object) => {
+                    return locations_object.locationId == event.data.parentLocationId;
+                }
+              );
+              console.log('Location Found', location_found);
+                
               this.location_edit.selected_location = {
-                    id: event.parent_location_id,
-                    text: location_found.name
+                    id: event.data.parentLocationId,
+                    text: location_found[0].name
               };
                 
               // Only Done because bug in ng2-select
@@ -342,14 +464,48 @@ export class Locations {
         console.log('Location Edit Initial Select:', this.location_edit.selected_location);
         this.editChildModal.show();
     }
-    public deleteThisNode(event){
-        console.log('Deleting Node', event);
-        this.locationService.deleteLocation(event.id);
+    public deleteLocation(event){
+        this.deleteConfirm = event;
+        this.delete_name = event.name;
         
-        this.locations = this.locationService.getLocationsNormal();
+        this.deleteModal.show();
+        console.log('Deleting Node', event);
+        
+        
+        /*this.locations = this.locationService.getLocationsNormal();
         var temp_locations = JSON.parse(JSON.stringify(this.locations));
         this.treeLocations = [].concat(convertToTree(temp_locations));
-        this.locations_tree.treeModel.update();
+        this.locations_tree.treeModel.update();*/
+    }
+
+    public saveDelete(){
+        // Should call the Confirmation Modal first
+        this.locationService.deleteLocation(this.deleteConfirm.data.locationId).subscribe(
+            (data) => {
+                console.log('Return Data', data);
+                // Refresh
+                this.ngOnInit();
+            }
+        );
+        this.deleteModal.hide();
+    }
+
+    public hideModal(){
+        this.editChildModal.hide();
+        this.childModal.hide();
+    }
+
+    public cancel(){
+        this.hideModal();
+        
+        // Maybe some other logic to reset the form
+        // Clear all input in the form
+        this.clearFormInputs(this.form);
+                    
+        
+    }
+    public clearFormInputs(form){
+        form.reset();
     }
     public hideChildModal(){
         this.childModal.hide();

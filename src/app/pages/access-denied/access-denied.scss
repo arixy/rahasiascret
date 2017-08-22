@@ -1,0 +1,26 @@
+.access-denied-card .center {
+    text-align: center;
+    padding-top: 1em;
+    padding-bottom: 1em;
+}
+.access-denied-card h1 {
+    color: #da235e;
+}
+.access-denied-card button {
+    margin-bottom: 0.5em;
+}
+.access-denied-card h1 i {
+    font-size: 50px;
+    position: relative;
+    top: 3px;
+}
+.access-denied-card p {
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 2em;
+    margin-bottom: 1em;
+}
+.go-back-container {
+    color: #4fbef5;
+}

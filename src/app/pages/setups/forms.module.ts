@@ -25,6 +25,7 @@ import { DataTableModule,SharedModule } from 'primeng/primeng';
 import { DropdownModule } from 'ng2-bootstrap';
 import { TreeTableModule,TreeNode } from 'primeng/primeng';
 import { ResetFilterModule } from './../reset-filter.module';
+import { SpinnerModule } from './../spinner.module';
 
 @NgModule({
   imports: [
@@ -42,7 +43,8 @@ import { ResetFilterModule } from './../reset-filter.module';
     SharedModule,
     DropdownModule.forRoot(),
     TreeTableModule,
-    ResetFilterModule
+    ResetFilterModule,
+    SpinnerModule
   ],
   declarations: [
     Locations,

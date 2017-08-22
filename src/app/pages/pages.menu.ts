@@ -266,7 +266,7 @@ export const PAGES_MENU = [
             path: 'work-orders',
             data: {
               menu: {
-                title: 'Work Order',
+                title: 'WO Categories',
                 pathMatch: 'prefix',
                 hidden: true
               }
@@ -324,7 +324,20 @@ export const PAGES_MENU = [
                   hidden: true
               }
           }
-      }
+      },
+    {
+        path: 'access-denied',
+        data: {
+            menu: {
+                title: 'Access Denied',
+                icon: 'ion-ios-checkmark-outline',
+                selected: false,
+                expanded: false,
+                order: 176,
+                hidden: true
+            }
+        }
+    },
     ]
   }
 ];

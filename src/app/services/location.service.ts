@@ -4,16 +4,16 @@ import { UUID } from 'angular2-uuid';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/observable/of';
+import { GlobalConfigs } from './../global.state';
 
-import { GlobalConfigs } from '../global.state';
 @Injectable()
 export class LocationService{
   private location_data: any;
 
   redirectUrl: string;
     
-  //private appUrl = 'http://ec2-52-40-147-30.us-west-2.compute.amazonaws.com/api/v1/master/';
-  private appUrl = GlobalConfigs.APP_BASE_URL + "/master/";
+    //private appUrl = 'http://ec2-52-40-147-30.us-west-2.compute.amazonaws.com/api/v1/master/';
+    private appUrl = GlobalConfigs.APP_MASTER_URL;
 
   constructor(private http: Http){
     var first_floor_id = UUID.UUID();
@@ -49,13 +49,41 @@ export class LocationService{
     headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
     
     var options = new RequestOptions({headers: headers});
-    var load_url = this.appUrl + 'location/all';
+    var load_url = this.appUrl + '/location/all';
       
     return this.http.get(load_url, options).map(this.extractData);  
     //return Observable.of(this.location_data);
   }
   getLocationsNormal(){
       return this.location_data;
+  }
+
+  getLocationsFilter(filter_data){
+      var headers = new Headers();
+        headers.append('Content-Type', 'application/json');
+        var bearer = "Bearer " + localStorage.getItem('bearer_token');
+
+        headers.append('Authorization', bearer);
+        headers.append('Access-Control-Allow-Origin', '*');
+        headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
+
+        var options = new RequestOptions({headers: headers});
+        var load_url = this.appUrl + '/location/all';
+        
+        let formatted_object = {
+                filters: {},
+                first: 0,
+                rows: 9999,
+                globalFilter: '',
+                multiSortMeta: null,
+                sortField: 'dateUpdated',
+                sortOrder: -1
+        };
+        if(filter_data){
+           formatted_object = filter_data; 
+        }
+        console.log('Formatted Object', formatted_object);
+        return this.http.post(load_url, formatted_object, options).map(this.extractData);
   }
   get(location_id){
       return this.location_data.find(
@@ -82,14 +110,19 @@ export class LocationService{
           headers: headers
       });
       
-      var add_url = this.appUrl + 'location/add';
+      var add_url = this.appUrl + '/location/add';
       
       // To Change the JSON object to urlencoded
       let url_search_params = new URLSearchParams();
       
       url_search_params.append('name', location.name);
       url_search_params.append('description', location.description);
-      url_search_params.append('parentLocationId', location.parent_location_id);
+      if(location.parent_location_id){
+        url_search_params.append('parentLocationId', location.parent_location_id);    
+      } else {
+          url_search_params.append('parentLocationId', "null");
+      }
+      
       url_search_params.append('isRoot', location.isRoot);
       // YS: temporary default to true
       url_search_params.append('haveChild', "true");
@@ -111,15 +144,19 @@ export class LocationService{
           headers: headers
       });
       
-      var update_url = this.appUrl + 'location/update';
+      var update_url = this.appUrl + '/location/update';
       
       // To Change the JSON object to urlencoded
       let url_search_params = new URLSearchParams();
-      
+      console.log('Incoming Location in Service', location);
       url_search_params.append('locationId', location.id);
       url_search_params.append('name', location.name);
       url_search_params.append('description', location.description);
-      url_search_params.append('parentLocationId', location.parent_location_id);
+      if(location.parent_location_id){
+        url_search_params.append('parentLocationId', location.parent_location_id);    
+      } else {
+          url_search_params.append('parentLocationId', "null");
+      }
       url_search_params.append('isRoot', "true");
       // YS: temporary default to true
       url_search_params.append('haveChild', "true");

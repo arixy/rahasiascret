@@ -36,6 +36,8 @@ export class WorkOrders {
     public edit_id;
     public selected_kpi = null;
      
+    error_from_server = null;
+     
   public location_editwo = {
       id:null,
       name:'',
