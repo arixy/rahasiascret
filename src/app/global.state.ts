@@ -49,6 +49,7 @@ export class GlobalConfigs {
     // used for ng-prime date picker year range
     public static readonly yearRange = '1970:2100';
     public static readonly DEFAULT_ITEM_PER_PAGE = 10;
+    public static readonly DEFAULT_SELECT_OPTION = { id: -9999, text: '-- Please Select --' };
 }
 export class WorkflowActions {
     public static readonly CREATE = -1;

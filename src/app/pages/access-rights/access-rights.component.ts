@@ -29,6 +29,12 @@ export class AccessRightsComponent implements OnDestroy {
     private hasChanges = false;
     private prevSelectedRole;
 
+    private visibleColumn = {
+        allowView: true,
+        allowAdd: false,
+        allowUpdate: false,
+        allowDelete: false
+    }
     // dropdown items
     private _itemsRoleGroup = null;
 
@@ -129,6 +135,10 @@ export class AccessRightsComponent implements OnDestroy {
                                         deleteCheckable: this.lstMenus[i].isAllowDelete
                                     };
 
+                                    this.visibleColumn.allowView = this.visibleColumn.allowView || objMenuAuth.accessCheckable;
+                                    this.visibleColumn.allowAdd = this.visibleColumn.allowAdd || objMenuAuth.addChechkable;
+                                    this.visibleColumn.allowUpdate = this.visibleColumn.allowUpdate || objMenuAuth.updateCheckable;
+                                    this.visibleColumn.allowDelete = this.visibleColumn.allowDelete || objMenuAuth.deleteCheckable;
                                     for (var j = 0; j < responseData.length; j++) {
                                         if (objMenuAuth.menuId == responseData[j].menuId) {
                                             objMenuAuth.allowAccessOrView = responseData[j].allowAccessOrView;

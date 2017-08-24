@@ -54,9 +54,6 @@ export class LocationService{
     return this.http.get(load_url, options).map(this.extractData);  
     //return Observable.of(this.location_data);
   }
-  getLocationsNormal(){
-      return this.location_data;
-  }
 
   getLocationsFilter(filter_data){
       var headers = new Headers();
@@ -84,6 +81,24 @@ export class LocationService{
         }
         console.log('Formatted Object', formatted_object);
         return this.http.post(load_url, formatted_object, options).map(this.extractData);
+  }
+  getLocationsLeaf(): Observable<any> {
+      var headers = new Headers();
+      headers.append('Content-Type', 'application/json');
+      var bearer = "Bearer " + localStorage.getItem('bearer_token');
+
+      headers.append('Authorization', bearer);
+      headers.append('Access-Control-Allow-Origin', '*');
+      headers.append('Access-Control-Allow-Methods', 'DELETE, HEAD, GET, OPTIONS, POST, PUT');
+
+      var options = new RequestOptions({ headers: headers });
+      var load_url = this.appUrl + '/location/leaf';
+
+      return this.http.get(load_url, options).map(this.extractData);  
+  }
+
+  getLocationsNormal(){
+      return this.location_data;
   }
   get(location_id){
       return this.location_data.find(

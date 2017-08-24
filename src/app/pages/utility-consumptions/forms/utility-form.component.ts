@@ -49,6 +49,7 @@ export class UtilityFormComponent {
 
     // error
     private errMsg = [];
+
     // select box by directives
     @ViewChild("utilityTypesSelectBox") utilityTypesSelectBox: SelectComponent;
     @ViewChild("uomSelectBox") uomSelectBox: SelectComponent;
@@ -61,6 +62,7 @@ export class UtilityFormComponent {
 
     // others
     private _yearRange = GlobalConfigs.yearRange;
+    private _defaultSelectOption = GlobalConfigs.DEFAULT_SELECT_OPTION;
     private isBtnSaveClicked = false;
 
     constructor(
@@ -104,7 +106,7 @@ export class UtilityFormComponent {
             if (response.resultCode.code == "0") {
                 let __lstUtilityTypes = response.data;
 
-                this._itemsUtilityTypes = [];
+                this._itemsUtilityTypes = [GlobalConfigs.DEFAULT_SELECT_OPTION];
                 for (var i = 0; i < __lstUtilityTypes.length; i++) {
                     this._itemsUtilityTypes.push({ id: __lstUtilityTypes[i].utilityTypeId, text: __lstUtilityTypes[i].name });
                 }
@@ -118,7 +120,7 @@ export class UtilityFormComponent {
             if (response.resultCode.code == "0") {
                 let __lstUOM = response.data;
 
-                this._itemsUOM = [];
+                this._itemsUOM = [GlobalConfigs.DEFAULT_SELECT_OPTION];
                 for (var i = 0; i < __lstUOM.length; i++) {
                     this._itemsUOM.push({ id: __lstUOM[i].utilityUomId, text: __lstUOM[i].name });
                 }
@@ -190,6 +192,11 @@ export class UtilityFormComponent {
 
     selectedSelectBoxValue(field, event) {
         console.log("selectedSelectBoxValue", field, event);
+
+        if (event.id == GlobalConfigs.DEFAULT_SELECT_OPTION.id) {
+            this.removeSelectBoxValue(field, event);
+            return;
+        }
 
         // handle every possible field here
         switch (field) {

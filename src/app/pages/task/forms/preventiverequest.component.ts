@@ -39,6 +39,7 @@ export class PreventiveRequestComponent {
 
     // const
     private _yearRange = GlobalConfigs.yearRange;
+    private _defaultSelectOption = GlobalConfigs.DEFAULT_SELECT_OPTION;
 
     // flag to disable almost all form
     public disabled = false;
@@ -252,7 +253,7 @@ export class PreventiveRequestComponent {
                 console.log("repeat options response", response.data);
 
                 var tmpLstRepeats = response.data;
-                this.items_repeats = [];
+                this.items_repeats = [GlobalConfigs.DEFAULT_SELECT_OPTION];
                 for (var i = 0; i < tmpLstRepeats.length; i++) {
                     var currentItem = { id: tmpLstRepeats[i].repeatOptionId, text: tmpLstRepeats[i].name };
                     this.items_repeats.push(currentItem);
@@ -264,7 +265,7 @@ export class PreventiveRequestComponent {
                 console.log("period durations response", response.data);
 
                 var tmpLstDurations = response.data;
-                this.items_period_duration = [];
+                this.items_period_duration = [GlobalConfigs.DEFAULT_SELECT_OPTION];
                 for (var i = 0; i < tmpLstDurations.length; i++) {
                     var currentItem = { id: tmpLstDurations[i].periodDurationId, text: tmpLstDurations[i].name };
                     this.items_period_duration.push(currentItem);
@@ -276,7 +277,7 @@ export class PreventiveRequestComponent {
                 console.log("priorities", response.data);
 
                 var tmpLstPriorities = response.data;
-                this.items_priorities = [];
+                this.items_priorities = [GlobalConfigs.DEFAULT_SELECT_OPTION];
                 for (var i = 0; i < tmpLstPriorities.length; i++) {
                     var currentItem = { id: tmpLstPriorities[i].woPriorityId, text: tmpLstPriorities[i].name };
                     this.items_priorities.push(currentItem);
@@ -288,7 +289,7 @@ export class PreventiveRequestComponent {
                 console.log("categories response", response.data);
 
                 var tmpLstCategories = response.data;
-                this.items_categories = [];
+                this.items_categories = [GlobalConfigs.DEFAULT_SELECT_OPTION];
                 for (var i = 0; i < tmpLstCategories.length; i++) {
                     var currentItem = { id: tmpLstCategories[i].woCategoryId, text: tmpLstCategories[i].name };
                     this.items_categories.push(currentItem);
@@ -296,10 +297,10 @@ export class PreventiveRequestComponent {
             });
 
             // load all locations
-            this._locationService.getLocations().subscribe((locations) => {
+            this._locationService.getLocationsLeaf().subscribe((locations) => {
                 console.log("location response", locations);
                 var lstLocations = locations.data;
-                this.items_locations = [];
+                this.items_locations = [GlobalConfigs.DEFAULT_SELECT_OPTION];
                 for (var i = 0; i < lstLocations.length; i++) {
                     this.items_locations.push({ text: lstLocations[i].name, id: lstLocations[i].locationId });
                 }
@@ -310,7 +311,7 @@ export class PreventiveRequestComponent {
             this._assetService.getAssets().subscribe((assets) => {
                 var lstAssets = assets.data;
 
-                this.items_assets = [];
+                this.items_assets = [GlobalConfigs.DEFAULT_SELECT_OPTION];
                 for (var i = 0; i < lstAssets.length; i++) {
                     this.items_assets.push({ text: lstAssets[i].name, id: lstAssets[i].assetId });
                 }
@@ -346,27 +347,27 @@ export class PreventiveRequestComponent {
                 }
             } else {
                 // general tab
-                if (this.task_name.valid
-                    && this.task_desc.valid
-                    && this.selected_category.valid
-                    && this.selected_priority.valid
-                    && this.selected_location.valid
-                    && this.location_info.valid
-                    && this.contact_person.valid
-                    && this.contact_number.valid
-                    && this.selected_asset.valid) {
+                if (this.task_name.enabled && this.task_name.valid
+                    && this.task_desc.enabled && this.task_desc.valid
+                    && this.selected_category.enabled && this.selected_category.valid
+                    && this.selected_priority.enabled && this.selected_priority.valid
+                    && this.selected_location.enabled && this.selected_location.valid
+                    && this.location_info.enabled && this.location_info.valid
+                    && this.contact_person.enabled && this.contact_person.valid
+                    && this.contact_number.enabled && this.contact_number.valid
+                    && this.selected_asset.enabled && this.selected_asset.valid) {
                     this._generalTab.headerStyleClass = '';
                 }
 
                 let isRecurringValid = false
 
                 // recurring tab
-                if (this.selected_repeat.valid
-                    && this.selected_startdate.valid
-                    && this.selected_due_period.valid
-                    && this.due_after.valid
-                    && this.repeat_every.valid
-                    && this.selected_every_period.valid) {
+                if (this.selected_repeat.enabled && this.selected_repeat.valid
+                    && this.selected_startdate.enabled && this.selected_startdate.valid
+                    && this.selected_due_period.enabled && this.selected_due_period.valid
+                    && this.due_after.enabled && this.due_after.valid
+                    && this.repeat_every.enabled && this.repeat_every.valid
+                    && this.selected_every_period.enabled && this.selected_every_period.valid) {
                     isRecurringValid = true;
                 }
 
@@ -428,7 +429,7 @@ export class PreventiveRequestComponent {
                     console.log("repeat options response", response.data);
 
                     var tmpLstRepeats = response.data;
-                    this.items_repeats = [];
+                    this.items_repeats = [GlobalConfigs.DEFAULT_SELECT_OPTION];
                     for (var i = 0; i < tmpLstRepeats.length; i++) {
                         var currentItem = { id: tmpLstRepeats[i].repeatOptionId, text: tmpLstRepeats[i].name };
                         this.items_repeats.push(currentItem);
@@ -445,7 +446,7 @@ export class PreventiveRequestComponent {
                     console.log("period durations response", response.data);
 
                     var tmpLstDurations = response.data;
-                    this.items_period_duration = [];
+                    this.items_period_duration = [GlobalConfigs.DEFAULT_SELECT_OPTION];
                     for (var i = 0; i < tmpLstDurations.length; i++) {
                         var currentItem = { id: tmpLstDurations[i].periodDurationId, text: tmpLstDurations[i].name };
                         this.items_period_duration.push(currentItem);
@@ -478,7 +479,7 @@ export class PreventiveRequestComponent {
                 console.log("priorities", response.data);
 
                 var tmpLstPriorities = response.data;
-                this.items_priorities = [];
+                this.items_priorities = [GlobalConfigs.DEFAULT_SELECT_OPTION];
                 for (var i = 0; i < tmpLstPriorities.length; i++) {
                     var currentItem = { id: tmpLstPriorities[i].woPriorityId, text: tmpLstPriorities[i].name };
                     this.items_priorities.push(currentItem);
@@ -495,7 +496,7 @@ export class PreventiveRequestComponent {
                 console.log("categories response", response.data);
 
                 var tmpLstCategories = response.data;
-                this.items_categories = [];
+                this.items_categories = [GlobalConfigs.DEFAULT_SELECT_OPTION];
                 for (var i = 0; i < tmpLstCategories.length; i++) {
                     var currentItem = { id: tmpLstCategories[i].woCategoryId, text: tmpLstCategories[i].name };
                     this.items_categories.push(currentItem);
@@ -508,10 +509,10 @@ export class PreventiveRequestComponent {
             });
 
             // load all locations
-            this._locationService.getLocations().subscribe((locations) => {
+            this._locationService.getLocationsLeaf().subscribe((locations) => {
                 console.log("location response", locations);
                 var lstLocations = locations.data;
-                this.items_locations = [];
+                this.items_locations = [GlobalConfigs.DEFAULT_SELECT_OPTION];
                 for (var i = 0; i < lstLocations.length; i++) {
                     var currentItem = { text: lstLocations[i].name, id: lstLocations[i].locationId };
                     this.items_locations.push(currentItem);
@@ -528,7 +529,7 @@ export class PreventiveRequestComponent {
             this._assetService.getAssets().subscribe((assets) => {
                 var lstAssets = assets.data;
 
-                this.items_assets = [];
+                this.items_assets = [GlobalConfigs.DEFAULT_SELECT_OPTION];
                 for (var i = 0; i < lstAssets.length; i++) {
                     var currentItem = { text: lstAssets[i].name, id: lstAssets[i].assetId };
                     this.items_assets.push(currentItem);
@@ -549,7 +550,7 @@ export class PreventiveRequestComponent {
                     console.log(lstUsers);
 
                     // clear assignee list
-                    this.items_assignees = [];
+                    this.items_assignees = [GlobalConfigs.DEFAULT_SELECT_OPTION];
                     for (var i = 0; i < lstUsers.length; i++) {
                         var currentItem = { text: lstUsers[i].fullname, id: lstUsers[i].userId };
                         this.items_assignees.push(currentItem);
@@ -567,7 +568,7 @@ export class PreventiveRequestComponent {
                     console.log(lstUsers);
 
                     // clear assignee list
-                    this.items_assignees = [];
+                    this.items_assignees = [GlobalConfigs.DEFAULT_SELECT_OPTION];
                     for (var i = 0; i < lstUsers.length; i++) {
                         var currentItem = { text: lstUsers[i].fullname, id: lstUsers[i].userId };
                         this.items_assignees.push(currentItem);
@@ -585,7 +586,7 @@ export class PreventiveRequestComponent {
                     console.log(lstUsers);
 
                     // clear assignee list
-                    this.items_assignees = [];
+                    this.items_assignees = [GlobalConfigs.DEFAULT_SELECT_OPTION];
                     for (var i = 0; i < lstUsers.length; i++) {
                         var currentItem = { text: lstUsers[i].fullname, id: lstUsers[i].userId };
                         this.items_assignees.push(currentItem);
@@ -611,8 +612,7 @@ export class PreventiveRequestComponent {
                 this.selected_assignee.disable();
                 //this._defFieldPermissions.selected_assignee = "disabled";
                 this._defFieldPermissions.btn_submit = "hide";
-            } else if (this.actionType.workflowActionId == WorkflowActions.ASSIGN_REASSIGN
-                || this.actionType.workflowActionId == WorkflowActions.RETURN) {
+            } else if (this.actionType.workflowActionId == WorkflowActions.ASSIGN_REASSIGN) {
                 // do not use FormGroup.disable() because FormGroup.valid will always FALSE
                 //this.formGroupAdd.disable();
                 this.disabled = true;
@@ -639,7 +639,7 @@ export class PreventiveRequestComponent {
             } else if (this.actionType.workflowActionId == WorkflowActions.CANCEL
                 || this.actionType.workflowActionId == WorkflowActions.PENDING
                 || this.actionType.workflowActionId == WorkflowActions.IN_PROGRESS
-                || this.actionType.workflowActionId == WorkflowActions.CANCEL_SCHEDULE) {
+                || this.actionType.workflowActionId == WorkflowActions.RETURN) {
                 if (this.selectedWO != null && this.selectedWO.currentStatusId == WorkOrderStatuses.SCHEDULED) {
                     this.isSchedule = true;
                 }
@@ -666,6 +666,33 @@ export class PreventiveRequestComponent {
                 this.selected_startdate.disable();
                 this.selected_starttime.disable();
                 this.selected_duedate.disable();
+            } else if (this.actionType.workflowActionId == WorkflowActions.CANCEL_SCHEDULE) {
+                console.log("cancel schedule");
+                this.isSchedule = true;
+
+                // disable all
+                this.disabled = true;
+                this.isCanEditExpenses = false;
+                this.isCanEditFiles = false;
+
+                this.wo_number.disable();
+                this.task_name.disable();
+                this.task_desc.disable();
+                this.selected_category.disable();
+                this.selected_location.disable();
+                this.location_info.disable();
+                this.selected_status.disable();
+                this.selected_priority.disable();
+                this.selected_vendor.disable();
+                this.contact_person.disable();
+                this.contact_number.disable();
+                this.due_after.disable();
+                this.solution.disable();
+                //this.selected_assignee.disable();
+
+                this.selected_startdate.disable();
+                //this.selected_starttime.disable();
+                //this.selected_duedate.disable();
             } else if (this.actionType.workflowActionId == WorkflowActions.COMPLETE
                 || this.actionType.workflowActionId == WorkflowActions.CLOSE_FOR_CONFIRMATION) {
                 //this.isCanEditExpenses = false;
@@ -734,15 +761,22 @@ export class PreventiveRequestComponent {
                 hasError = true;
             }
         } else {
+            this.markAsTouchedAll();
+
+            //Object.keys(this.formGroupAdd.controls).forEach(key => {
+            //    (<FormControl>this.formGroupAdd.controls[key]).updateValueAndValidity();
+            //    console.log(key, this.formGroupAdd.controls[key]);
+            //});
+
             this._recurringTab.headerStyleClass = '';
-            console.log("isschedule");
             // recurring tab
-            if (!this.selected_repeat.valid
-                || !this.selected_startdate.valid
-                || !this.selected_due_period.valid
-                || !this.due_after.valid
-                || !this.repeat_every.valid
-                || !this.selected_every_period.valid) {
+            if ((!this.selected_repeat.disabled && !this.selected_repeat.valid)
+                || (!this.selected_startdate.disabled && !this.selected_startdate.valid)
+                || (!this.selected_due_period.disabled && !this.selected_due_period.valid)
+                || (!this.due_after.disabled && !this.due_after.valid)
+                || (!this.repeat_every.disabled && !this.repeat_every.valid)
+                || (!this.selected_every_period.disabled && !this.selected_every_period.valid)
+            ) {
                 hasError = true;
                 this.markAsTouchedAll();
                 this._recurringTab.headerStyleClass = 'tabpanel-has-error';
@@ -760,15 +794,15 @@ export class PreventiveRequestComponent {
             //}
 
             // general tab
-            if (!this.task_name.valid
-                || !this.task_desc.valid
-                || !this.selected_category.valid
-                || !this.selected_priority.valid
-                || !this.selected_location.valid
-                || !this.location_info.valid
-                || !this.contact_person.valid
-                || !this.contact_number.valid
-                || !this.selected_asset.valid) {
+            if ((!this.task_name.disabled && !this.task_name.valid)
+                || (!this.task_desc.disabled && !this.task_desc.valid)
+                || (!this.selected_category.disabled && !this.selected_category.valid)
+                || (!this.selected_priority.disabled && !this.selected_priority.valid)
+                || (!this.selected_location.disabled && !this.selected_location.valid)
+                || (!this.location_info.disabled && !this.location_info.valid)
+                || (!this.contact_person.disabled && !this.contact_person.valid)
+                || (!this.contact_number.disabled && !this.contact_number.valid)
+                || (!this.selected_asset.disabled && !this.selected_asset.valid)) {
                 hasError = true;
                 this.markAsTouchedAll();
                 this._generalTab.headerStyleClass = 'tabpanel-has-error';
@@ -822,7 +856,7 @@ export class PreventiveRequestComponent {
             contactPerson: this.contact_person.value,
             contactNumber: this.contact_number.value,
             solution: this.solution.value,
-            vendor: this.selected_vendor.value == null ? null : this.selected_vendor.value.id
+            vendorId: this.selected_vendor.value == null || this.selected_vendor.value == "" ? null : this.selected_vendor.value.id
         });
 
         var formatted_object = {
@@ -916,6 +950,11 @@ export class PreventiveRequestComponent {
 
     selectedSelectBoxValue(field, event) {
         console.log("selectedSelectBoxValue", field, event);
+
+        if (event.id == GlobalConfigs.DEFAULT_SELECT_OPTION.id) {
+            this.removeSelectBoxValue(field, event);
+            return;
+        }
 
         // handle every possible field here
         switch (field.toLowerCase()) {
@@ -1057,7 +1096,7 @@ export class PreventiveRequestComponent {
         console.log("validateRepeat", input);
         if (this.actionType.workflowActionId == WorkflowActions.CREATE
             || (this.actionType.workflowActionId == WorkflowActions.EDIT && this.isSchedule)) {
-            if (input.value == null || input.value == "") {
+            if (input.value == null || input.value == "" || input.value.id == null || input.value.id == GlobalConfigs.DEFAULT_SELECT_OPTION.id) {
                 return { required: true };
             }
         }
@@ -1070,7 +1109,7 @@ export class PreventiveRequestComponent {
             || (this.actionType.workflowActionId == WorkflowActions.EDIT && this.isSchedule)) {
             // if selected repeat is EVERY
             if (this.selected_repeat != null && this.selected_repeat.value != null && this.selected_repeat.value.id == 6) {
-                if (input.value == null || input.value == "") {
+                if (input.value == null || input.value == "" || input.value.id == null || input.value.id == GlobalConfigs.DEFAULT_SELECT_OPTION.id) {
                     return { required: true };
                 } else {
                     return CustomValidators.numberOnly(input);
@@ -1086,7 +1125,7 @@ export class PreventiveRequestComponent {
             || (this.actionType.workflowActionId == WorkflowActions.EDIT && this.isSchedule)) {
             // if selected repeat is EVERY
             if (this.selected_repeat != null && this.selected_repeat.value != null && this.selected_repeat.value.id == 6) {
-                if (input.value == null || input.value == "" || input.value.id == null) {
+                if (input.value == null || input.value == "" || input.value.id == null || input.value.id == GlobalConfigs.DEFAULT_SELECT_OPTION.id) {
                     return { required: true };
                 }
             }
@@ -1098,7 +1137,7 @@ export class PreventiveRequestComponent {
     validateDuePeriod(input: FormControl) {
         if (this.actionType.workflowActionId == WorkflowActions.CREATE
             || (this.actionType.workflowActionId == WorkflowActions.EDIT && this.isSchedule)) {
-            if (input.value == null || input.value == "" || input.value.id == null) {
+            if (input.value == null || input.value == "" || input.value.id == null || input.value.id == GlobalConfigs.DEFAULT_SELECT_OPTION.id) {
                 return { required: true };
             }
         }
@@ -1118,6 +1157,8 @@ export class PreventiveRequestComponent {
                 if (startDate > dueDate) return { crossdate: true };
             }
         }
+
+        console.log("validate start due date");
 
         return null;
     }
@@ -1190,7 +1231,8 @@ export class PreventiveRequestComponent {
 
     markAsTouchedAll() {
         Object.keys(this.formGroupAdd.controls).forEach(key => {
-            this.formGroupAdd.controls[key].markAsTouched();
+            (<FormControl>this.formGroupAdd.controls[key]).markAsTouched();
+            (<FormControl>this.formGroupAdd.controls[key]).markAsDirty();
         });
     }
 }

@@ -58,7 +58,7 @@ export class RoutingGuard implements CanActivate {
         }
 
         // redirect if user has no permission
-        this.router.navigate(['pages','dashboard']);
+        this.router.navigate(['pages','access-denied']);
         return false;
     }
 }

@@ -10,7 +10,7 @@
     </div>
   </div>
   <ba-card baCardClass="with-scroll">
-    <spinner *ngIf="isLoadingData"></spinner> 
+    <spinner *ngIf="isLoadingData"></spinner>
     <div class="alert alert-danger" *ngIf="errMsg.length > 0">
       <ul style="margin-bottom: 0px;">
         <li *ngFor="let err of errMsg">
@@ -18,7 +18,7 @@
         </li>
       </ul>
     </div>
-    <p-dataTable #dt [value]="lstUtilityConsumptions" [lazy]="true" (onLazyLoad)="refresh($event, dt)" [sortField]="DEFAULT_SORT_FIELD" [rows]="DEFAULT_ITEM_PER_PAGE" sortOrder="-1" [paginator]="true" [totalRecords]="totalRecords">
+    <p-dataTable #dt [value]="lstUtilityConsumptions" [lazy]="true" (onLazyLoad)="refresh($event, dt)" [sortField]="DEFAULT_SORT_FIELD" [rows]="DEFAULT_ITEM_PER_PAGE" sortOrder="-1" [paginator]="true" [totalRecords]="totalRecords" styleClass="custom-filter-datatable">
       <p-header>
         <div class="ui-helper-clearfix">
           <button type="button" iconPos="left" label="CSV" (click)="downloadCSV(dt)" style="float:left" class="btn-export__csv">
@@ -50,17 +50,51 @@
           </div>
         </template>
       </p-column>
-      <p-column field="utilityConsumptionId" header="ID" filter="true" sortable="true"></p-column>
-      <p-column field="utilityTypeName" header="Type" filter="true" sortable="true"></p-column>
-      <p-column field="date" header="Date" sortable="true"></p-column>
-      <p-column field="total" header="Total" filter="true" sortable="true"></p-column>
+      <p-column field="utilityConsumptionId" header="ID" sortable="true">
+        <template pTemplate="header">
+          <span class="ui-column-title">ID</span>
+          <sortable-filter-input #filterTable [dataTable]="dt" field="utilityConsumptionId" [disabled]="isLoadingData" (onFilter)="onFilter($event)"></sortable-filter-input>
+        </template>
+      </p-column>
+      <p-column field="utilityTypeName" header="Type" sortable="true">
+        <template pTemplate="header">
+          <span class="ui-column-title">Type</span>
+          <sortable-filter-input #filterTable [dataTable]="dt" field="utilityTypeName" [disabled]="isLoadingData" (onFilter)="onFilter($event)"></sortable-filter-input>
+        </template>
+      </p-column>
+      <p-column field="date" header="Date" sortable="true">
+        <template pTemplate="header">
+          <span class="ui-column-title">Date</span>
+          <sortable-filter-input #filterTable [dataTable]="dt" field="date" [disabled]="isLoadingData" (onFilter)="onFilter($event)"></sortable-filter-input>
+        </template>
+      </p-column>
+      <p-column field="total" header="Total" sortable="true">
+        <template pTemplate="header">
+          <span class="ui-column-title">Total</span>
+          <sortable-filter-input #filterTable [dataTable]="dt" field="total" [disabled]="isLoadingData" (onFilter)="onFilter($event)"></sortable-filter-input>
+        </template>
+      </p-column>
       <p-column field="totalExclusion" header="Total Exclusion" sortable="true">
+        <template pTemplate="header">
+          <span class="ui-column-title">Total Exclusion</span>
+          <sortable-filter-input #filterTable [dataTable]="dt" field="totalExclusion" [disabled]="isLoadingData" (onFilter)="onFilter($event)"></sortable-filter-input>
+        </template>
         <template pTemplate="body" let-data="rowData">
           {{ data.totalExclusion == null ? '' : data.totalExclusion }}
         </template>
       </p-column>
-      <p-column field="nettTotal" header="Nett Total" sortable="true"></p-column>
-      <p-column field="utilityUomName" header="UOM" filter="true" sortable="true"></p-column>
+      <p-column field="nettTotal" header="Nett Total" sortable="true">
+        <template pTemplate="header">
+          <span class="ui-column-title">Nett Total</span>
+          <sortable-filter-input #filterTable [dataTable]="dt" field="nettTotal" [disabled]="isLoadingData" (onFilter)="onFilter($event)"></sortable-filter-input>
+        </template>
+      </p-column>
+      <p-column field="utilityUomName" header="UOM" sortable="true">
+        <template pTemplate="header">
+          <span class="ui-column-title">UOM</span>
+          <sortable-filter-input #filterTable [dataTable]="dt" field="utilityUomName" [disabled]="isLoadingData" (onFilter)="onFilter($event)"></sortable-filter-input>
+        </template>
+      </p-column>
     </p-dataTable>
   </ba-card>
 </div>

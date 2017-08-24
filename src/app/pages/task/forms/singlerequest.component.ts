@@ -39,6 +39,7 @@ export class SingleRequestComponent implements OnChanges {
 
     // const
     private _yearRange = GlobalConfigs.yearRange;
+    private _defaultSelectOption = GlobalConfigs.DEFAULT_SELECT_OPTION;
 
     // flag to disable almost all form
     public disabled = false;
@@ -235,7 +236,7 @@ export class SingleRequestComponent implements OnChanges {
                 console.log("vendors", response.data);
 
                 var tmpLstVendors = response.data;
-                this.items_vendors = [];
+                this.items_vendors = [GlobalConfigs.DEFAULT_SELECT_OPTION];
                 for (var i = 0; i < tmpLstVendors.length; i++) {
                     var currentItem = { id: tmpLstVendors[i].entityId, text: tmpLstVendors[i].name };
                     this.items_vendors.push(currentItem);
@@ -247,7 +248,7 @@ export class SingleRequestComponent implements OnChanges {
                 console.log("priorities", response.data);
 
                 var tmpLstPriorities = response.data;
-                this.items_priorities = [];
+                this.items_priorities = [GlobalConfigs.DEFAULT_SELECT_OPTION];
                 for (var i = 0; i < tmpLstPriorities.length; i++) {
                     var currentItem = { id: tmpLstPriorities[i].woPriorityId, text: tmpLstPriorities[i].name };
                     this.items_priorities.push(currentItem);
@@ -259,7 +260,7 @@ export class SingleRequestComponent implements OnChanges {
                 console.log("categories response", response.data);
 
                 var tmpLstCategories = response.data;
-                this.items_categories = [];
+                this.items_categories = [GlobalConfigs.DEFAULT_SELECT_OPTION];
                 for (var i = 0; i < tmpLstCategories.length; i++) {
                     var currentItem = { id: tmpLstCategories[i].woCategoryId, text: tmpLstCategories[i].name };
                     this.items_categories.push(currentItem);
@@ -267,10 +268,10 @@ export class SingleRequestComponent implements OnChanges {
             });
 
             // load all locations
-            this._locationService.getLocations().subscribe((locations) => {
+            this._locationService.getLocationsLeaf().subscribe((locations) => {
                 console.log("location response", locations);
                 var lstLocations = locations.data;
-                this.items_locations = [];
+                this.items_locations = [GlobalConfigs.DEFAULT_SELECT_OPTION];
                 for (var i = 0; i < lstLocations.length; i++) {
                     this.items_locations.push({ text: lstLocations[i].name, id: lstLocations[i].locationId });
                 }
@@ -281,7 +282,7 @@ export class SingleRequestComponent implements OnChanges {
             this._assetService.getAssets().subscribe((assets) => {
                 var lstAssets = assets.data;
 
-                this.items_assets = [];
+                this.items_assets = [GlobalConfigs.DEFAULT_SELECT_OPTION];
                 for (var i = 0; i < lstAssets.length; i++) {
                     this.items_assets.push({ text: lstAssets[i].name, id: lstAssets[i].assetId });
                 }
@@ -292,7 +293,7 @@ export class SingleRequestComponent implements OnChanges {
             this._userService.getAssigneeByTypeId("User", 1).subscribe((users) => {
                 var lstUsers = users.data;
 
-                this.items_assignees = [];
+                this.items_assignees = [GlobalConfigs.DEFAULT_SELECT_OPTION];
                 for (var i = 0; i < lstUsers.length; i++) {
                     this.items_assignees.push({ text: lstUsers[i].fullname, id: lstUsers[i].userId });
                 }
@@ -358,7 +359,7 @@ export class SingleRequestComponent implements OnChanges {
                 console.log("vendors", response.data);
 
                 var tmpLstVendors = response.data;
-                this.items_vendors = [];
+                this.items_vendors = [GlobalConfigs.DEFAULT_SELECT_OPTION];
                 for (var i = 0; i < tmpLstVendors.length; i++) {
                     var currentItem = { id: tmpLstVendors[i].entityId, text: tmpLstVendors[i].name };
                     this.items_vendors.push(currentItem);
@@ -376,7 +377,7 @@ export class SingleRequestComponent implements OnChanges {
                 console.log("priorities", response.data);
 
                 var tmpLstPriorities = response.data;
-                this.items_priorities = [];
+                this.items_priorities = [GlobalConfigs.DEFAULT_SELECT_OPTION];
                 for (var i = 0; i < tmpLstPriorities.length; i++) {
                     var currentItem = { id: tmpLstPriorities[i].woPriorityId, text: tmpLstPriorities[i].name };
                     this.items_priorities.push(currentItem);
@@ -394,7 +395,7 @@ export class SingleRequestComponent implements OnChanges {
                 console.log("categories response", response.data);
 
                 var tmpLstCategories = response.data;
-                this.items_categories = [];
+                this.items_categories = [GlobalConfigs.DEFAULT_SELECT_OPTION];
                 for (var i = 0; i < tmpLstCategories.length; i++) {
                     var currentItem = { id: tmpLstCategories[i].woCategoryId, text: tmpLstCategories[i].name };
                     this.items_categories.push(currentItem);
@@ -408,10 +409,10 @@ export class SingleRequestComponent implements OnChanges {
             });
 
             // get locations
-            this._locationService.getLocations().subscribe((locations) => {
+            this._locationService.getLocationsLeaf().subscribe((locations) => {
                 console.log("location response", locations);
                 var lstLocations = locations.data;
-                this.items_locations = [];
+                this.items_locations = [GlobalConfigs.DEFAULT_SELECT_OPTION];
                 for (var i = 0; i < lstLocations.length; i++) {
                     var currentItem = { text: lstLocations[i].name, id: lstLocations[i].locationId };
                     this.items_locations.push(currentItem);
@@ -432,7 +433,7 @@ export class SingleRequestComponent implements OnChanges {
             this._assetService.getAssets().subscribe((assets) => {
                 var lstAssets = assets.data;
 
-                this.items_assets = [];
+                this.items_assets = [GlobalConfigs.DEFAULT_SELECT_OPTION];
                 for (var i = 0; i < lstAssets.length; i++) {
                     var currentItem = { text: lstAssets[i].name, id: lstAssets[i].assetId };
                     this.items_assets.push(currentItem);
@@ -453,7 +454,7 @@ export class SingleRequestComponent implements OnChanges {
                     console.log(lstUsers);
 
                     // clear assignee list
-                    this.items_assignees = [];
+                    this.items_assignees = [GlobalConfigs.DEFAULT_SELECT_OPTION];
                     for (var i = 0; i < lstUsers.length; i++) {
                         var currentItem = { text: lstUsers[i].fullname, id: lstUsers[i].userId };
                         this.items_assignees.push(currentItem);
@@ -471,7 +472,7 @@ export class SingleRequestComponent implements OnChanges {
                     console.log(lstUsers);
 
                     // clear assignee list
-                    this.items_assignees = [];
+                    this.items_assignees = [GlobalConfigs.DEFAULT_SELECT_OPTION];
                     for (var i = 0; i < lstUsers.length; i++) {
                         var currentItem = { text: lstUsers[i].fullname, id: lstUsers[i].userId };
                         this.items_assignees.push(currentItem);
@@ -489,7 +490,7 @@ export class SingleRequestComponent implements OnChanges {
                     console.log(lstUsers);
 
                     // clear assignee list
-                    this.items_assignees = [];
+                    this.items_assignees = [GlobalConfigs.DEFAULT_SELECT_OPTION];
                     for (var i = 0; i < lstUsers.length; i++) {
                         var currentItem = { text: lstUsers[i].fullname, id: lstUsers[i].userId };
                         this.items_assignees.push(currentItem);
@@ -513,8 +514,7 @@ export class SingleRequestComponent implements OnChanges {
                 //this._defFieldPermissions.selected_assignee = 'disabled';
                 this._defFieldPermissions.btn_submit = 'hide';
 
-            } else if (this.actionType.workflowActionId == WorkflowActions.ASSIGN_REASSIGN
-                || this.actionType.workflowActionId == WorkflowActions.RETURN) {
+            } else if (this.actionType.workflowActionId == WorkflowActions.ASSIGN_REASSIGN) {
                 // do not use FormGroup.disable() because FormGroup.valid will always FALSE
                 //this.formGroupAdd.disable();
                 this.disabled = true;
@@ -540,7 +540,8 @@ export class SingleRequestComponent implements OnChanges {
 
             } else if (this.actionType.workflowActionId == WorkflowActions.CANCEL
                 || this.actionType.workflowActionId == WorkflowActions.PENDING
-                || this.actionType.workflowActionId == WorkflowActions.IN_PROGRESS) {
+                || this.actionType.workflowActionId == WorkflowActions.IN_PROGRESS
+                || this.actionType.workflowActionId == WorkflowActions.RETURN) {
                 // disable all
                 this.disabled = true;
                 this.isCanEditExpenses = false;
@@ -676,7 +677,7 @@ export class SingleRequestComponent implements OnChanges {
                 contactPerson: this.contact_person.value,
                 contactNumber: this.contact_number.value,
                 solution: this.solution.value,
-                vendorId: this.selected_vendor.value.id
+                vendorId: this.selected_vendor.value == null || this.selected_vendor.value == "" ? null : this.selected_vendor.value.id
             };
 
             var formatted_object = {
@@ -788,6 +789,11 @@ export class SingleRequestComponent implements OnChanges {
 
     selectedSelectBoxValue(field, event) {
         console.log("selectedSelectBoxValue", field, event);
+
+        if (event.id == GlobalConfigs.DEFAULT_SELECT_OPTION.id) {
+            this.removeSelectBoxValue(field, event);
+            return;
+        }
 
         // handle every possible field here
         switch (field.toLowerCase()) {
@@ -914,7 +920,7 @@ export class SingleRequestComponent implements OnChanges {
         console.log("validateSelectedCategory", input, this.actionType);
         if (this.actionType.workflowActionId == WorkflowActions.CREATE
             || this.actionType.workflowActionId == WorkflowActions.EDIT) {
-            if (input.value == null || input.value == "" || input.value.id == null) {
+            if (input.value == null || input.value == "" || input.value.id == null || input.value.id == GlobalConfigs.DEFAULT_SELECT_OPTION.id) {
                 return { required: true};
             }
         }
@@ -926,7 +932,7 @@ export class SingleRequestComponent implements OnChanges {
         console.log("validateSelectedPriority", input, this.actionType);
         if (this.actionType.workflowActionId == WorkflowActions.CREATE
             || this.actionType.workflowActionId == WorkflowActions.EDIT) {
-            if (input.value == null || input.value == "" || input.value.id == null) {
+            if (input.value == null || input.value == "" || input.value.id == null || input.value.id == GlobalConfigs.DEFAULT_SELECT_OPTION.id) {
                 return { required: true };
             }
         }

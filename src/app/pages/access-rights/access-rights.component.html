@@ -38,21 +38,21 @@
           </div>
         </template>
       </p-column>
-      <p-column field="allowAdd" header="Allow Add">
+      <p-column field="allowAdd" header="Allow Add" *ngIf="visibleColumn.allowAdd">
         <template pTemplate="body" let-data="rowData">
           <div style="text-align: center">
             <p-checkbox binary="true" [(ngModel)]="data.allowAdd" (click)="setHasChanges(true)" [disabled]="!data.addCheckable"></p-checkbox>
           </div>
         </template>
       </p-column>
-      <p-column field="allowUpdate" header="Allow Update">
+      <p-column field="allowUpdate" header="Allow Update" *ngIf="visibleColumn.allowUpdate">
         <template pTemplate="body" let-data="rowData">
           <div style="text-align: center">
             <p-checkbox binary="true" [(ngModel)]="data.allowUpdate" (click)="setHasChanges(true)" [disabled]="!data.updateCheckable"></p-checkbox>
           </div>
         </template>
       </p-column>
-      <p-column field="allowDelete" header="Allow Delete">
+      <p-column field="allowDelete" header="Allow Delete" *ngIf="visibleColumn.allowDelete">
         <template pTemplate="body" let-data="rowData">
           <div style="text-align: center">
             <p-checkbox binary="true" [(ngModel)]="data.allowDelete" (click)="setHasChanges(true)" [disabled]="!data.deleteCheckable"></p-checkbox>
@@ -64,7 +64,7 @@
           <div class="btn-with-icon">
             <button type="submit" class="btn btn-primary btn-save" (click)="onSubmit()" [disabled]="roleGroupSelectBox.active.length == 0 || isSaving">
               <i class="icon ion-checkmark"></i>
-              {{ btnSaveLabel }}
+              Save
             </button>
           </div>
         </div>

@@ -75,6 +75,14 @@ export class Preventatives {
     // wo type list
     private woTypes;
 
+    // master wo list
+    private woTypesMaster = [{ id: 1, label: "Preventive Maintenance", menuId: 'PreventiveWorkOrder' },
+    { id: 2, label: "Recurring Request", menuId: 'RecurringWorkOrder' },
+    { id: 3, label: "Single Request", menuId: 'SingleWorkOrder' },
+    { id: 4, label: "Tenant Request", menuId: 'TenantWorkOrder' },
+    { id: 5, label: "Guest Request", menuId: 'GuestWorkOrder' },
+    { id: 6, label: "Owner Request", menuId: 'OwnerWorkOrder' },
+    ];
     // selected wo type
     public selectedWoType: {id, label};
 
@@ -330,21 +338,13 @@ export class Preventatives {
   }
 
     ngOnInit(){
-        // master wo list
-        let woTypesMaster = [{ id: 1, label: "Preventive Maintenance", menuId: 'PreventiveWorkOrder' },
-        { id: 2, label: "Recurring Request", menuId: 'RecurringWorkOrder' },
-        { id: 3, label: "Single Request", menuId: 'SingleWorkOrder' },
-        { id: 4, label: "Tenant Request", menuId: 'TenantWorkOrder' },
-        { id: 5, label: "Guest Request", menuId: 'GuestWorkOrder' },
-        { id: 6, label: "Owner Request", menuId: 'OwnerWorkOrder' },
-        ];
 
         // build creatable WO Type button
         this.woTypes = [];
 
         let sitemaps = JSON.parse(localStorage.getItem('sitemaps'));
         let authorizedSitemaps = JSON.parse(localStorage.getItem('authorizedSitemaps'));
-        for (let master of woTypesMaster) {
+        for (let master of this.woTypesMaster) {
             if (authorizedSitemaps[master.menuId] != null && authorizedSitemaps[master.menuId].allowAccessOrView) {
                 let sitemap = sitemaps[master.menuId];
                 this.woTypes.push({ id: master.id, label: sitemap.name });
@@ -504,27 +504,27 @@ export class Preventatives {
         if (modelData.woTypeId == this.SINGLE_TIME_REQUEST) {
             this.currentOpenModal = this.createNewSingleRequestComponent(this.viewModalBody, SingleRequestComponent);
             //this.modalTitle = "Work Order - Single Request (" + selectedAction.name + ")";
-            this.currentOpenModal.instance.selectedWoType = this.woTypes[2];
+            this.currentOpenModal.instance.selectedWoType = this.woTypesMaster[2];
         } else if (modelData.woTypeId == this.GUEST_REQUEST) {
             this.currentOpenModal = this.createNewGuestRequestComponent(this.viewModalBody, GuestRequestComponent);
             //this.modalTitle = "Work Order - Guest Request (" + selectedAction.name + ")";
-            this.currentOpenModal.instance.selectedWoType = this.woTypes[2];
+            this.currentOpenModal.instance.selectedWoType = this.woTypesMaster[4];
         } else if (modelData.woTypeId == this.TENANT_REQUEST) {
             this.currentOpenModal = this.createNewTenantRequestComponent(this.viewModalBody, TenantRequestComponent);
             //this.modalTitle = "Work Order - Tenant Request (" + selectedAction.name + ")";
-            this.currentOpenModal.instance.selectedWoType = this.woTypes[2];
+            this.currentOpenModal.instance.selectedWoType = this.woTypesMaster[3];
         } else if (modelData.woTypeId == this.OWNER_REQUEST) {
             this.currentOpenModal = this.createNewOwnerRequestComponent(this.viewModalBody, OwnerRequestComponent);
             //this.modalTitle = "Work Order - Owner Request (" + selectedAction.name + ")";
-            this.currentOpenModal.instance.selectedWoType = this.woTypes[2];
+            this.currentOpenModal.instance.selectedWoType = this.woTypesMaster[5];
         } else if (modelData.woTypeId == this.RECURRING_REQUEST) {
             this.currentOpenModal = this.createNewRecurringRequestComponent(this.viewModalBody, RecurringRequestComponent);
             //this.modalTitle = "Work Order - Recurring Request (" + selectedAction.name + ")";
-            this.currentOpenModal.instance.selectedWoType = this.woTypes[1];
+            this.currentOpenModal.instance.selectedWoType = this.woTypesMaster[1];
         } else if (modelData.woTypeId == this.PREVENTIVE_REQUEST) {
             this.currentOpenModal = this.createNewPreventiveRequestComponent(this.viewModalBody, PreventiveRequestComponent);
             //this.modalTitle = "Work Order - Preventative Request (" + selectedAction.name + ")";
-            this.currentOpenModal.instance.selectedWoType = this.woTypes[1];
+            this.currentOpenModal.instance.selectedWoType = this.woTypesMaster[0];
         }
         // set modal title
         if(selectedAction.workflowActionId == WorkflowActions.IN_PROGRESS){
@@ -532,9 +532,9 @@ export class Preventatives {
         }else{
             this.modalTitle = selectedAction.name + " ";
         }
-        for(var i=0; i < this.woTypes.length; i++){
-            if (this.woTypes[i].id == modelData.woTypeId){
-                this.modalTitle += this.woTypes[i].label;
+        for (var i = 0; i < this.woTypesMaster.length; i++){
+            if (this.woTypesMaster[i].id == modelData.woTypeId){
+                this.modalTitle += this.woTypesMaster[i].label;
                 break;
             }
         }
