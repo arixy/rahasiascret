@@ -63,6 +63,10 @@ export class BaMenu {
           if (item.children == null || item.children.length == 0) {
 
               if (item.route && item.route.data && item.route.data.menuId) {
+                  if (item.route.data.menuId == 'Dashboard') {
+                      // Always show Dashboard menu
+                      items.push(item)
+                  }else{
                   let menuAuthorization = JSON.parse(localStorage.getItem('sitemaps'))[item.route.data.menuId];
 
                   if (menuAuthorization) {
@@ -82,10 +86,9 @@ export class BaMenu {
                       if (item.route.data.menuId) {
                           let menuAuthorization = JSON.parse(localStorage.getItem('authorizedSitemaps'))[item.route.data.menuId];
                           if (menuAuthorization != null && menuAuthorization.allowAccessOrView) {
-                              //console.log("added menu by checking authorization", item);
+                                  // has access
                               items.push(item);
-                          } else {
-                              console.error("authorization menu", item, menuAuthorization);
+                              }
                           }
                       }
                   }

@@ -58,6 +58,7 @@ export class WorkOrderWeeklyChartComponent implements OnDestroy {
                 },
                 ticks: {
                     beginAtZero: true,
+                    stepSize: 1
                 }
             }]
         },

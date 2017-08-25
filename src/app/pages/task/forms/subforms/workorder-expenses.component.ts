@@ -51,7 +51,7 @@ export class WorkOrderExpensesComponent {
             console.log("expenses response", response.data);
 
             var tmpLstExpenses = response.data;
-            this.items_expenses_types = [];
+            this.items_expenses_types = [GlobalConfigs.DEFAULT_SELECT_OPTION];
 
             for (var i = 0; i < tmpLstExpenses.length; i++) {
                 this.items_expenses_types.push({ id: tmpLstExpenses[i].expenseTypeId, text: tmpLstExpenses[i].name });
@@ -91,7 +91,12 @@ export class WorkOrderExpensesComponent {
     } 
 
     setSelectedExpenseType(expense, event) {
-        expense.expenseTypeId = event.id;
+        if (event != null && event.id == GlobalConfigs.DEFAULT_SELECT_OPTION.id) {
+            this.removeSelectedExpenseType(expense, event);
+        } else {
+            expense.expenseTypeId = event.id;
+        }
+        
     }
 
     removeSelectedExpenseType(expense, event) {

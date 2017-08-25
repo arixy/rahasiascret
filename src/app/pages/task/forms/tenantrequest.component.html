@@ -262,7 +262,7 @@
           Start date is Required
         </div>
         <div class="error-message col-xg-10" *ngIf="formGroupAdd.get('selected_startdate').hasError('crossdate') && formGroupAdd.get('selected_startdate').touched">
-          Start date must before due date
+          Start date must be before due date
         </div>
       </div>
 
@@ -281,7 +281,7 @@
           Due date is Required
         </div>
         <div class="error-message col-xg-10" *ngIf="formGroupAdd.get('selected_startdate').hasError('crossdate') && formGroupAdd.get('selected_startdate').touched">
-          Due date must after start date
+          Due date must be after start date
         </div>
       </div>
       <!-- Solution -->

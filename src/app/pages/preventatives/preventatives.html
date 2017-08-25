@@ -1,7 +1,7 @@
 <div class="widgets">
 <div class="row">
    <div class="ui-helper-clearfix">
-            <div class="btn-group add-new-dropdown" dropdown style="float: right">
+            <div class="btn-group add-new-dropdown" dropdown style="float: right" *ngIf="woTypes == null || woTypes.length > 0">
                 <button id="addNewWorkOrder" type="button" class="btn btn-primary" dropdownToggle>
                     
                     <i class="icon ion-plus-round"></i>

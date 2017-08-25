@@ -1,4 +1,4 @@
-﻿import { Component, Input, ChangeDetectorRef, ViewChild, ViewEncapsulation, OnDestroy, ViewContainerRef, ComponentFactoryResolver, ComponentRef} from '@angular/core';
+﻿import { Component, Input, ChangeDetectorRef, ViewChild, ViewChildren, QueryList, ViewEncapsulation, OnDestroy, ViewContainerRef, ComponentFactoryResolver, ComponentRef} from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
@@ -15,6 +15,9 @@ import { UtilityFormComponent } from './forms/utility-form.component';
 
 // services
 import { UtilityConsumptionsService } from './utility-consumptions.service';
+
+// filter input
+import { FilterInputComponent } from '../filter-input.component';
     
 @Component({
   selector: 'utility-consumptions',
@@ -47,8 +50,12 @@ export class UtilityConsumptions implements OnDestroy {
 
     // error messages
     private errMsg = [];
+
     // flag is loading
     private isLoadingData = true;
+
+    // filters
+    private filterMaster: any = {};
 
     // ViewChilds
     @ViewChild('dt') consumptionsTable: DataTable;
@@ -56,6 +63,8 @@ export class UtilityConsumptions implements OnDestroy {
     @ViewChild("deleteModal") deleteModal: ModalDirective;
 
     @ViewChild('dynamicModalBody', { read: ViewContainerRef }) viewModalBody: ViewContainerRef;
+
+    @ViewChildren('filterTable') filters: QueryList<FilterInputComponent>;
 
     constructor(
         private componentFactoryResolver: ComponentFactoryResolver,
@@ -103,6 +112,7 @@ export class UtilityConsumptions implements OnDestroy {
                 this.errMsg = [];
                 this.errMsg = this.errMsg.concat(response.resultCode.message);
             }
+
             this.isLoadingData = false;
         });
     }
@@ -126,7 +136,7 @@ export class UtilityConsumptions implements OnDestroy {
         }
         else {
             return {
-                "filters": table.filters,
+                "filters": this.filterMaster,
                 "first": table.first,
                 "rows": table.rows,
                 "globalFilter": table.globalFilter,
@@ -139,6 +149,12 @@ export class UtilityConsumptions implements OnDestroy {
 
     resetFilters(table: DataTable) {
         console.log("resetFilters");
+
+        this.filters.forEach(item => {
+            item.resetFilter();
+        });
+
+        this.filterMaster = {};
 
         table.filters = {};
         table.globalFilter = "";
@@ -232,6 +248,15 @@ export class UtilityConsumptions implements OnDestroy {
 
     hideChildModal(currentOpenModal) {
         currentOpenModal.hide();
+    }
+
+    // onFilter event
+    onFilter(event) {
+        console.log("onFilter event", event);
+
+        this.filterMaster[event.field] = event.value;
+
+        this.refresh(event, this.consumptionsTable);
     }
 
     ngOnDestroy() {

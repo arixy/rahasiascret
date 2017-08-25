@@ -23,7 +23,7 @@ import { ConsumptionReportService } from './consumption-report.service';
     encapsulation: ViewEncapsulation.None
 })
 export class ConsumptionReportComponent implements OnDestroy {
-	// constants
+    // constants
     private readonly DEFAULT_SORT_FIELD = "date";
     private readonly DEFAULT_ITEM_PER_PAGE = "10";
     private readonly _yearRange = GlobalConfigs.yearRange;
@@ -46,12 +46,32 @@ export class ConsumptionReportComponent implements OnDestroy {
             line: {
                 tension: 0,
             }
-        }
+        },
+        scales: {
+            //xAxes: [{
+            //    //stacked: true,
+            //    scaleLabel: {
+            //        display: true,
+            //        labelString: "Date"
+            //    },
+            //}],
+            yAxes: [{
+                //stacked: true,
+                //scaleLabel: {
+                //    display: true,
+                //    labelString: "Nett Total"
+                //},
+                ticks: {
+                    beginAtZero: true,
+                    //stepSize: 1
+                }
+            }]
+        },
     };
 
     private chartData;
 
-	// filter model
+    // filter model
     private filterModel: { _itemsDateTypes, dateType, dateFrom, dateTo, _itemsUtilityTypes, utilityType } = {
         _itemsDateTypes: [
             { id: 1, text: "Created On", field: "dateCreated" },
@@ -61,10 +81,10 @@ export class ConsumptionReportComponent implements OnDestroy {
         dateFrom: null,
         dateTo: null,
         _itemsUtilityTypes: [{ id: -1, text: "All" }],
-		utilityType: []
+        utilityType: []
     };
 
-	// data model
+    // data model
     private lstConsumptions = [];
 
     // loading state
@@ -76,6 +96,7 @@ export class ConsumptionReportComponent implements OnDestroy {
         reportResult: false,
         reportChart: false
     }
+
     // View Childs
     @ViewChild("selectDateType") _lsbSelectDateType: SelectComponent;
     @ViewChild("selectUtilityType") _lsbUtilityType: SelectComponent;
@@ -291,6 +312,7 @@ export class ConsumptionReportComponent implements OnDestroy {
                             "data": tmpChartData[data],
                             "fill": false,
                             "borderColor": chartColor[index],
+                            "backgroundColor": chartColor[index],
                         });
                     }
                     index = (index + 1) % chartColor.length;
