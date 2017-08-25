@@ -1,4 +1,4 @@
-﻿<div class="widgets">
+<div class="widgets">
 <div class="row">
    <div class="ui-helper-clearfix">
             <div class="btn-group add-new-dropdown" dropdown style="float: right" *ngIf="woTypes == null || woTypes.length > 0">
@@ -18,9 +18,9 @@
             </div>
         </div>
     
-    <ba-card title="Work Orders" baCardClass="with-scroll">
+    <ba-card title="Work Orders" baCardClass="with-scroll card-top-stack">
       <spinner *ngIf="isLoadingWOData"></spinner> 
-            <p-dataTable #dt [value]="myTasks" [lazy]="true" (onLazyLoad)="refresh($event, dt)" [rows]="10" [paginator]="true" [totalRecords]="totalRecords" sortField="dateUpdated" sortOrder="-1" styleClass="custom-filter-datatable">
+            <p-dataTable #dt [value]="myTasks" [lazy]="true" (onLazyLoad)="refresh($event, dt)" [rows]="10" [paginator]="true" [totalRecords]="totalRecords" sortField="dateUpdated" sortOrder="-1" styleClass="custom-filter-datatable custom-dropdown-datatable">
                 <p-header>
                     <div class="ui-helper-clearfix">
                     <button type="button" iconPos="left" label="CSV" (click)="downloadAllWorkOrdersCSV(dt)" style="float:left" class="btn-export__csv">
@@ -130,7 +130,7 @@
     </ba-card>
     <ba-card title="Schedule" baCardClass="with-scroll">
       <spinner *ngIf="isLoadingScheduleData"></spinner> 
-      <p-dataTable #dtschedule [value]="maintenances" [lazy]="true" (onLazyLoad)="refreshScheduled($event, dtschedule)" [rows]="10" [paginator]="true" [totalRecords]="totalRecordsScheduled" sortField="dateUpdated" sortOrder="-1" styleClass="custom-filter-datatable">
+      <p-dataTable #dtschedule [value]="maintenances" [lazy]="true" (onLazyLoad)="refreshScheduled($event, dtschedule)" [rows]="10" [paginator]="true" [totalRecords]="totalRecordsScheduled" sortField="dateUpdated" sortOrder="-1" styleClass="custom-filter-datatable custom-dropdown-datatable">
           <p-header>
             <div class="ui-helper-clearfix">
                 <button type="button" iconPos="left" label="CSV" (click)="downloadAllScheduleWorkOrdersCSV(dtschedule)" style="float:left" class="btn-export__csv">
