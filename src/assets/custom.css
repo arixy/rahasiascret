@@ -601,6 +601,21 @@ body .ui-paginator .ui-paginator-first, body .ui-paginator .ui-paginator-prev, b
 .mat-dialog-container .delete-modal .modal-content {
     border: none !important;
 }
+
+.al-main {
+    z-index: 99;
+}
+.card-top-stack {
+    z-index: 900;
+}
+.custom-dropdown-datatable .dropdown-menu{
+    left: auto !important;
+    top: auto !important;
+    margin-top: 30px !important;
+}
+.custom-dropdown-datatable .dropdown{
+    position: static !important;
+}
 /* Added by Mike */
 .ui-fileupload-buttonbar button:not(.ui-fileupload-choose) {
   display: none !important;
