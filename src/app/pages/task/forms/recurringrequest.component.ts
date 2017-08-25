@@ -24,6 +24,7 @@ import { ExpenseTypeService } from '../../expense-type/expense-type.service';
 import { PriorityService } from '../../priorities/priority.service';
 
 import { GlobalConfigs, WorkflowActions, WorkOrderStatuses } from '../../../global.state';
+import { GrowlMessage, MessageSeverity, MessageLabels } from '../../../popup-notification';
 
 import { CustomValidators } from './custom-validators';
 
@@ -140,6 +141,33 @@ export class RecurringRequestComponent {
         }
     }
 
+    // loading state
+    private loadingState = {
+        isLoading: () => {
+            return this.loadingState.workOrder || this.loadingState.expenses || this.loadingState.files || this.loadingState.location
+                || this.loadingState.category || this.loadingState.priority || this.loadingState.assignee || this.loadingState.asset
+                || this.loadingState.vendor || this.loadingState.repeatOption || this.loadingState.repeatPeriod
+                || this.loadingState.duePeriod || this.loadingState.expenseType || this.loadingState.saving;
+        },
+        // work order data
+        workOrder: false,
+        expenses: false,
+        files: false,
+        saving: false,
+
+        // lookup
+        location: false,
+        category: false,
+        priority: false,
+        assignee: false,
+        asset: false,
+        vendor: false,
+        repeatOption: false,
+        repeatPeriod: false,
+        duePeriod: false,
+        expenseType: false,
+    };
+
     @ViewChild("addStatusSelectBox") _addStatusSelectBox: SelectComponent;
     @ViewChild("addLocationSelectBox") _addLocationSelectBox: SelectComponent;
     @ViewChild("addCategorySelectBox") _addCategorySelectBox: SelectComponent;
@@ -245,6 +273,7 @@ export class RecurringRequestComponent {
             }
 
             // repeat options
+            this.loadingState.repeatOption = true;
             this._periodService.getRepeatOptions().subscribe((response) => {
                 console.log("repeat options response", response.data);
 
@@ -254,9 +283,11 @@ export class RecurringRequestComponent {
                     var currentItem = { id: tmpLstRepeats[i].repeatOptionId, text: tmpLstRepeats[i].name };
                     this.items_repeats.push(currentItem);
                 }
+                this.loadingState.repeatOption = false;
             });
 
             // period durations
+            this.loadingState.repeatPeriod = true;
             this._periodService.getPeriodDurations().subscribe((response) => {
                 console.log("period durations response", response.data);
 
@@ -266,9 +297,11 @@ export class RecurringRequestComponent {
                     var currentItem = { id: tmpLstDurations[i].periodDurationId, text: tmpLstDurations[i].name };
                     this.items_period_duration.push(currentItem);
                 }
+                this.loadingState.repeatPeriod = false;
             });
 
             // get priorities
+            this.loadingState.priority = true;
             this._priorityService.getPriorities().subscribe((response) => {
                 console.log("priorities", response.data);
 
@@ -278,9 +311,11 @@ export class RecurringRequestComponent {
                     var currentItem = { id: tmpLstPriorities[i].woPriorityId, text: tmpLstPriorities[i].name };
                     this.items_priorities.push(currentItem);
                 }
+                this.loadingState.priority = false;
             });
 
             // get categories
+            this.loadingState.category = true;
             this._workOrderService.getWOs().subscribe((response) => {
                 console.log("categories response", response.data);
 
@@ -290,9 +325,11 @@ export class RecurringRequestComponent {
                     var currentItem = { id: tmpLstCategories[i].woCategoryId, text: tmpLstCategories[i].name };
                     this.items_categories.push(currentItem);
                 }
+                this.loadingState.category = false;
             });
 
             // load all locations
+            this.loadingState.location = true;
             this._locationService.getLocationsLeaf().subscribe((locations) => {
                 console.log("location response", locations);
                 var lstLocations = locations.data;
@@ -301,6 +338,7 @@ export class RecurringRequestComponent {
                     this.items_locations.push({ text: lstLocations[i].name, id: lstLocations[i].locationId });
                 }
                 console.log("items_locations", this.items_locations);
+                this.loadingState.location = false;
             });
 
             // load all users as assignee
@@ -365,6 +403,7 @@ export class RecurringRequestComponent {
 
     private loadWorkOrderDataAndSetPermission() {
         // reload WO Data
+        this.loadingState.workOrder = true;
         this._taskService.getMyTaskById(this.selectedWO.workOrderId).subscribe((response) => {
             console.log("work-order/get response:", response.data);
 
@@ -408,6 +447,7 @@ export class RecurringRequestComponent {
                 });
             } else {
                 // repeat options
+                this.loadingState.repeatOption = true;
                 this._periodService.getRepeatOptions().subscribe((response) => {
                     console.log("repeat options response", response.data);
 
@@ -422,9 +462,11 @@ export class RecurringRequestComponent {
                             this._addRepeatSelectBox.active = [currentItem];
                         }
                     }
+                    this.loadingState.repeatOption = false;
                 });
 
                 // period durations
+                this.loadingState.repeatPeriod = true;
                 this._periodService.getPeriodDurations().subscribe((response) => {
                     console.log("period durations response", response.data);
 
@@ -447,6 +489,7 @@ export class RecurringRequestComponent {
                             this._addDuePeriodSelectBox.active = [currentItem];
                         }
                     }
+                    this.loadingState.repeatPeriod = false;
                 });
             }
 
@@ -462,6 +505,7 @@ export class RecurringRequestComponent {
             }
 
             // get priorities
+            this.loadingState.priority = true;
             this._priorityService.getPriorities().subscribe((response) => {
                 console.log("priorities", response.data);
 
@@ -476,9 +520,11 @@ export class RecurringRequestComponent {
                         this._addPrioritySelectBox.active = [currentItem];
                     }
                 }
+                this.loadingState.priority = false;
             });
 
             // get categories
+            this.loadingState.category = true;
             this._workOrderService.getWOs().subscribe((response) => {
                 console.log("categories response", response.data);
 
@@ -493,9 +539,11 @@ export class RecurringRequestComponent {
                         this._addCategorySelectBox.active = [currentItem];
                     }
                 }
+                this.loadingState.category = false;
             });
 
             // load all locations
+            this.loadingState.location = true;
             this._locationService.getLocationsLeaf().subscribe((locations) => {
                 console.log("location response", locations);
                 var lstLocations = locations.data;
@@ -510,11 +558,13 @@ export class RecurringRequestComponent {
                     }
                 }
                 console.log("items_locations", this.items_locations);
+                this.loadingState.location = false;
             });
 
             // load all users as assignee
             if (this.actionType.toRoleId != null) {
                 console.log("get assignee by type: Role", this.actionType);
+                this.loadingState.assignee = true;
                 this._userService.getAssigneeByTypeId("Role", this.actionType.toRoleId).subscribe((users) => {
                     var lstUsers = users.data;
                     console.log(lstUsers);
@@ -530,9 +580,11 @@ export class RecurringRequestComponent {
                             this._addAssigneeSelectBox.active = [currentItem];
                         }
                     }
+                    this.loadingState.assignee = false;
                 });
             } else if (this.actionType.toRoleTypeId != null) {
                 console.log("get assignee by type: RoleType", this.actionType);
+                this.loadingState.assignee = true;
                 this._userService.getAssigneeByTypeId("RoleType", this.actionType.toRoleTypeId).subscribe((users) => {
                     var lstUsers = users.data;
                     console.log(lstUsers);
@@ -548,9 +600,11 @@ export class RecurringRequestComponent {
                             this._addAssigneeSelectBox.active = [currentItem];
                         }
                     }
+                    this.loadingState.assignee = false;
                 });
             } else {
                 console.log("get assignee by type: user");
+                this.loadingState.assignee = true;
                 this._userService.getAssigneeByTypeId("User", 1).subscribe((users) => {
                     var lstUsers = users.data;
                     console.log(lstUsers);
@@ -566,6 +620,7 @@ export class RecurringRequestComponent {
                             this._addAssigneeSelectBox.active = [currentItem];
                         }
                     }
+                    this.loadingState.assignee = false;
                 });
             }
 
@@ -675,6 +730,7 @@ export class RecurringRequestComponent {
                 this.isCanEditFiles = false;
                 this.formGroupAdd.disable();
             }
+            this.loadingState.workOrder = false;
         });
     }
 
@@ -838,10 +894,12 @@ export class RecurringRequestComponent {
                 console.log("save response", response);
                 if (response.resultCode.code == 0) {
                     this._taskService.announceEvent("addNewModal_btnSaveOnClick_createSuccess");
+                    GrowlMessage.addMessage(MessageSeverity.SUCCESS, MessageLabels.SAVE_SUCCESS);
                 } else {
                     // an error occured
                     this.errMsg = [];
                     this.errMsg = this.errMsg.concat(response.resultCode.message);
+                    GrowlMessage.addMessage(MessageSeverity.ERROR, MessageLabels.SAVE_ERROR);
                 }
             });
         } else {
@@ -849,10 +907,12 @@ export class RecurringRequestComponent {
                 console.log("update response", response);
                 if (response.resultCode.code == 0) {
                     this._taskService.announceEvent("addNewModal_btnSaveOnClick_updateSuccess");
+                    GrowlMessage.addMessage(MessageSeverity.SUCCESS, MessageLabels.SAVE_SUCCESS);
                 } else {
                     // an error occured
                     this.errMsg = [];
                     this.errMsg = this.errMsg.concat(response.resultCode.message);
+                    GrowlMessage.addMessage(MessageSeverity.ERROR, MessageLabels.SAVE_ERROR);
                 }
             });
         }
@@ -862,11 +922,6 @@ export class RecurringRequestComponent {
 
     removeSelectBoxValue(field, event) {
         console.log("selectedSelectBoxValue", field, event);
-
-        if (event.id == GlobalConfigs.DEFAULT_SELECT_OPTION.id) {
-            this.removeSelectBoxValue(field, event);
-            return;
-        }
 
         // handle every possible field here
         switch (field.toLowerCase()) {
@@ -891,6 +946,11 @@ export class RecurringRequestComponent {
 
     selectedSelectBoxValue(field, event) {
         console.log("selectedSelectBoxValue", field, event);
+
+        if (event.id == GlobalConfigs.DEFAULT_SELECT_OPTION.id) {
+            this.removeSelectBoxValue(field, event);
+            return;
+        }
 
         // handle every possible field here
         switch (field.toLowerCase()) {
@@ -1035,7 +1095,7 @@ export class RecurringRequestComponent {
         console.log("validateRepeat", input);
         if (this.actionType.workflowActionId == WorkflowActions.CREATE
             || (this.actionType.workflowActionId == WorkflowActions.EDIT && this.isSchedule)) {
-            if (input.value == null || input.value == "") {
+            if (input.value == null || input.value == "" || input.value.id == null || input.value.id == GlobalConfigs.DEFAULT_SELECT_OPTION) {
                 return { required: true };
             }
         }
@@ -1049,7 +1109,7 @@ export class RecurringRequestComponent {
             || (this.actionType.workflowActionId == WorkflowActions.EDIT && this.isSchedule)) {
             // if selected repeat is EVERY
             if (this.selected_repeat != null && this.selected_repeat.value != null && this.selected_repeat.value.id == 6) {
-                if (input.value == null || input.value == "") {
+                if (input.value == null || input.value == "" || input.value.id == null || input.value.id == GlobalConfigs.DEFAULT_SELECT_OPTION) {
                     return { required: true };
                 } else {
                     return CustomValidators.numberOnly(input);
@@ -1066,7 +1126,7 @@ export class RecurringRequestComponent {
             || (this.actionType.workflowActionId == WorkflowActions.EDIT && this.isSchedule)) {
             // if selected repeat is EVERY
             if (this.selected_repeat != null && this.selected_repeat.value != null && this.selected_repeat.value.id == 6) {
-                if (input.value == null || input.value == "" || input.value.id == null) {
+                if (input.value == null || input.value == "" || input.value.id == null || input.value.id == GlobalConfigs.DEFAULT_SELECT_OPTION) {
                     return { required: true };
                 }
             }
@@ -1078,7 +1138,7 @@ export class RecurringRequestComponent {
     validateDuePeriod(input: FormControl) {
         if (this.actionType.workflowActionId == WorkflowActions.CREATE
             || (this.actionType.workflowActionId == WorkflowActions.EDIT && this.isSchedule)) {
-            if (input.value == null || input.value == "" || input.value.id == null) {
+            if (input.value == null || input.value == "" || input.value.id == null || input.value.id == GlobalConfigs.DEFAULT_SELECT_OPTION) {
                 return { required: true };
             }
         }

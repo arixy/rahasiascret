@@ -41,6 +41,7 @@ export class GlobalState {
     });
   }
 }
+
 export class GlobalConfigs {
     public static readonly APP_BASE_URL = "http://ec2-52-40-147-30.us-west-2.compute.amazonaws.com/api/v1";
     public static readonly APP_MASTER_URL = "http://ec2-52-40-147-30.us-west-2.compute.amazonaws.com/api/v1/master";

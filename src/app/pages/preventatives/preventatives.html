@@ -189,10 +189,10 @@
             </p-column>
             <p-column field="start" header="Start">
               <template pTemplate="body" let-data="rowData">
-                {{ data.start | date: 'y-MM-dd HH:mm' }}
+                {{ data.start | date: 'y-MM-dd' }}
               </template>
             </p-column>
-            <p-column field="due" header="Due"></p-column>
+            <p-column field="repeat" header="Repeat"></p-column>
             <p-column field="lastWo" header="Last WO">
               <template pTemplate="body" let-data="rowData">
                 {{ data.lastWo | date: 'y-MM-dd' }}
@@ -201,7 +201,7 @@
             
             <p-column field="nextWo" header="Next WO">
               <template pTemplate="body" let-data="rowData">
-                {{ data.nextWo | date: 'y-MM-dd HH:mm' }}
+                {{ data.nextWo | date: 'y-MM-dd' }}
               </template>
             </p-column>
             
@@ -232,7 +232,7 @@
             
             <div class="modal-body">
                 <div>
-                    <ba-card title="" baCardClass="with-scroll">
+                    <ba-card title="" baCardClass="with-scroll custom-card">
                         <template #dynamicModalBody></template>
                     </ba-card>
                 </div>
@@ -252,7 +252,7 @@
       </div>
       <div class="modal-body">
         <div>
-            <ba-card title="Edit WO" baCardClass="with-scroll">
+            <ba-card title="Edit WO" baCardClass="with-scroll custom-card">
               <form [formGroup]="editForm" (ngSubmit)="onEditSubmit(form.value)" class="form-horizontal">
                   <div class="form-group row" [ngClass]="{'has-error': (!wo_number.valid && wo_number.touched), 'has-success': (wo_number.valid && wo_number.touched)}">
                     <label for="inputEmail3" class="col-sm-2 control-label">WO Number</label>

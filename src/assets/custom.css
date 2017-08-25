@@ -659,4 +659,25 @@ input[disabled], textarea[disabled] {
 input[disabled].form-control, textarea[disabled].form-control {
   border: 1px solid #cfdadd
 }
+
+.btn-yes {
+  background-color: #5cb85c !important;
+  border-color: #5cb85c !important;
+}
+
+.ui-growl-message-error {
+  background-color: #d9534f !important;
+  border-color: #d9534f !important;
+  color: #ffffff !important;
+}
+
+.ui-growl-message-success {
+  background-color: #5cb85c !important;
+  border-color: #5cb85c !important;
+  color: #ffffff !important;
+}
+
+.ui-growl {
+  z-index: 9999999 !important;
+}
 /* End Added by Mike */

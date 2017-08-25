@@ -63,7 +63,7 @@ import { ConsumptionReportComponent } from './reports/consumption/consumption-re
 
 // add primeng
 import { TabViewModule, FileUploadModule, PanelModule, CalendarModule, CheckboxModule, PaginatorModule } from 'primeng/primeng';
-import { TreeTableModule, TreeNode, ChartModule } from 'primeng/primeng';
+import { TreeTableModule, TreeNode, ChartModule, GrowlModule } from 'primeng/primeng';
 
 import {MdTabsModule} from '@angular/material';
 import { LoadingSmallComponent } from './loading-small.component';
@@ -96,7 +96,8 @@ import { AccessDenied } from './access-denied/access-denied.component';
       PaginatorModule,
       ChartModule,
       ResetFilterModule,
-      SpinnerModule
+      SpinnerModule,
+      GrowlModule
            ],
     providers: [
         DialogsService

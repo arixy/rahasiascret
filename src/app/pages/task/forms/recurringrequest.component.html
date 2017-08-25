@@ -1,4 +1,5 @@
-﻿<form [formGroup]="formGroupAdd" onsubmit="return false;" class="form-horizontal" id="single-request-form">
+﻿<spinner *ngIf="loadingState.isLoading()"></spinner>
+<form [formGroup]="formGroupAdd" onsubmit="return false;" class="form-horizontal" id="single-request-form">
   <div class="alert alert-danger" *ngIf="errMsg.length > 0">
     <ul style="margin-bottom: 0px;" class="lst-error">
       <li *ngFor="let err of errMsg">
@@ -356,7 +357,7 @@
           <label for="selected_duedate" class="control-label">Start Date</label><br />
 
           <div class="col-xg-10">
-            <p-calendar [formControl]="selected_startdate" [showIcon]="true" dateFormat="yy-mm-dd" [yearNavigator]="true" [yearRange]="_yearRange" [showTime]="true"></p-calendar>
+            <p-calendar [formControl]="selected_startdate" [showIcon]="true" dateFormat="yy-mm-dd" [yearNavigator]="true" [yearRange]="_yearRange" [showTime]="false"></p-calendar>
           </div>
         </div>
         <div class="row error-row">

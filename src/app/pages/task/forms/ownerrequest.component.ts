@@ -23,6 +23,7 @@ import { ExpenseTypeService } from '../../expense-type/expense-type.service';
 import { PriorityService } from '../../priorities/priority.service';
 
 import { GlobalConfigs, WorkflowActions, WorkOrderStatuses } from '../../../global.state';
+import { GrowlMessage, MessageSeverity, MessageLabels } from '../../../popup-notification';
 
 import { CustomValidators } from './custom-validators';
 
@@ -108,6 +109,34 @@ export class OwnerRequestComponent {
         default: "show",
         btn_submit: 'show'
     }
+
+    // loading state
+    private loadingState = {
+        isLoading: () => {
+            return this.loadingState.workOrder || this.loadingState.expenses || this.loadingState.files || this.loadingState.location
+                || this.loadingState.category || this.loadingState.priority || this.loadingState.assignee || this.loadingState.asset
+                || this.loadingState.vendor || this.loadingState.owner || this.loadingState.repeatOption || this.loadingState.repeatPeriod
+                || this.loadingState.duePeriod || this.loadingState.expenseType || this.loadingState.saving;
+        },
+        // work order data
+        workOrder: false,
+        expenses: false,
+        files: false,
+        saving: false,
+
+        // lookup
+        location: false,
+        category: false,
+        priority: false,
+        assignee: false,
+        asset: false,
+        vendor: false,
+        owner: false,
+        repeatOption: false,
+        repeatPeriod: false,
+        duePeriod: false,
+        expenseType: false,
+    };
 
     @ViewChild("addStatusSelectBox") _addStatusSelectBox: SelectComponent;
     @ViewChild("addLocationSelectBox") _addLocationSelectBox: SelectComponent;
@@ -198,6 +227,7 @@ export class OwnerRequestComponent {
             this.loadWorkOrderDataAndSetPermission();
         } else {
             // get vendors
+            this.loadingState.vendor = true;
             this._entityService.getEntitiesByType(1).subscribe((response) => {
                 console.log("vendors", response.data);
 
@@ -207,9 +237,11 @@ export class OwnerRequestComponent {
                     var currentItem = { id: tmpLstVendors[i].entityId, text: tmpLstVendors[i].name };
                     this.items_vendors.push(currentItem);
                 }
+                this.loadingState.vendor = false;
             });
 
             // get priorities
+            this.loadingState.priority = true;
             this._priorityService.getPriorities().subscribe((response) => {
                 console.log("priorities", response.data);
 
@@ -219,9 +251,11 @@ export class OwnerRequestComponent {
                     var currentItem = { id: tmpLstPriorities[i].woPriorityId, text: tmpLstPriorities[i].name };
                     this.items_priorities.push(currentItem);
                 }
+                this.loadingState.priority = false;
             });
 
             // get categories
+            this.loadingState.category = true;
             this._workOrderService.getWOs().subscribe((response) => {
                 console.log("categories response", response.data);
 
@@ -231,9 +265,11 @@ export class OwnerRequestComponent {
                     var currentItem = { id: tmpLstCategories[i].woCategoryId, text: tmpLstCategories[i].name };
                     this.items_categories.push(currentItem);
                 }
+                this.loadingState.category = false;
             });
 
             // load entities: owner
+            this.loadingState.owner = true;
             this._entityService.getEntitiesByType(4).subscribe((response) => {
                 console.log("entity:owners", response.data);
 
@@ -243,9 +279,11 @@ export class OwnerRequestComponent {
                     var currentItem = { id: tmpLstEntities[i].entityId, text: tmpLstEntities[i].name };
                     this.items_entities.push(currentItem);
                 }
+                this.loadingState.owner = false;
             });
 
             // load all locations
+            this.loadingState.location = true;
             this._locationService.getLocationsLeaf().subscribe((locations) => {
                 console.log("location response", locations);
                 var lstLocations = locations.data;
@@ -254,9 +292,11 @@ export class OwnerRequestComponent {
                     this.items_locations.push({ text: lstLocations[i].name, id: lstLocations[i].locationId });
                 }
                 console.log("items_locations", this.items_locations);
+                this.loadingState.location = false;
             });
 
             // load all assets
+            this.loadingState.asset = true;
             this._assetService.getAssets().subscribe((assets) => {
                 var lstAssets = assets.data;
 
@@ -264,10 +304,12 @@ export class OwnerRequestComponent {
                 for (var i = 0; i < lstAssets.length; i++) {
                     this.items_assets.push({ text: lstAssets[i].name, id: lstAssets[i].assetId });
                 }
+                this.loadingState.asset = false;
             });
 
             // load all users as assignee
             // clear assignee list
+            this.loadingState.assignee = true;
             this._userService.getAssigneeByTypeId("User", 1).subscribe((users) => {
                 var lstUsers = users.data;
 
@@ -277,6 +319,7 @@ export class OwnerRequestComponent {
                 }
 
                 console.log("list assignees", this.items_assignees);
+                this.loadingState.assignee = false;
             });
         }
 
@@ -289,6 +332,7 @@ export class OwnerRequestComponent {
 
     private loadWorkOrderDataAndSetPermission() {
         // reload WO Data
+        this.loadingState.workOrder = true;
         this._taskService.getMyTaskById(this.selectedWO.workOrderId).subscribe((response) => {
             console.log("work-order/get response:", response.data);
 
@@ -337,6 +381,7 @@ export class OwnerRequestComponent {
             }
 
             // get vendors
+            this.loadingState.vendor = true;
             this._entityService.getEntitiesByType(1).subscribe((response) => {
                 console.log("vendors", response.data);
 
@@ -352,9 +397,11 @@ export class OwnerRequestComponent {
                         this._addVendorSelectBox.active = [currentItem];
                     }
                 }
+                this.loadingState.vendor = false;
             });
 
             // get priorities
+            this.loadingState.priority = true;
             this._priorityService.getPriorities().subscribe((response) => {
                 console.log("priorities", response.data);
 
@@ -370,9 +417,11 @@ export class OwnerRequestComponent {
                         this._addPrioritySelectBox.active = [currentItem];
                     }
                 }
+                this.loadingState.priority = false;
             });
 
             // get categories
+            this.loadingState.category = true;
             this._workOrderService.getWOs().subscribe((response) => {
                 console.log("categories response", response.data);
 
@@ -388,9 +437,11 @@ export class OwnerRequestComponent {
                         this._addCategorySelectBox.active = [currentItem];
                     }
                 }
+                this.loadingState.category = false;
             });
 
             // get locations
+            this.loadingState.location = true;
             this._locationService.getLocationsLeaf().subscribe((locations) => {
                 console.log("location response", locations);
                 var lstLocations = locations.data;
@@ -406,9 +457,11 @@ export class OwnerRequestComponent {
                     }
                 }
                 console.log("items_locations", this.items_locations);
+                this.loadingState.location = false;
             });
 
             // load entities: owner
+            this.loadingState.owner = true;
             this._entityService.getEntitiesByType(4).subscribe((response) => {
                 console.log("entity:owners", response.data);
 
@@ -424,9 +477,11 @@ export class OwnerRequestComponent {
                         this._addEntitySelectBox.active = [currentItem];
                     }
                 }
+                this.loadingState.owner = false;
             });
 
             // load all assets
+            this.loadingState.asset = true;
             this._assetService.getAssets().subscribe((assets) => {
                 var lstAssets = assets.data;
 
@@ -441,12 +496,14 @@ export class OwnerRequestComponent {
                         this._addAssetSelectBox.active = [currentItem];
                     }
                 }
+                this.loadingState.asset = false;
             });
 
             // TODO: update this part
             // load all users as assignee
             if (this.actionType.toRoleId != null) {
                 console.log("get assignee by type: Role", this.actionType);
+                this.loadingState.assignee = true;
                 this._userService.getAssigneeByTypeId("Role", this.actionType.toRoleId).subscribe((users) => {
                     var lstUsers = users.data;
                     console.log(lstUsers);
@@ -462,9 +519,11 @@ export class OwnerRequestComponent {
                             this._addAssigneeSelectBox.active = [currentItem];
                         }
                     }
+                    this.loadingState.assignee = false;
                 });
             } else if (this.actionType.toRoleTypeId != null) {
                 console.log("get assignee by type: RoleType", this.actionType);
+                this.loadingState.assignee = true;
                 this._userService.getAssigneeByTypeId("RoleType", this.actionType.toRoleTypeId).subscribe((users) => {
                     var lstUsers = users.data;
                     console.log(lstUsers);
@@ -480,9 +539,11 @@ export class OwnerRequestComponent {
                             this._addAssigneeSelectBox.active = [currentItem];
                         }
                     }
+                    this.loadingState.assignee = false;
                 });
             } else {
                 console.log("get assignee by type: user");
+                this.loadingState.assignee = true;
                 this._userService.getAssigneeByTypeId("User", 1).subscribe((users) => {
                     var lstUsers = users.data;
                     console.log(lstUsers);
@@ -498,6 +559,7 @@ export class OwnerRequestComponent {
                             this._addAssigneeSelectBox.active = [currentItem];
                         }
                     }
+                    this.loadingState.assignee = false;
                 });
             }
 
@@ -611,6 +673,7 @@ export class OwnerRequestComponent {
                 //this._defFieldPermissions.selected_assignee = "disabled";
                 //this._defFieldPermissions.selected_status = "disabled";
             }
+            this.loadingState.workOrder = false;
         });
     }
 
@@ -738,10 +801,12 @@ export class OwnerRequestComponent {
                         console.log("save response", response);
                         if (response.resultCode.code == 0) {
                             this._taskService.announceEvent("addNewModal_btnSaveOnClick_createSuccess");
+                            GrowlMessage.addMessage(MessageSeverity.SUCCESS, MessageLabels.SAVE_SUCCESS);
                         } else {
                             // an error occured
                             this.errMsg = [];
                             this.errMsg = this.errMsg.concat(response.resultCode.message);
+                            GrowlMessage.addMessage(MessageSeverity.ERROR, MessageLabels.SAVE_ERROR);
                         }
                     });
                 } else {
@@ -749,10 +814,12 @@ export class OwnerRequestComponent {
                         console.log("update response", response);
                         if (response.resultCode.code == 0) {
                             this._taskService.announceEvent("addNewModal_btnSaveOnClick_updateSuccess");
+                            GrowlMessage.addMessage(MessageSeverity.SUCCESS, MessageLabels.SAVE_SUCCESS);
                         } else {
                             // an error occured
                             this.errMsg = [];
                             this.errMsg = this.errMsg.concat(response.resultCode.message);
+                            GrowlMessage.addMessage(MessageSeverity.ERROR, MessageLabels.SAVE_ERROR);
                         }
                     });
                 }
