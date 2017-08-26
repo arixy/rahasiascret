@@ -603,15 +603,20 @@ body .ui-paginator .ui-paginator-first, body .ui-paginator .ui-paginator-prev, b
 }
 
 .al-main {
-    z-index: 99;
+    /* z-index: 99; */
+    position: static;
 }
 .card-top-stack {
     z-index: 900;
+}
+.content-top {
+    position: relative;
 }
 .custom-dropdown-datatable .dropdown-menu{
     left: auto !important;
     top: auto !important;
     margin-top: 30px !important;
+    border-bottom: 3px solid #d7d7d7 !important;
 }
 .custom-dropdown-datatable .dropdown{
     position: static !important;
