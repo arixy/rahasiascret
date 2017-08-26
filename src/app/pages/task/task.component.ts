@@ -23,6 +23,7 @@ import 'rxjs/add/operator/map';
 // services
 import { TaskService } from './task.service';
 import { LocationService } from '../../services/location.service';
+import { DialogsService } from './../../services/dialog.service';
 
 // custom components
 //import { AddNewWorkOrderComponent } from './add-wo.component';
@@ -35,6 +36,7 @@ import { PreventiveRequestComponent } from './forms/preventiverequest.component'
 import { PrintWOComponent } from './print/print-wo.component';
 
 import { GlobalState, WorkOrderStatuses, WorkflowActions } from '../../global.state';
+import { GrowlMessage, MessageSeverity, MessageLabels } from '../../popup-notification';
 
 @Component({
   selector: 'my-task',
@@ -119,7 +121,8 @@ export class TaskComponent implements OnDestroy{
     public cdr: ChangeDetectorRef,
     private componentFactoryResolver: ComponentFactoryResolver,
     private _taskService: TaskService,
-    private _locationService: LocationService
+    private _locationService: LocationService,
+    private _dialogService: DialogsService
     ) {
       this.deleteWO = {};
 
@@ -265,7 +268,14 @@ export class TaskComponent implements OnDestroy{
             return;
         } else if (selectedAction.workflowActionId == WorkflowActions.DELETE) {
             this.deleteWO = modelData;
-            this.deleteModal.show();
+            //this.deleteModal.show();
+            this._dialogService.confirmDelete(modelData.taskName, '').subscribe(
+                (response) => {
+                    if (response == true) {
+                        this.saveDelete();
+                    }
+                }
+            );
             return;
         }
 
@@ -407,10 +417,12 @@ export class TaskComponent implements OnDestroy{
             if (response.resultCode.code == "0") {
                 this.deleteModal.hide();
                 this.getAllMyTasks(this.buildFilter(this.taskListsTable));
+                GrowlMessage.addMessage(MessageSeverity.SUCCESS, MessageLabels.DELETE_SUCCESS);
             } else {
                 this.errDelete = response.resultCode.message;
+                this.isLoadingData = false;
+                GrowlMessage.addMessage(MessageSeverity.ERROR, MessageLabels.DELETE_ERROR);
             }
-            this.isLoadingData = false;
         });
     }
 

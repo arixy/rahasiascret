@@ -5,6 +5,7 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 
 import { GlobalState, GlobalConfigs } from '../../../global.state';
+import { GROWL_MESSAGES, DEFAULT_LIFE_TIME } from '../../../popup-notification';
 import { AuthenticationService } from '../../../services/authentication.service';
 import { Router } from '@angular/router';
 import { ModalDirective } from 'ng2-bootstrap';
@@ -31,6 +32,8 @@ export class BaPageTop {
   public isMenuCollapsed:boolean = false;
   public isDropdownNewmenu:boolean = false;
   public isDropdownConfiguration: boolean = false;
+  private messages = GROWL_MESSAGES;
+  private life = DEFAULT_LIFE_TIME;
 
   /*
     * Added by Mike

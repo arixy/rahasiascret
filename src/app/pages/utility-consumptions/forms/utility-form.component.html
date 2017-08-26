@@ -1,4 +1,5 @@
-﻿<form [formGroup]="formGroup" class="form-horizontal" id="single-request-form">
+﻿<spinner *ngIf="loadingState.isLoading()"></spinner>
+<form [formGroup]="formGroup" class="form-horizontal" id="single-request-form">
   <div class="alert alert-danger" *ngIf="errMsg.length > 0">
     <ul style="margin-bottom: 0px;">
       <li *ngFor="let err of errMsg">

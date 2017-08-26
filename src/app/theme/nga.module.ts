@@ -6,6 +6,7 @@ import { NgUploaderModule } from 'ngx-uploader';
 import { AuthenticationService } from '../services/authentication.service';
 import { ModalModule } from 'ng2-bootstrap';
 
+import { GrowlModule } from 'primeng/primeng';
 import {
   BaThemeConfig
 } from './theme.config';
@@ -111,7 +112,9 @@ const NGA_VALIDATORS = [
     FormsModule,
     ReactiveFormsModule,
     NgUploaderModule,
-    ModalModule.forRoot()
+    ModalModule.forRoot(),
+    // primeng module
+    GrowlModule
   ],
   exports: [
     ...NGA_PIPES,

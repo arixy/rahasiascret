@@ -9,6 +9,7 @@ import { LocationService } from '../../services/location.service';
 import { WorkOrderService } from '../../services/work-order.service';
 import { MaintenanceService } from './maintenance.service';
 import { TaskService } from './../task/task.service';
+import { DialogsService } from './../../services/dialog.service';
 
 import { ExpensesComponent } from './component/expenses/expenses.component';
 
@@ -196,12 +197,13 @@ export class Preventatives {
     public woService: WorkOrderService,
     public cdr: ChangeDetectorRef,
     private componentFactoryResolver: ComponentFactoryResolver,
-    public assetService: AssetService,
-    public locationService: LocationService,
-    public maintenanceService: MaintenanceService,
+    private assetService: AssetService,
+    private locationService: LocationService,
+    private maintenanceService: MaintenanceService,
     private _taskService: TaskService,
-    public fb: FormBuilder,
-    public activatedRoute: ActivatedRoute
+    private fb: FormBuilder,
+    private activatedRoute: ActivatedRoute,
+    private _dialogService: DialogsService 
   ) {
       this.deleteWO = {};
       
@@ -496,7 +498,14 @@ export class Preventatives {
             return;
         } else if (selectedAction.workflowActionId == WorkflowActions.DELETE) {
             this.deleteWO = modelData;
-            this.deleteModal.show();
+            //this.deleteModal.show();
+            this._dialogService.confirmDelete(modelData.taskName, '').subscribe(
+                (response) => {
+                    if (response == true) {
+                        this.saveDelete();
+                    }
+                }
+            );
             return;
         }
 

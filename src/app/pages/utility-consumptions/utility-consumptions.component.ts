@@ -9,12 +9,14 @@ import { DataTable, TabViewModule } from "primeng/primeng";
 import { saveAs } from 'file-saver';
 
 import { GlobalState } from '../../global.state';
+import { GrowlMessage, MessageSeverity, MessageLabels } from '../../popup-notification';
 
 // supporting component
 import { UtilityFormComponent } from './forms/utility-form.component';
 
 // services
 import { UtilityConsumptionsService } from './utility-consumptions.service';
+import { DialogsService } from './../../services/dialog.service';
 
 // filter input
 import { FilterInputComponent } from '../filter-input.component';
@@ -68,7 +70,8 @@ export class UtilityConsumptions implements OnDestroy {
 
     constructor(
         private componentFactoryResolver: ComponentFactoryResolver,
-        private _utilityConsumptionService: UtilityConsumptionsService) {
+        private _utilityConsumptionService: UtilityConsumptionsService,
+        private _dialogService: DialogsService) {
 
     }
 
@@ -200,7 +203,14 @@ export class UtilityConsumptions implements OnDestroy {
     private deleteUtilityConsumption(utility) {
         this.utilityConsumptionToDelete = new Array(utility);
 
-        this.deleteModal.show();
+        //this.deleteModal.show();
+        this._dialogService.confirmDelete(utility.utilityConsumptionId + '-' + utility.utilityTypeName, '').subscribe(
+            (response) => {
+                if (response == true) {
+                    this.saveDelete();
+                }
+            }
+        );
     }
 
     downloadCSV(dataTable: DataTable) {
@@ -227,11 +237,13 @@ export class UtilityConsumptions implements OnDestroy {
                 this.utilityConsumptionToDelete = null;
                 this.deleteModal.hide();
 
+                GrowlMessage.addMessage(MessageSeverity.SUCCESS, MessageLabels.DELETE_SUCCESS);
                 this.getAllUtilityConsumptions(this.buildFilter(this.consumptionsTable));
             } else {
                 // error?
                 this.errMsg = [];
                 this.errMsg = this.errMsg.concat(response.resultCode.message);
+                GrowlMessage.addMessage(MessageSeverity.ERROR, MessageLabels.DELETE_ERROR);
             }
         });
     }

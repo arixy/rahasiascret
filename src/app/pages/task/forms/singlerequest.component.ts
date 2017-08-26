@@ -24,6 +24,7 @@ import { EntityService } from '../../entities/entity.service';
 import { WorkOrderService } from '../../../services/work-order.service';
 
 import { GlobalConfigs, WorkflowActions, WorkOrderStatuses } from '../../../global.state';
+import { GrowlMessage, MessageSeverity, MessageLabels } from '../../../popup-notification';
 
 import { CustomValidators } from './custom-validators';
 
@@ -115,6 +116,33 @@ export class SingleRequestComponent implements OnChanges {
     };
 
     private errMsg = [];
+
+    // loading state
+    private loadingState = {
+        isLoading: () => {
+            return this.loadingState.workOrder || this.loadingState.expenses || this.loadingState.files || this.loadingState.location
+                || this.loadingState.category || this.loadingState.priority || this.loadingState.assignee || this.loadingState.asset
+                || this.loadingState.vendor || this.loadingState.repeatOption || this.loadingState.repeatPeriod
+                || this.loadingState.duePeriod || this.loadingState.expenseType || this.loadingState.saving;
+        },
+        // work order data
+        workOrder: false,
+        expenses: false,
+        files: false,
+        saving: false,
+
+        // lookup
+        location: false,
+        category: false,
+        priority: false,
+        assignee: false,
+        asset: false,
+        vendor: false,
+        repeatOption: false,
+        repeatPeriod: false,
+        duePeriod: false,
+        expenseType: false,
+    };
 
     public _defFieldPermissions = {
         // just put fields that is different from other select box
@@ -232,6 +260,7 @@ export class SingleRequestComponent implements OnChanges {
             this.loadWorkOrderDataAndSetPermission();
         } else {
             // get vendors
+            this.loadingState.vendor = true;
             this._entityService.getEntitiesByType(1).subscribe((response) => {
                 console.log("vendors", response.data);
 
@@ -241,9 +270,12 @@ export class SingleRequestComponent implements OnChanges {
                     var currentItem = { id: tmpLstVendors[i].entityId, text: tmpLstVendors[i].name };
                     this.items_vendors.push(currentItem);
                 }
+
+                this.loadingState.vendor = false;
             });
 
             // get priorities
+            this.loadingState.priority = true;
             this._priorityService.getPriorities().subscribe((response) => {
                 console.log("priorities", response.data);
 
@@ -253,9 +285,11 @@ export class SingleRequestComponent implements OnChanges {
                     var currentItem = { id: tmpLstPriorities[i].woPriorityId, text: tmpLstPriorities[i].name };
                     this.items_priorities.push(currentItem);
                 }
+                this.loadingState.priority = false;
             });
 
             // get categories
+            this.loadingState.category = true;
             this._workOrderService.getWOs().subscribe((response) => {
                 console.log("categories response", response.data);
 
@@ -265,9 +299,11 @@ export class SingleRequestComponent implements OnChanges {
                     var currentItem = { id: tmpLstCategories[i].woCategoryId, text: tmpLstCategories[i].name };
                     this.items_categories.push(currentItem);
                 }
+                this.loadingState.category = false;
             });
 
             // load all locations
+            this.loadingState.location = true;
             this._locationService.getLocationsLeaf().subscribe((locations) => {
                 console.log("location response", locations);
                 var lstLocations = locations.data;
@@ -276,9 +312,11 @@ export class SingleRequestComponent implements OnChanges {
                     this.items_locations.push({ text: lstLocations[i].name, id: lstLocations[i].locationId });
                 }
                 console.log("items_locations", this.items_locations);
+                this.loadingState.location = false;
             });
 
             // load all assets
+            this.loadingState.asset = true;
             this._assetService.getAssets().subscribe((assets) => {
                 var lstAssets = assets.data;
 
@@ -286,10 +324,12 @@ export class SingleRequestComponent implements OnChanges {
                 for (var i = 0; i < lstAssets.length; i++) {
                     this.items_assets.push({ text: lstAssets[i].name, id: lstAssets[i].assetId });
                 }
+                this.loadingState.asset = false;
             });
 
             // load all users as assignee
             // clear assignee list
+            this.loadingState.assignee = true;
             this._userService.getAssigneeByTypeId("User", 1).subscribe((users) => {
                 var lstUsers = users.data;
 
@@ -299,12 +339,14 @@ export class SingleRequestComponent implements OnChanges {
                 }
 
                 console.log("list assignees", this.items_assignees);
+                this.loadingState.assignee = false;
             });
         }
     }
 
     private loadWorkOrderDataAndSetPermission() {
         // reload WO Data
+        this.loadingState.workOrder = true;
         this._taskService.getMyTaskById(this.selectedWO.workOrderId).subscribe((response) => {
             console.log("work-order/get response:", response.data);
 
@@ -355,6 +397,7 @@ export class SingleRequestComponent implements OnChanges {
             }
 
             // get vendors
+            this.loadingState.vendor = true;
             this._entityService.getEntitiesByType(1).subscribe((response) => {
                 console.log("vendors", response.data);
 
@@ -370,9 +413,11 @@ export class SingleRequestComponent implements OnChanges {
                         this._addVendorSelectBox.active = [currentItem];
                     }
                 }
+                this.loadingState.vendor = false;
             });
 
             // get priorities
+            this.loadingState.priority = true;
             this._priorityService.getPriorities().subscribe((response) => {
                 console.log("priorities", response.data);
 
@@ -388,9 +433,11 @@ export class SingleRequestComponent implements OnChanges {
                         this._addPrioritySelectBox.active = [currentItem];
                     }
                 }
+                this.loadingState.priority = false;
             });
 
             // get categories
+            this.loadingState.category = true;
             this._workOrderService.getWOs().subscribe((response) => {
                 console.log("categories response", response.data);
 
@@ -406,9 +453,11 @@ export class SingleRequestComponent implements OnChanges {
                         this._addCategorySelectBox.active = [currentItem];
                     }
                 }
+                this.loadingState.category = false;
             });
 
             // get locations
+            this.loadingState.location = true;
             this._locationService.getLocationsLeaf().subscribe((locations) => {
                 console.log("location response", locations);
                 var lstLocations = locations.data;
@@ -424,12 +473,11 @@ export class SingleRequestComponent implements OnChanges {
                     }
                 }
                 console.log("items_locations", this.items_locations);
+                this.loadingState.location = false;
             });
 
-            // load entities
-
-
             // load all assets
+            this.loadingState.asset = true;
             this._assetService.getAssets().subscribe((assets) => {
                 var lstAssets = assets.data;
 
@@ -444,9 +492,11 @@ export class SingleRequestComponent implements OnChanges {
                         this._addAssetSelectBox.active = [currentItem];
                     }
                 }
+                this.loadingState.asset = false;
             });
 
             // load all users as assignee
+            this.loadingState.assignee = true;
             if (this.actionType.toRoleId != null) {
                 console.log("get assignee by type: Role", this.actionType);
                 this._userService.getAssigneeByTypeId("Role", this.actionType.toRoleId).subscribe((users) => {
@@ -464,6 +514,7 @@ export class SingleRequestComponent implements OnChanges {
                             this._addAssigneeSelectBox.active = [currentItem];
                         }
                     }
+                    this.loadingState.assignee = false;
                 });
             } else if (this.actionType.toRoleTypeId != null) {
                 console.log("get assignee by type: RoleType", this.actionType);
@@ -482,6 +533,7 @@ export class SingleRequestComponent implements OnChanges {
                             this._addAssigneeSelectBox.active = [currentItem];
                         }
                     }
+                    this.loadingState.assignee = false;
                 });
             } else {
                 console.log("get assignee by type: user");
@@ -500,6 +552,7 @@ export class SingleRequestComponent implements OnChanges {
                             this._addAssigneeSelectBox.active = [currentItem];
                         }
                     }
+                    this.loadingState.assignee = false;
                 });
             }
 
@@ -597,6 +650,7 @@ export class SingleRequestComponent implements OnChanges {
                 this.formGroupAdd.disable();
             }
 
+            this.loadingState.workOrder = false;
         });
     }
 
@@ -733,26 +787,34 @@ export class SingleRequestComponent implements OnChanges {
             // TODO: uncomment later
             // TODO: change function name and maybe location?
             if (this.actionType.workflowActionId == WorkflowActions.CREATE) {
+                this.loadingState.saving = true;
                 this._taskService.addNewWorkOrder(formData).subscribe((response) => {
                     console.log("save response", response);
                     if (response.resultCode.code == 0) {
                         this._taskService.announceEvent("addNewModal_btnSaveOnClick_createSuccess");
+                        GrowlMessage.addMessage(MessageSeverity.SUCCESS, MessageLabels.SAVE_SUCCESS);
                     } else {
                         // an error occured
                         this.errMsg = [];
                         this.errMsg = this.errMsg.concat(response.resultCode.message);
+                        GrowlMessage.addMessage(MessageSeverity.ERROR, MessageLabels.SAVE_ERROR);
                     }
+                    this.loadingState.saving = false;
                 });
             } else {
+                this.loadingState.saving = true;
                 this._taskService.updateWorkOrder(formData).subscribe((response) => {
                     console.log("update response", response);
                     if (response.resultCode.code == 0) {
                         this._taskService.announceEvent("addNewModal_btnSaveOnClick_updateSuccess");
+                        GrowlMessage.addMessage(MessageSeverity.SUCCESS, MessageLabels.SAVE_SUCCESS);
                     } else {
                         // an error occured
                         this.errMsg = [];
                         this.errMsg = this.errMsg.concat(response.resultCode.message);
+                        GrowlMessage.addMessage(MessageSeverity.ERROR, MessageLabels.SAVE_ERROR);
                     }
+                    this.loadingState.saving = false;
                 });
             }
         }

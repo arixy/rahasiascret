@@ -3,7 +3,13 @@
     <p-dataTable [value]="getExpenses()">
       <p-header>
         <div class="ui-helper-clearfix" style="text-align: left;">
-          <button type="button" class="btn btn-primary" (click)="addExpenses()" *ngIf="isCanEdit">Add Expense</button>
+          <div class="btn-with-icon">
+            <button type="button" (click)="addExpenses()" class="btn btn-primary" *ngIf="isCanEdit">
+              <i class="icon ion-plus-round"></i>
+              Expense
+            </button>
+          </div>
+          <!--<button type="button" class="btn btn-primary" (click)="addExpenses()" *ngIf="isCanEdit">Add Expense</button>-->
         </div>
       </p-header>
       <p-column header="Expense Type" [style]="{'width':'200px'}">

@@ -11,6 +11,7 @@ import { TabPanel } from 'primeng/primeng';
 
 // global configs
 import { GlobalConfigs } from '../../../global.state';
+import { GrowlMessage, MessageSeverity, MessageLabels } from '../../../popup-notification';
 
 // validators
 import { CustomValidators } from './custom-validators';
@@ -65,6 +66,21 @@ export class UtilityFormComponent {
     private _defaultSelectOption = GlobalConfigs.DEFAULT_SELECT_OPTION;
     private isBtnSaveClicked = false;
 
+    private loadingState = {
+        isLoading: () => {
+            return this.loadingState.consumption || this.loadingState.saving
+                || this.loadingState.innerUtilityType || this.loadingState.innerUtilityUOM
+                || this.loadingState.utilityType || this.loadingState.utilityUOM;
+        },
+        consumption: false,
+        innerUtilityType: false,
+        innerUtilityUOM: false,
+        saving: false,
+
+        utilityType: false,
+        utilityUOM: false
+    };
+
     constructor(
         public fb: FormBuilder,
         public cdr: ChangeDetectorRef,
@@ -101,6 +117,7 @@ export class UtilityFormComponent {
             // futhermore, disable all exclusion tab items
         }
 
+        this.loadingState.utilityType = true;
         this._utilityTypeService.getAllUtilityTypes().subscribe(response => {
             console.log("/utility-type/all", response);
             if (response.resultCode.code == "0") {
@@ -113,8 +130,10 @@ export class UtilityFormComponent {
             } else {
                 // show error message?
             }
+            this.loadingState.utilityType = false;
         });
 
+        this.loadingState.utilityUOM = true;
         this._uomService.getAllUtilityUOM().subscribe(response => {
             console.log("/utility-uom/all", response);
             if (response.resultCode.code == "0") {
@@ -127,10 +146,12 @@ export class UtilityFormComponent {
             } else {
                 // show error message?
             }
+            this.loadingState.utilityUOM = false;
         });
 
         // load data
         if (this.formMode != "NEW") {
+            this.loadingState.consumption = true;
             this._utilityConsumptionService.getUtilityConsumptionById(this.utilityModel.utilityConsumptionId).subscribe(response => {
                 if (response.resultCode.code == "0") {
                     this.formGroup.patchValue({
@@ -140,6 +161,7 @@ export class UtilityFormComponent {
                         'txtValue': response.data.value
                     });
 
+                    this.loadingState.innerUtilityType = true;
                     this._utilityTypeService.getAllUtilityTypeById(response.data.utilityTypeId).subscribe(response => {
                         console.log("/utility-type/get", response);
                         if (response.resultCode.code == "0") {
@@ -150,8 +172,10 @@ export class UtilityFormComponent {
                         } else {
                             // show error message?
                         }
+                        this.loadingState.innerUtilityType = false;
                     });
 
+                    this.loadingState.innerUtilityUOM = true;
                     this._uomService.getUtilityUOMById(response.data.utilityUomId).subscribe(response => {
                         console.log("/utility-uom/get", response);
                         if (response.resultCode.code == "0") {
@@ -162,12 +186,14 @@ export class UtilityFormComponent {
                         } else {
                             // show error message?
                         }
+                        this.loadingState.innerUtilityUOM = false;
                     });
 
                     this.lstExclusions = response.data.utilityConsumptionExclusions;
                 } else {
                     // show error message?
                 }
+                this.loadingState.consumption = false;
             });
         }
     }
@@ -340,26 +366,34 @@ export class UtilityFormComponent {
             console.log("object to send: ", utilityConsumptionObject);
 
             if (this.formMode == "NEW") {
+                this.loadingState.saving = true;
                 this._utilityConsumptionService.addUtilityConsumption(utilityConsumptionObject).subscribe(response => {
                     if (response.resultCode.code == "0") {
                         this._utilityConsumptionService.announceEvent("utilityConsumptions_btnSaveOnSuccess");
+                        GrowlMessage.addMessage(MessageSeverity.SUCCESS, MessageLabels.SAVE_SUCCESS);
                     } else {
                         // show error message?
                         this.errMsg = [];
                         this.errMsg = this.errMsg.concat(response.resultCode.message);
+                        GrowlMessage.addMessage(MessageSeverity.ERROR, MessageLabels.SAVE_ERROR);
                     }
+                    this.loadingState.saving = false;
                 });
             } else {
+                this.loadingState.saving = true;
                 this._utilityConsumptionService.updateUtilityConsumption(utilityConsumptionObject).subscribe(response => {
                     console.log("update", response);
                     if (response.resultCode.code == "0") {
                         this._utilityConsumptionService.announceEvent("utilityConsumptions_btnSaveOnSuccess");
+                        GrowlMessage.addMessage(MessageSeverity.SUCCESS, MessageLabels.SAVE_SUCCESS);
                     } else {
                         console.log("error?");
                         // show error message?
                         this.errMsg = [];
                         this.errMsg = this.errMsg.concat(response.resultCode.message);
+                        GrowlMessage.addMessage(MessageSeverity.ERROR, MessageLabels.SAVE_ERROR);
                     }
+                    this.loadingState.saving = false;
                 });
             }
         } else {
