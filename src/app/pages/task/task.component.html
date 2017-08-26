@@ -1,4 +1,4 @@
-﻿<div class="widgets">
+<div class="widgets">
         <div class="ui-helper-clearfix">
           <div class="add-new-button__container">
             <div class="btn-group add-new-dropdown" dropdown style="float: right" *ngIf="woTypes != null && woTypes.length > 0">
@@ -15,9 +15,8 @@
           </div>
         </div>
     <ba-card title="" baCardClass="with-scroll">
-      <spinner *ngIf="isLoadingData"></spinner> 
-        <div style="width: 100%; overflow-x: auto; overflow-y: auto;">
-            <p-dataTable #dt [value]="myTasks" [lazy]="true" (onLazyLoad)="refresh($event, dt)" [rows]="10" [paginator]="true" [totalRecords]="totalRecords" sortField="dateUpdated" sortOrder="-1">
+      <spinner *ngIf="isLoadingData"></spinner>
+            <p-dataTable #dt [value]="myTasks" [lazy]="true" (onLazyLoad)="refresh($event, dt)" [rows]="10" [paginator]="true" [totalRecords]="totalRecords" sortField="dateUpdated" sortOrder="-1" styleClass="custom-dropdown-datatable">
                 <p-header>
                     <div class="ui-helper-clearfix">
                         <button type="button" iconPos="left" label="CSV" (click)="exportMyTaskCSV(dt)" style="float:left" class="btn-export__csv">
@@ -73,7 +72,6 @@
                     </template>
                 </p-column>
             </p-dataTable>
-        </div>
     </ba-card>
 </div>
 

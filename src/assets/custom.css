@@ -621,6 +621,24 @@ body .ui-paginator .ui-paginator-first, body .ui-paginator .ui-paginator-prev, b
 .custom-dropdown-datatable .dropdown{
     position: static !important;
 }
+.custom-dropdown-expense .dropdown-menu{
+    left: auto !important;
+    top: auto !important;
+    border-bottom: 3px solid #d7d7d7 !important;
+}
+.custom-dropdown-expense .dropdown{
+    position: static !important;
+}
+.custom-dropdown-expense .ui-calendar {
+    position: static !important;
+}
+.custom-dropdown-expense .ui-datepicker {
+    top: auto !important;
+    left: auto !important;
+}
+.custom-dropdown-expense .ui-datepicker-trigger {
+    height: auto !important;
+}
 /* Added by Mike */
 .ui-fileupload-buttonbar button:not(.ui-fileupload-choose) {
   display: none !important;
