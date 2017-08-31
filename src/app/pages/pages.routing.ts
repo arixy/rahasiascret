@@ -59,7 +59,7 @@ export const routes: Routes = [
       // { path: 'woreports', component: WOReports }, // ?
       { path: 'all-list', component: AllList, canActivate: [RoutingGuard], data: { menuId: ['Vendor', 'Tenant', 'Guest', 'Owner', 'WOPriority', 'ExpenseType', 'UtilityType', 'UtilityUOM'] } },
       { path: 'priorities', component: Priorities, canActivate: [RoutingGuard], data: { menuId: ['WOPriority'] } },
-      { path: 'entities/:entity_type_id', component: Entities, canActivate: [RoutingGuard], data: { menuId: ['Vendor', 'Tenant', 'Guest', 'Owner'] } },
+      { path: 'entities/:entity_type_id', component: Entities, canActivate: [RoutingGuard], data: { type: 'EntityList', extraParam: ['entity_type_id'], menuId: ['Vendor', 'Tenant', 'Guest', 'Owner'] } },
       //{ path: 'entities', component: Entities }, // ?
       { path: 'utility-types', component: UtilityTypes, canActivate: [RoutingGuard], data: { menuId: ['UtilityType'] } },
       { path: 'utility-uom', component: UtilityUom, canActivate: [RoutingGuard], data: { menuId: ['UtilityUOM'] } },

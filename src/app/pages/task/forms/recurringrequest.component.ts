@@ -427,8 +427,8 @@ export class RecurringRequestComponent {
                 "due_after": this.selectedWO.dueAfter,
                 "repeat_every": this.selectedWO.every,
 
-                "selected_startdate": new Date(this.selectedWO.startDate + "T" + this.selectedWO.startTime + "Z"),
-                "selected_starttime": new Date(this.selectedWO.startDate + "T" + this.selectedWO.startTime + "Z"),
+                "selected_startdate": this.selectedWO != null && this.selectedWO.currentStatusId == WorkOrderStatuses.SCHEDULED ? new Date(this.selectedWO.startDate) : new Date(this.selectedWO.startDate + "T" + this.selectedWO.startTime + "Z"),
+                //"selected_starttime": new Date(this.selectedWO.startDate + "T" + this.selectedWO.startTime + "Z"),
                 //"selected_duedate": new Date(this.selectedWO.dueDate)
             });
 
@@ -718,6 +718,7 @@ export class RecurringRequestComponent {
             } else if (this.actionType.workflowActionId == WorkflowActions.EDIT) {
                 if (this.selectedWO != null && this.selectedWO.currentStatusId == WorkOrderStatuses.SCHEDULED) {
                     this.isSchedule = true;
+                    if (this.selectedWO.lastWoDate != null) this.selected_startdate.disable();
                 }
 
                 this.wo_number.disable();
@@ -829,8 +830,8 @@ export class RecurringRequestComponent {
             currentStatusId: this.selected_status.value == null ? null : this.selected_status.value.id,
             currentAssigneeId: this.selected_assignee.value == null ? null : this.selected_assignee.value.id,
             mainPicId: this.selected_assignee.value.id,
-            startDate: this.selected_startdate.value,
-            startTime: this.selected_startdate.value,
+            startDate: this.isSchedule == true ? moment(this.selected_startdate.value).format("YYYY-MM-DD") : this.selected_startdate.value,
+            startTime: this.isSchedule == true ? moment(this.selected_startdate.value).format("YYYY-MM-DD") : this.selected_startdate.value,
             repeatOptionId: this.selected_repeat.value == null ? null : this.selected_repeat.value.id,
             every: this.selected_repeat.value.id != 6 ? null : this.repeat_every.value,
             everyPeriodId: this.selected_repeat.value.id != 6 ? null : this.selected_every_period.value.id,
@@ -1109,7 +1110,7 @@ export class RecurringRequestComponent {
             || (this.actionType.workflowActionId == WorkflowActions.EDIT && this.isSchedule)) {
             // if selected repeat is EVERY
             if (this.selected_repeat != null && this.selected_repeat.value != null && this.selected_repeat.value.id == 6) {
-                if (input.value == null || input.value == "" || input.value.id == null || input.value.id == GlobalConfigs.DEFAULT_SELECT_OPTION) {
+                if (input.value == null || input.value == "") {
                     return { required: true };
                 } else {
                     return CustomValidators.numberOnly(input);
@@ -1156,6 +1157,21 @@ export class RecurringRequestComponent {
                 let dueDate = moment(this.selected_duedate.value).format("YYYY-MM-DD");
 
                 if (startDate > dueDate) return { crossdate: true };
+            }
+        } else {
+            let editedStartDate = moment(this.selected_startdate.value).format("YYYY-MM-DD");
+            let todayDate = moment(new Date()).format("YYYY-MM-DD");
+            if (this.selectedWO != null) {
+
+                let woStartDate = moment(this.selectedWO.startDate).format("YYYY-MM-DD");
+                if (this.selected_startdate.enabled && this.selected_startdate != null && woStartDate != editedStartDate && editedStartDate < todayDate) {
+                    return { earlierdate: true };
+                }
+            } else {
+
+                if (this.selected_startdate.enabled && this.selected_startdate != null && editedStartDate < todayDate) {
+                    return { earlierdate: true };
+                }
             }
         }
 

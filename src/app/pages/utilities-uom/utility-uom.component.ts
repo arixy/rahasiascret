@@ -10,6 +10,8 @@ import { FilterInputComponent } from '../filter-input.component';
 import { Subscription } from 'rxjs/Subscription';
 import { saveAs } from 'file-saver';
 
+import { GlobalConfigs } from '../../global.state';
+import { GrowlMessage, MessageLabels, MessageSeverity } from '../../popup-notification';
 @Component({
   selector: 'utility-uom',
   templateUrl: './utility-uom.component.html',
@@ -43,7 +45,7 @@ export class UtilityUom {
 	@ViewChildren('filterUtility') filterUtility: QueryList<FilterInputComponent>;
 
 	 // static
-	private readonly DEFAULT_ITEM_PER_PAGE : number = 10;
+    private readonly DEFAULT_ITEM_PER_PAGE: number = GlobalConfigs.DEFAULT_ITEM_PER_PAGE;
 	private readonly DEFAULT_SORT_FIELD : string = "dateUpdated";
 
 	private totalRecords;
@@ -158,9 +160,11 @@ export class UtilityUom {
 					if(response.resultCode.code==0){
 						this.submitLoadingUtility = false;
 						this.utilityUomService.announceEvent("addNewModal_btnSaveOnClick_createSuccess");
+                        GrowlMessage.addMessage(MessageSeverity.SUCCESS, MessageLabels.SAVE_SUCCESS);
 					}else{
 						this.errMsg=[];
 						this.errMsg=this.errMsg.concat(response.resultCode.message);
+                        GrowlMessage.addMessage(MessageSeverity.ERROR, MessageLabels.SAVE_ERROR);
 					}
 				}
 			);
@@ -198,10 +202,11 @@ export class UtilityUom {
 						// using announceEvent
 						this.submitLoadingUtility = false;
 						this.utilityUomService.announceEvent("addNewModal_btnSaveOnClick_updateSuccess");
+                        GrowlMessage.addMessage(MessageSeverity.SUCCESS, MessageLabels.SAVE_SUCCESS);
 					}else{
 						this.errMsgEdit=[];
 						this.errMsgEdit=this.errMsg.concat(data.data.message);
-						
+                        GrowlMessage.addMessage(MessageSeverity.ERROR, MessageLabels.SAVE_ERROR);
 					}
                 }
 		     );

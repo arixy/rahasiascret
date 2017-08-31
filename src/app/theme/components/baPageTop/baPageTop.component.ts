@@ -5,6 +5,7 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 
 import { GlobalState, GlobalConfigs } from '../../../global.state';
+import { GrowlMessage, MessageLabels, MessageSeverity } from '../../../popup-notification';
 import { GROWL_MESSAGES, DEFAULT_LIFE_TIME } from '../../../popup-notification';
 import { AuthenticationService } from '../../../services/authentication.service';
 import { Router } from '@angular/router';
@@ -278,9 +279,11 @@ export class BaPageTop {
                   console.log('Response from server', response);
                   if (response.resultCode.code == "0") {
                       this.hideChangeModal();
+                      GrowlMessage.addMessage(MessageSeverity.SUCCESS, MessageLabels.SAVE_SUCCESS);
                   } else {
                       this.errMsgChangePw = [];
                       this.errMsgChangePw = this.errMsgChangePw.concat(response.resultCode.message);
+                      GrowlMessage.addMessage(MessageSeverity.ERROR, MessageLabels.SAVE_ERROR);
                   }
               }
            );

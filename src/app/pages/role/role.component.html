@@ -21,8 +21,8 @@
       </ul>
     </div>
     <spinner *ngIf="isSpinerLoading"></spinner> 
-    <p-dataTable #dt [value]="lstRole" [lazy]="true" (onLazyLoad)="refreshRole($event, dt)" [rows]="10" [paginator]="true" [totalRecords]="totalRecords"
-      sortField="name" sortOrder="1" styleClass="custom-filter-datatable">
+    <p-dataTable #dt [value]="lstRole" [lazy]="true" (onLazyLoad)="refreshRole($event, dt)" [rows]="DEFAULT_ITEM_PER_PAGE" [paginator]="true" [totalRecords]="totalRecords"
+      sortField="name" sortOrder="1" styleClass="custom-filter-datatable custom-dropdown-datatable">
       <p-header>
         <div class="ui-helper-clearfix">
           <button type="button" iconPos="left" label="CSV" (click)="downloadRoleCSV(dt)" style="float:left" class="btn-export__csv">
@@ -101,7 +101,6 @@
                              <ng-select  #addRoleTypeSelectBox
                                          [allowClear]="true"
                                          [items]="items_roletype"
-                                         [disabled]="isDisabled"
                                          (selected)="selectedRoleType($event)"
                                          (removed)="removedRoleType($event)"
                                          (typed)="typed($event)"

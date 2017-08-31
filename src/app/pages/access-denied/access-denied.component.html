@@ -15,10 +15,10 @@
          <div class="center">
              <h1><i class="icon ion-android-lock"></i> Access Denied</h1>
              <p>We apologize for the inconvenience. You currently don't have the permission to access this Page / Information. Please contact administrators to gain permission or login to different account with higher permission.</p>
-             <button class="btn btn-primary">
+             <button class="btn btn-primary" (click)="showLoginPage()">
                  <i class="icon ion-android-unlock"></i> Login
              </button>
-             <div class="go-back-container">
+             <div class="go-back-container" (click)="showPreviousPage()">
                  <i class="icon ion-ios-arrow-back"></i> Back to previous Page
              </div>
          </div>

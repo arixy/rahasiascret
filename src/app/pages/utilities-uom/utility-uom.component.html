@@ -11,7 +11,7 @@
     </div>
     <ba-card title="" baCardClass="with-scroll">
         <spinner *ngIf="isLoadingUtilityUOM"></spinner>
-        <p-dataTable #dt [value]="utilities"  [lazy]="true" (onLazyLoad)="refresh($event, dt)" [rows]="10" [paginator]="true" [totalRecords]="totalRecords" sortField="dateUpdated" sortOrder="-1" styleClass="custom-filter-datatable">
+        <p-dataTable #dt [value]="utilities"  [lazy]="true" (onLazyLoad)="refresh($event, dt)" [rows]="DEFAULT_ITEM_PER_PAGE" [paginator]="true" [totalRecords]="totalRecords" sortField="dateUpdated" sortOrder="-1" styleClass="custom-filter-datatable custom-dropdown-datatable">
           <p-header>
             <div class="ui-helper-clearfix">
                 <button type="button" iconPos="left" label="CSV" (click)="exportUtilityUOMCSV(dt)" style="float:left" class="btn-export__csv">
@@ -43,7 +43,7 @@
                             </div>
                     </template>
             </p-column>
-           <p-column field="utilityUomId" header="Utility Type ID" [style]="{'width':'140px'}" [sortable]="true"  class="sortable-custom-icon fa fa-sort"></p-column>
+           <p-column field="utilityUomId" header="Utility UOM ID" [style]="{'width':'140px'}" [sortable]="true"  class="sortable-custom-icon fa fa-sort"></p-column>
            <p-column field="name" [style]="{'width':'280px'}" [sortable]="true"  >
                 <template pTemplate="header">
                   <span class="ui-column-title">Name </span>

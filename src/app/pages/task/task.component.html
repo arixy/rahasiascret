@@ -16,7 +16,7 @@
         </div>
     <ba-card title="" baCardClass="with-scroll">
       <spinner *ngIf="isLoadingData"></spinner>
-            <p-dataTable #dt [value]="myTasks" [lazy]="true" (onLazyLoad)="refresh($event, dt)" [rows]="10" [paginator]="true" [totalRecords]="totalRecords" sortField="dateUpdated" sortOrder="-1" styleClass="custom-dropdown-datatable">
+      <p-dataTable #dt [value]="myTasks" [lazy]="true" (onLazyLoad)="refresh($event, dt)" [rows]="DEFAULT_ITEM_PER_PAGE" [paginator]="true" [totalRecords]="totalRecords" sortField="dateUpdated" sortOrder="-1" styleClass="custom-dropdown-datatable">
                 <p-header>
                     <div class="ui-helper-clearfix">
                         <button type="button" iconPos="left" label="CSV" (click)="exportMyTaskCSV(dt)" style="float:left" class="btn-export__csv">

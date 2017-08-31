@@ -8,7 +8,8 @@ import { RoleService } from './role.service';
 import { DataTable } from 'primeng/primeng';
 import { FilterInputComponent } from '../filter-input.component';
 import { Subscription }   from 'rxjs/Subscription';
-import { GlobalConfigs } from '../../../global.state';
+import { GlobalConfigs } from '../../global.state';
+import { GrowlMessage, MessageLabels, MessageSeverity } from '../../popup-notification';
 import { SelectComponent, SelectItem } from 'ng2-select';
 
 @Component({
@@ -33,7 +34,7 @@ export class RoleComponent {
 
     private isSpinerLoading=false;
 
-    private readonly DEFAULT_ITEM_PER_PAGE : number = 10;
+    private readonly DEFAULT_ITEM_PER_PAGE: number = GlobalConfigs.DEFAULT_ITEM_PER_PAGE;
     private readonly DEFAULT_SORT_FIELD : string = "name";
     
     @ViewChild("dt") dataTabel:DataTable;
@@ -294,10 +295,12 @@ export class RoleComponent {
                      if(response.resultCode.code==0){
                          this.submitLoading = false;
                          this.roleService.announceEvent("addNewModal_btnSaveOnClick_createSuccess");
+                         GrowlMessage.addMessage(MessageSeverity.SUCCESS, MessageLabels.SAVE_SUCCESS);
                      }else{
                          this.errMsg=[];
                          this.errMsg=this.errMsg.concat(response.resultCode.message);
                          this.submitLoading = false;
+                         GrowlMessage.addMessage(MessageSeverity.ERROR, MessageLabels.SAVE_ERROR);
                      }
                  }
              );
@@ -385,7 +388,6 @@ export class RoleComponent {
                 name: values.edit_name,
                 description: values.edit_description,
             });
-		      this.hideChildModal();
              
               let response = this.roleService.updateRole(formatted_object).subscribe(
                  (data) => {
@@ -394,11 +396,13 @@ export class RoleComponent {
 			 			this.submitLoading = false;
                          // refresh data
                          this.roleService.announceEvent("addNewModal_btnSaveOnClick_updateSuccess");
+                        GrowlMessage.addMessage(MessageSeverity.SUCCESS, MessageLabels.SAVE_SUCCESS);
+                        this.hideChildModal();
 			 		}else{
                          this.submitLoading = false;
 			 			this.errMsgEdit=[];
 			 			this.errMsgEdit=this.errMsgEdit.concat(data.data.message);
-				
+                      GrowlMessage.addMessage(MessageSeverity.ERROR, MessageLabels.SAVE_ERROR);
 			 		}
                  }
               );  
