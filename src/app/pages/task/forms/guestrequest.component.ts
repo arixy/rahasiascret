@@ -189,7 +189,7 @@ export class GuestRequestComponent {
             'selected_vendor': ['', null],
             'contact_person': ['', null],
             'contact_number': ['', Validators.compose([CustomValidators.numberOnly])],
-            'solution': ['', null],
+            'solution': ['', Validators.compose([this.validateSolution.bind(this)])],
 
             'selected_startdate': ['', Validators.compose([Validators.required, this.validateStartDueDate.bind(this)])],
             //'selected_starttime': ['', null],
@@ -1017,6 +1017,18 @@ export class GuestRequestComponent {
             let dueDate = moment(this.selected_duedate.value).format("YYYY-MM-DD");
 
             if (startDate > dueDate) return { crossdate: true };
+        }
+
+        return null;
+    }
+
+    validateSolution(input: FormControl) {
+        console.log("validateSolution", this.actionType.workflowActionId, WorkflowActions.CLOSE_FOR_CONFIRMATION, this.solution);
+        if (this.actionType.workflowActionId == WorkflowActions.CLOSE_FOR_CONFIRMATION
+            && (this.solution == null
+                || this.solution.value == null
+                || this.solution.value == "")) {
+            return { required: true };
         }
 
         return null;

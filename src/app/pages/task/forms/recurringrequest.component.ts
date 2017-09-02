@@ -219,7 +219,7 @@ export class RecurringRequestComponent {
             'selected_vendor': ['', null],
             'contact_person': ['', null],
             'contact_number': ['', Validators.compose([CustomValidators.numberOnly])],
-            'solution': ['', null],
+            'solution': ['', Validators.compose([this.validateSolution.bind(this)])],
 
             'selected_startdate': ['', Validators.compose([Validators.required, this.validateStartDueDate.bind(this)])],
             'selected_starttime': ['', null],
@@ -665,8 +665,7 @@ export class RecurringRequestComponent {
             } else if (this.actionType.workflowActionId == WorkflowActions.CANCEL
                 || this.actionType.workflowActionId == WorkflowActions.PENDING
                 || this.actionType.workflowActionId == WorkflowActions.IN_PROGRESS
-                || this.actionType.workflowActionId == WorkflowActions.RETURN
-                || this.actionType.workflowActionId == WorkflowActions.CANCEL_SCHEDULE) {
+                || this.actionType.workflowActionId == WorkflowActions.RETURN) {
                 if (this.selectedWO != null && this.selectedWO.currentStatusId == WorkOrderStatuses.SCHEDULED) {
                     this.isSchedule = true;
                 }
@@ -693,6 +692,33 @@ export class RecurringRequestComponent {
                 this.selected_startdate.disable();
                 this.selected_starttime.disable();
                 this.selected_duedate.disable();
+            } else if (this.actionType.workflowActionId == WorkflowActions.CANCEL_SCHEDULE) {
+                this.isSchedule = true;
+
+                // disable all
+                this.disabled = true;
+                this.isCanEditExpenses = false;
+                //this.isCanEditFiles = false;
+
+                this.wo_number.disable();
+                this.task_name.disable();
+                this.task_desc.disable();
+                this.selected_category.disable();
+                this.selected_location.disable();
+                this.location_info.disable();
+                this.selected_status.disable();
+                this.selected_priority.disable();
+                this.selected_vendor.disable();
+                this.contact_person.disable();
+                this.contact_number.disable();
+                this.solution.disable();
+                this.selected_assignee.disable();
+                this.due_after.disable();
+                this.repeat_every.disable();
+
+                this.selected_startdate.disable();
+                //this.selected_starttime.disable();
+                //this.selected_duedate.disable();
             } else if (this.actionType.workflowActionId == WorkflowActions.COMPLETE
                 || this.actionType.workflowActionId == WorkflowActions.CLOSE_FOR_CONFIRMATION) {
                 //this.isCanEditExpenses = false;
@@ -1173,6 +1199,18 @@ export class RecurringRequestComponent {
                     return { earlierdate: true };
                 }
             }
+        }
+
+        return null;
+    }
+
+    validateSolution(input: FormControl) {
+        console.log("validateSolution", this.actionType.workflowActionId, WorkflowActions.CLOSE_FOR_CONFIRMATION, this.solution);
+        if (this.actionType.workflowActionId == WorkflowActions.CLOSE_FOR_CONFIRMATION
+            && (this.solution == null
+                || this.solution.value == null
+                || this.solution.value == "")) {
+            return { required: true };
         }
 
         return null;

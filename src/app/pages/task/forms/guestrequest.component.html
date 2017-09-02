@@ -287,6 +287,13 @@
         <label for="solution" class="col-xg-2 control-label">Solution</label><br />
         <textarea [formControl]="solution" class="form-control" id="solution" [placeholder]="solution.disabled ? '' : 'Solution'" pInputTextArea></textarea>
       </div>
+      <div class="row error-row">
+        <div class="col-xg-2 line-height-zero">&nbsp;</div>
+        <div class="error-message col-xg-10" *ngIf="formGroupAdd.get('solution').hasError('required') && formGroupAdd.get('solution').touched">
+          Solution is Required
+        </div>
+      </div>
+
       <!-- Vendor -->
       <div class="form-group row">
         <label for="selected_priority" class="col-xg-2 control-label">Vendor</label>

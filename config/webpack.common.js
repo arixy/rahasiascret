@@ -26,8 +26,8 @@ const ngcWebpack = require('ngc-webpack');
 const HMR = helpers.hasProcessFlag('hot');
 const AOT = helpers.hasNpmFlag('aot');
 const METADATA = {
-  title: 'SMART',
-  description: 'SMART',
+  title: 'Lumatix',
+  description: 'Lumatix',
   baseUrl: '/',
   isDevServer: helpers.isWebpackDevServer()
 };

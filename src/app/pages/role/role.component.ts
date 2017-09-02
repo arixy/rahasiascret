@@ -12,6 +12,7 @@ import { GlobalConfigs } from '../../global.state';
 import { GrowlMessage, MessageLabels, MessageSeverity } from '../../popup-notification';
 import { SelectComponent, SelectItem } from 'ng2-select';
 
+import { DialogsService } from './../../services/dialog.service';
 @Component({
   selector: 'utility-types',
   templateUrl: './role.component.html',
@@ -78,12 +79,22 @@ export class RoleComponent {
     public selected_typeid_edit = null;
     public selectedRoleFc;
 
+    // loading state
+    private popupLoadingState = {
+        isLoading: () => {
+            return this.popupLoadingState.roleData || this.popupLoadingState.roleType || this.popupLoadingState.saving;
+        },
+        roleData: false,
 
+        roleType: false,
+        saving: false
+    };
 
     constructor(
         public fb: FormBuilder,
         public cdr: ChangeDetectorRef,
-        public roleService: RoleService
+        public roleService: RoleService,
+        private _dialogService: DialogsService
     ) 
     {
         this.subscription=this.roleService.eventEmitted$.subscribe(event=>{
@@ -279,7 +290,7 @@ export class RoleComponent {
              return ;
         }
         
-        this.submitLoading = true;
+        //this.submitLoading = true;
         if(this.form.valid){
               console.log('Form Values uti:', values);
               console.log("role type id ",this.selected_typeid.id);
@@ -290,6 +301,7 @@ export class RoleComponent {
                 description:this.description.value
               };
 
+              this.popupLoadingState.saving = true;
               this.roleService.addRole(roleValues).subscribe(
                  (response) => {
                      if(response.resultCode.code==0){
@@ -302,6 +314,7 @@ export class RoleComponent {
                          this.submitLoading = false;
                          GrowlMessage.addMessage(MessageSeverity.ERROR, MessageLabels.SAVE_ERROR);
                      }
+                     this.popupLoadingState.saving = false;
                  }
              );
              
@@ -333,6 +346,7 @@ export class RoleComponent {
         this.edit_form.enable();
 
         this.utilityRoleId = event.roleId;
+        this.popupLoadingState.roleData = true;
         this.roleService.getRoleById(event.roleId).subscribe(response => {
             if (response.resultCode.code == "0") {
                 this.edit_form.patchValue({
@@ -359,6 +373,7 @@ export class RoleComponent {
                 this.errMsgEdit=[];
                 this.errMsgEdit=this.errMsgEdit.concat(response.data.message);
             }
+            this.popupLoadingState.roleData = false;
         });
         this.isDisabled=false;
 		this.isVisible=false;
@@ -378,7 +393,7 @@ export class RoleComponent {
 		  if(hasError){
 		     	return;
 		  }
-		 this.submitLoading = true;
+          //this.submitLoading = true;
 		 if(this.edit_form.valid){
 			
             // parsing parameter to same value
@@ -389,6 +404,7 @@ export class RoleComponent {
                 description: values.edit_description,
             });
              
+              this.popupLoadingState.saving = true;
               let response = this.roleService.updateRole(formatted_object).subscribe(
                  (data) => {
 			 		if(data.resultCode.code==0){
@@ -404,6 +420,7 @@ export class RoleComponent {
 			 			this.errMsgEdit=this.errMsgEdit.concat(data.data.message);
                       GrowlMessage.addMessage(MessageSeverity.ERROR, MessageLabels.SAVE_ERROR);
 			 		}
+                      this.popupLoadingState.saving = false;
                  }
               );  
             
@@ -460,7 +477,14 @@ export class RoleComponent {
     public deleteRole(lstRole){
         this.deleteConfirm= lstRole;
 		this.delete_name= lstRole.name;
-		this.deleteModal.show();
+		//this.deleteModal.show();
+        this._dialogService.confirmDelete(lstRole.name, '').subscribe(
+            (response) => {
+                if (response == true) {
+                    this.saveDelete();
+                }
+            }
+        );
     }
 
     public saveDelete(){
@@ -468,11 +492,20 @@ export class RoleComponent {
 		console.log('test', this.deleteConfirm.userId);
 			this.roleService.deleteRole(this.deleteConfirm.roleId).subscribe(
             (data) => {
+                if (data.resultCode.code == 0) {
                 this.roleService.announceEvent("deleteModal_btnSaveOnClick_deleteSuccess");
+                    GrowlMessage.addMessage(MessageSeverity.SUCCESS, MessageLabels.SAVE_SUCCESS);
+                } else {
+                    if (data.resultCode.message && data.resultCode.message[0]) {
+                        GrowlMessage.addMessage(MessageSeverity.ERROR, data.resultCode.message[0]);
+                    } else {
+                        GrowlMessage.addMessage(MessageSeverity.ERROR, MessageLabels.SAVE_ERROR);
+                    }
+                }
                 this.submitLoading=false;
             }
 		);
-		this.submitLoading=false;
+		//this.submitLoading=false;
 		this.deleteModal.hide();
     }
 

@@ -677,10 +677,10 @@ input[disabled], textarea[disabled] {
   width: 100% !important;
 }
 
-.ui-select-container .btn {
+/*.report-selectbox .ui-select-container .btn {
   border: 1px solid #d4d4d4;
   border-radius: 2px;
-}
+}*/
 
 .ui-select-container .btn:hover {
   transform: scale(1.0) !important;
@@ -717,5 +717,11 @@ input[disabled].form-control, textarea[disabled].form-control {
 
 .ui-growl {
   z-index: 9999999 !important;
+}
+.custom-color-yes {
+  background-color: #5cb85c !important;
+}
+.custom-color-no {
+  background-color: #ed266b !important;
 }
 /* End Added by Mike */

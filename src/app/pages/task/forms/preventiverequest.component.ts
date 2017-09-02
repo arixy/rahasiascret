@@ -215,7 +215,7 @@ export class PreventiveRequestComponent {
             'selected_vendor': ['', null],
             'contact_person': ['', null],
             'contact_number': ['', Validators.compose([CustomValidators.numberOnly])],
-            'solution': ['', null],
+            'solution': ['', Validators.compose([this.validateSolution.bind(this)])],
 
             'selected_startdate': ['', Validators.compose([Validators.required, this.validateStartDueDate.bind(this)])],
             //'selected_starttime': ['', null],
@@ -740,6 +740,7 @@ export class PreventiveRequestComponent {
                 this.contact_person.disable();
                 this.contact_number.disable();
                 this.due_after.disable();
+                this.repeat_every.disable();
                 this.solution.disable();
                 //this.selected_assignee.disable();
 
@@ -1233,6 +1234,18 @@ export class PreventiveRequestComponent {
         }
 
         console.log("validate start due date");
+
+        return null;
+    }
+
+    validateSolution(input: FormControl) {
+        console.log("validateSolution", this.actionType.workflowActionId, WorkflowActions.CLOSE_FOR_CONFIRMATION, this.solution);
+        if (this.actionType.workflowActionId == WorkflowActions.CLOSE_FOR_CONFIRMATION
+            && (this.solution == null
+                || this.solution.value == null
+                || this.solution.value == "")) {
+            return { required: true };
+        }
 
         return null;
     }
