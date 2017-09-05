@@ -193,9 +193,9 @@ export class Locations {
   public ngOnInit() {
       
       //BUG on SERVER
-      //this.dataLoading = true;
-      //this.initialRefresh(this.filter_master);
-      this.locations$ = this.locationService.getLocations();
+      this.dataLoading = true;
+      this.initialRefresh(this.filter_master);
+      /*this.locations$ = this.locationService.getLocations();
       this.locations$.subscribe(
         (data) => {
             this.locations = data.data;
@@ -229,7 +229,7 @@ export class Locations {
                 }
               );
         }
-      );
+      );*/
   }
 
     public initialRefresh(filter_master){
@@ -242,7 +242,7 @@ export class Locations {
             rows: 9999,
             globalFilter: '',
             multiSortMeta: null,
-            sortField: 'name',
+            sortField: 'dateUpdated',
             sortOrder: -1
         }
         console.log('Shoot Refresh', formatted_object);

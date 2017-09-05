@@ -13,7 +13,8 @@
             </div>
     </div>
     <ba-card title="" baCardClass="with-scroll">
-      <p-dataTable #dt [value]="work_orders">
+     <spinner *ngIf="dataLoading"></spinner>
+      <p-dataTable #dt [value]="work_orders" [lazy]="true" (onLazyLoad)="refresh(filter_master, dt)" [rows]="10" [paginator]="true" [totalRecords]="totalRecords" sortField="name" sortOrder="-1" styleClass="custom-filter-datatable custom-dropdown-datatable">
           <p-header>
             <div class="ui-helper-clearfix">
                 <button type="button" iconPos="left" label="CSV" (click)="dt.exportCSV()" style="float:left" class="btn-export__csv">
@@ -30,7 +31,7 @@
                 </div>
             </div>
         </p-header>
-          <p-column styleClass="col-button">
+          <p-column [hidden]="testHidden" styleClass="col-button">
                     <template pTemplate="header">
                         Action
                     </template>
@@ -47,11 +48,36 @@
                             </div>
                     </template>
             </p-column>
-           <p-column field="woCategoryId" header="ID"></p-column>
-            <p-column field="name" header="Name"></p-column>
-            <p-column field="description" header="Description"></p-column>
+           <!-- <p-column field="woCategoryId" header="ID"></p-column> -->
+            <p-column field="name" header="Name" [sortable]="true" [filter]="false">
+                <template pTemplate="header">
+                       <span class="ui-column-title">Name</span> <span *ngIf="dt.sortOrder == 1 || dt.sortField != 'name'" class="sortable-custom-icon fa fa-sort"></span>
+                       <span *ngIf="dt.sortOrder == -1 && dt.sortField == 'name'" class="sortable-custom-icon fa fa-sort-desc"></span>
+                       <input class="ui-column-filter ui-inputtext ui-corner-all ui-widget" type="text" [formControl]="filter_name_fc" />
+                   </template>
+                    <template let-node="rowData" pTemplate="body">
+                        {{node.name}}
+                    </template>
+            </p-column>
+            <p-column field="description" header="Description" [sortable]="true" [filter]="false">
+                <template pTemplate="header">
+                       <span class="ui-column-title">Description</span> <span *ngIf="dt.sortOrder == 1 || dt.sortField != 'description'" class="sortable-custom-icon fa fa-sort"></span>
+                       <span *ngIf="dt.sortOrder == -1 && dt.sortField == 'description'" class="sortable-custom-icon fa fa-sort-desc"></span>
+                       <input class="ui-column-filter ui-inputtext ui-corner-all ui-widget" type="text" [formControl]="filter_description_fc" />
+                   </template>
+                    <template let-node="rowData" pTemplate="body">
+                        {{node.description}}
+                    </template>
+            </p-column>
 			<p-column field="prefix" header="Prefix"></p-column>
-			<p-column field="kpiBaseline" header="KPI Baseline"></p-column>
+			<p-column field="kpiBaseline" header="KPI Baseline">
+			    <template pTemplate="header">
+                       <span class="ui-column-title">KPI Baseline</span> 
+                   </template>
+                    <template let-node="rowData" pTemplate="body">
+                        {{node.kpiBaseline}} {{node.kpiBaselineDurationName}}
+                    </template>
+			</p-column>
 			
         </p-dataTable>
     </ba-card>
@@ -82,13 +108,19 @@
           <span aria-hidden="true">&times;</span>
         </button>
         <h4 class="modal-title">Add New WO Category</h4>
-        <div *ngIf="error_from_server" class="error-from-server">
-              <i class="fa fa-exclamation-circle"></i> {{error_from_server}}
+        <div *ngIf="error_from_server.length > 0" class="error-from-server">
+              <i class="fa fa-exclamation-circle"></i>
+              <ul style="margin-bottom: 0px;" class="lst-error">
+                  <li *ngFor="let err of error_from_server">
+                    {{err}}
+                  </li>
+                </ul>
           </div>
       </div>
       <div class="modal-body">
         <div>
             <ba-card title="" baCardClass="with-scroll custom-card">
+             <spinner *ngIf="modalLoading"></spinner>
               <form [formGroup]="form" (ngSubmit)="onSubmit(form.value)" class="form-horizontal">
                  <div class="modal-form-container">
                   <div class="form-group row" [ngClass]="{'has-error': (!name.valid && name.touched), 'has-success': (name.valid && name.touched)}">
@@ -99,6 +131,13 @@
                       <input [formControl]="name" type="text" class="form-control" id="inputEmail3" placeholder="Name">
                     </div>
                   </div>
+                  <div class="row error-row">
+                       <div class="col-sm-12">
+                        <div class="error-message col-xg-10" *ngIf="form.get('name').hasError('required') && add_form_submitted">
+                          Name is required
+                        </div>
+                        </div>
+                    </div>
                   <div class="form-group row" [ngClass]="{'has-error': (!description.valid && description.touched), 'has-success': (description.valid && description.touched)}">
                     
                     <div class="col-sm-12">
@@ -107,27 +146,43 @@
                       <input [formControl]="description" type="text" class="form-control" id="inputPassword3" placeholder="Description">
                     </div>
                   </div>
+                  <div class="row error-row">
+                       <div class="col-sm-12">
+                        <div class="error-message col-xg-10" *ngIf="form.get('description').hasError('required') && add_form_submitted">
+                          Description is required
+                        </div>
+                        </div>
+                    </div>
                   <div class="form-group row" [ngClass]="{'has-error': (!prefix.valid && prefix.touched), 'has-success': (prefix.valid && prefix.touched)}">
                     
 
                     <div class="col-sm-12">
                      <label for="inputPassword3" class="control-label">Prefix</label>
-                      <input [formControl]="prefix" type="text" class="form-control" id="inputPassword3" placeholder="Description">
+                      <input [formControl]="prefix" type="text" class="form-control" id="inputPassword3" placeholder="Prefix">
                     </div>
                   </div>
+                  <div class="row error-row">
+                       <div class="col-sm-12">
+                        <div class="error-message col-xg-10" *ngIf="form.get('prefix').hasError('required') && add_form_submitted">
+                          Prefix is required
+                        </div>
+                        </div>
+                    </div>
                   <div class="form-group row" [ngClass]="{'has-error': (!kpi_baseline.valid && kpi_baseline.touched), 'has-success': (kpi_baseline.valid && kpi_baseline.touched)}">
-                    
-
-                    <div class="col-sm-12">
-                     <label for="inputPassword3" class="control-label">KPI Baseline</label>
-                      <input [formControl]="kpi_baseline" type="text" class="form-control" id="inputPassword3" placeholder="Description"> 
-                      &nbsp; 
-                        <ng-select #addSelectBox
-                                 [allowClear]="true"
-                                  [items]="items_kpi_baseline"
-                                  (selected)="selectedKPIBaseline($event)"
-                                  placeholder="No Duration selected">
-                          </ng-select>
+                    <div class="col-sm-12 nopadding">
+                        <div class="col-sm-6">
+                            <label for="inputPassword3" class="control-label">KPI Baseline</label>
+                          <input [formControl]="kpi_baseline" type="text" class="form-control" id="inputPassword3" placeholder="KPI Baseline">    
+                        </div>
+                        <div class="col-sm-6">
+                           <label for="inputPassword3" class="control-label">KPI Duration</label>
+                            <ng-select #addSelectBox
+                                     [allowClear]="true"
+                                      [items]="items_kpi_baseline"
+                                      (selected)="selectedKPIBaseline($event)"
+                                      placeholder="No Duration selected">
+                              </ng-select>
+                        </div> 
                     </div>
                   </div>
                   </div>

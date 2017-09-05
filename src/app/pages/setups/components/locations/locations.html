@@ -64,7 +64,7 @@
                        Date Updated
                    </template>
                     <template let-node="rowData" pTemplate="body">
-                        {{node.data.dateUpdated | date: 'yyyy-MM-dd'}}
+                        {{node.data.dateUpdated | date: 'shortDate'}}
                     </template>
                 </p-column>
                 <p-column styleClass="col-button">
@@ -77,6 +77,7 @@
                                 Action <span class="caret"></span>
                               </button>
                               <ul dropdownMenu role="menu" aria-labelledby="single-button">
+                                <li role="menuitem"><a class="dropdown-item" (click)="addChildNode(node)">Add Child</a></li>
                                 <li role="menuitem"><a class="dropdown-item" (click)="viewLocation(node)">View</a></li>
                                 <li role="menuitem"><a class="dropdown-item" (click)="editLocation(node)">Edit</a></li>
                                 <li role="menuitem"><a class="dropdown-item" (click)="deleteLocation(node)">Delete</a></li>
@@ -166,7 +167,7 @@
         <button class="close" aria-label="Close" (click)="hideChildModal()">
           <span aria-hidden="true">&times;</span>
         </button>
-        <h4 class="modal-title">Edit modal</h4>
+        <h4 class="modal-title">Edit Location</h4>
       </div>
       <div class="modal-body">
         <div>
@@ -174,22 +175,21 @@
               <form [formGroup]="editForm" (ngSubmit)="onSubmitEdit(editForm.value, $event)" class="form-horizontal">
               <div class="modal-form-container">
               <div class="form-group row" [ngClass]="{'has-error': (!name.valid && name.touched), 'has-success': name.valid}">
-                <label for="inputEmail3" class="col-sm-2 control-label">Name</label>
 
-                <div class="col-sm-10">
+                <div class="col-sm-12">
+                 <label for="inputEmail3" class="control-label">Name</label>
                   <input [formControl]="edit_name" type="text" class="form-control" id="inputEmail3" placeholder="Name">
                 </div>
               </div>
               <div class="form-group row" [ngClass]="{'has-error': (!description.valid && description.touched), 'has-success': description.valid}">
-                <label for="inputPassword3" class="col-sm-2 control-label">Description</label>
-
-                <div class="col-sm-10">
+                <div class="col-sm-12">
+                 <label for="inputPassword3" class="control-label">Description</label>
                   <input [formControl]="edit_description"  type="text" class="form-control" id="inputPassword3" placeholder="Description">
                 </div>
               </div>
               <div class="form-group row select-container">
-                 <label for="selectlocation" class="col-sm-2 control-label">Parent Location</label>
-                 <div class="col-sm-10">
+                 <div class="col-sm-12">
+                     <label for="selectlocation" class="control-label">Parent Location</label>
                       <ng-select #editSelectBox
                                [allowClear]="true"
                                 [multiple]="false"

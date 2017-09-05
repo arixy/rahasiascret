@@ -161,13 +161,15 @@ body .ui-datatable thead th.ui-state-active {
 	text-align: center;
 	margin-bottom: 1em;
 	font-weight: 400;
+    color: #fff;
 }
 .delete-btn_confirm{
 	text-align: center;
-	margin-bottom: 2em;
 }
 button.btn-yes{
-	background: #ffc400;
+	background: rgb(212, 103, 82) !important;
+    background-color: rgb(212, 103, 82) !important;
+    border-color: none !important;
     padding: 8px 30px;
     border-radius: 5px;
     border: none;
@@ -175,7 +177,7 @@ button.btn-yes{
 }
 
 button.btn-no{
-	background: #4f595d;
+	background: #c1c1c1 !important;
     padding: 8px 30px;
     border-radius: 5px;
     border: none;
@@ -190,12 +192,10 @@ button.btn-no{
     float: right;
 }
 button.btn-no:hover{
-	-webkit-box-shadow: 0 0 20px 5px #4f595d;
-	box-shadow: 0 0 20px 5px #4f595d;
+	opacity: 0.8;
 }
 button.btn-yes:hover{
-	-webkit-box-shadow: 0 0 20px 5px #ffc400;
-	box-shadow: 0 0 20px 5px #ffc400;
+	opacity: 0.8;
 }
 /* .mat-tab-label {
     min-width: 110px !important;
@@ -424,9 +424,11 @@ td .dropdown li{
 .tabpanel-has-error .ui-tabview-title:after{
   content: " !";
 }
-
-.modal.delete-modal {
-    max-width: 350px;
+.cdk-focus-trap-content .modal-dialog {
+    margin: 0 auto !important;
+}
+.delete-modal {
+    max-width: 400px;
     width: 100%;
     margin-left: auto;
     margin-right: auto;
@@ -434,14 +436,29 @@ td .dropdown li{
 
 .delete-modal .content_confirm {
     text-align: center;
-    padding-bottom: 1.6em;
 }
 .delete-modal .icon {
     font-size: 5em;
     color: #ffc400;
     
 }
-
+.delete-modal .modal-header {
+    background: #f46b45;
+    background: -webkit-linear-gradient(to right, #eea849, #f46b45);
+    background: linear-gradient(to right, #eea849, #f46b45);
+}
+.delete-modal .modal-content {
+    background: none !important;
+    padding: 0 !important;
+}
+.delete-modal .modal-body {
+    background: #fff;
+    padding: 18px 0;
+}
+.delete-modal .content_confirm img {
+    width: 56px;
+    margin-bottom: 12px;
+}
 .custom-filter-datatable .ui-sortable-column-icon {
     display: none !important;
 }
@@ -639,6 +656,51 @@ body .ui-paginator .ui-paginator-first, body .ui-paginator .ui-paginator-prev, b
 .custom-dropdown-expense .ui-datepicker-trigger {
     height: auto !important;
 }
+
+.nopadding {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+.glyphicon, .glyphicon:before {
+    display: inline-block;
+    font-family: "Ionicons";
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    text-rendering: auto;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+.glyphicon-remove:before {
+    content: "\F12A";
+}
+.lst-error {
+    list-style: none;
+    padding: 0;
+}
+.error-from-server i{
+    position: absolute;
+    right: 20px;
+    font-size: 1.6em;
+}
+.error-from-server {
+    padding-top: 10px;
+    padding-bottom: 14px;
+    /* background: #f6295d; */
+    margin-left: -16px;
+    margin-right: -16px;
+    padding-left: 16px;
+    padding-right: 16px;
+    color: white;
+    margin-top: 12px;
+    background: #f31a79; /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #f31a79, #f15f79); /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to right, #f31a79, #f15f79);
+}
+
 /* Added by Mike */
 .ui-fileupload-buttonbar button:not(.ui-fileupload-choose) {
   display: none !important;

@@ -95,6 +95,7 @@
                                 Action <span class="caret"></span>
                               </button>
                               <ul dropdownMenu role="menu" aria-labelledby="single-button">
+                                <li role="menuitem"><a class="dropdown-item" (click)="addChildNode(node)">Add Child</a></li>
                                 <li role="menuitem"><a class="dropdown-item" (click)="viewAsset(node)">View</a></li>
                                 <li role="menuitem"><a class="dropdown-item" (click)="editAsset(node)">Edit</a></li>
                                 <li role="menuitem"><a class="dropdown-item" (click)="deleteAsset(node)">Delete</a></li>
@@ -203,7 +204,14 @@
           <span aria-hidden="true">&times;</span>
         </button>
         <h4 class="modal-title">Add New Asset</h4>
-		  <hr/>
+		  <div *ngIf="error_from_server.length > 0" class="error-from-server">
+              <i class="fa fa-exclamation-circle"></i>
+              <ul style="margin-bottom: 0px;" class="lst-error">
+                  <li *ngFor="let err of error_from_server">
+                    {{err}}
+                  </li>
+                </ul>
+          </div>
       </div>
       <div class="modal-body">
         <div>
@@ -510,20 +518,20 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-     
+         <div class="content_confirm">
+             <img src="assets/img/lnr-warning.svg">
+            <h3>Delete {{delete_name}}?</h3>    
+		  </div>
       </div>
       <div class="modal-body">
-		  <div class="content_confirm">
-				<h3>Delete {{delete_name}}?</h3>
-                <i class="icon ion-ios-minus-outline"></i>
-		  </div>
+		  
 		  <!-- <p>Please be aware deleted items might not be Recoverable</p> -->
 		  <div class="delete-btn_confirm">
-			  <button (click)="saveDelete()" class="btn-yes">
-				  Yes
-			  </button>
 			  <button (click)="deleteClose()" class="btn-no">
 				  No
+			  </button>
+             <button (click)="saveDelete()" class="btn-yes">
+				  Yes
 			  </button>
           </div>
       </div>

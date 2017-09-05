@@ -12,6 +12,7 @@ import { TreeComponent } from 'angular2-tree-component';
 import { SelectComponent } from 'ng2-select';
 import { TabPanel } from 'primeng/primeng';
 import { saveAs } from 'file-saver';
+import { GrowlMessage, MessageSeverity, MessageLabels } from '../../popup-notification';
 
 function convertToTree(flat_data){
         console.log('Flat Data:', flat_data);
@@ -146,6 +147,7 @@ export class Assets {
   deleteConfirm;
   delete_name;
 
+  error_from_server = [];
   public existingPhotos = [];
   public editExistingPhotos = [];
 
@@ -556,27 +558,42 @@ export class Assets {
                     this.submitLoading = false;
                     console.log('Response Data', data);
                     
-                    // Clear all input in the form
-                    this.clearFormInputs(this.form);
+                    if(data.resultCode.code == 0){
+                        // Success
+                        // Clear all input in the form
+                        this.clearFormInputs(this.form);
+
+                        // Specific clearing for add select boxes
+                        this.selected_parent_asset = null;
+
+                        this.addSelectBox.active = [];
+                        this.addSelectBox.ngOnInit();
+
+                        this.addWOSelectBox.active = [];
+                        this.addWOSelectBox.ngOnInit();
+
+                        this.addLocationSelectBox.active = [];
+                        this.addLocationSelectBox.ngOnInit();
+
+                        this.childModal.hide();
+                        
+                        // Growl Message Success
+                        GrowlMessage.addMessage(MessageSeverity.SUCCESS, MessageLabels.SAVE_SUCCESS);
+                        
+                        this.ngOnInit();
+                        
+                        
+                    } else {
+                        // Error
+                        this.error_from_server = [];
+                        this.error_from_server = this.error_from_server.concat(data.resultCode.message);
+                    }
                     
-                    // Specific clearing for add select boxes
-                    this.addSelectBox.active = [];
-                    this.addSelectBox.ngOnInit();
-                    
-                    this.addWOSelectBox.active = [];
-                    this.addWOSelectBox.ngOnInit();
-                    
-                    this.addLocationSelectBox.active = [];
-                    this.addLocationSelectBox.ngOnInit();
-                    
-                    
-                    this.ngOnInit();
                     
                 }
             );
             
         
-            this.childModal.hide();
             
         } else {
             this.addGeneralTab.headerStyleClass = "tabpanel-has-error";
@@ -584,11 +601,12 @@ export class Assets {
     }
 
     public addChildNode(event){
+        console.log('Event Add Child', event);
         var selected_asset = {
-            id: event.id,
-            text: event.name
+            id: event.data.assetId,
+            text: event.data.name
         }
-        this.selected_asset = selected_asset;
+        this.selected_parent_asset = selected_asset;
         
         this.addSelectBox.active = [selected_asset];
         this.addSelectBox.ngOnInit();
@@ -622,7 +640,17 @@ export class Assets {
     public saveDelete(){
         this.assetService.deleteAsset(this.deleteConfirm.data.assetId).subscribe(
             (data) => {
+                
                 console.log('Return Data', data);
+                if(data.resultCode.code == 0){
+                    // Growl Message Success
+                    GrowlMessage.addMessage(MessageSeverity.SUCCESS, MessageLabels.DELETE_SUCCESS);
+                } else {
+                    // Error
+                    let error_delete = [];
+                    error_delete = error_delete.concat(data.resultCode.message);
+                    GrowlMessage.addMessage(MessageSeverity.ERROR, MessageLabels.DELETE_ERROR + error_delete[0]);
+                }
                 this.ngOnInit();
             }
         );
