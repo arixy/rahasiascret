@@ -4,6 +4,7 @@ import { DatePickerOptions, DateModel } from 'ng2-datepicker';
 import { DataTable, TabViewModule } from "primeng/primeng";
 
 import { SettingsService } from './settings.service';
+import { GrowlMessage, MessageLabels, MessageSeverity } from '../../popup-notification';
 
 import { GlobalState, GlobalConfigs } from '../../global.state';
 
@@ -45,8 +46,10 @@ export class SettingsComponent {
         this._settingsService.updateSettings(this.settingsModel).subscribe(response => {
             this.isLoadingData = false;
             if (response.resultCode.code == "0") {
+                GrowlMessage.addMessage(MessageSeverity.SUCCESS, MessageLabels.SAVE_SUCCESS);
             } else {
                 this.errMsg = [response.resultCode.message];
+                GrowlMessage.addMessage(MessageSeverity.ERROR, MessageLabels.SAVE_ERROR);
             }
         });
     }

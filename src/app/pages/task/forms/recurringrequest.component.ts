@@ -219,7 +219,7 @@ export class RecurringRequestComponent {
             'selected_vendor': ['', null],
             'contact_person': ['', null],
             'contact_number': ['', Validators.compose([CustomValidators.numberOnly])],
-            'solution': ['', null],
+            'solution': ['', Validators.compose([this.validateSolution.bind(this)])],
 
             'selected_startdate': ['', Validators.compose([Validators.required, this.validateStartDueDate.bind(this)])],
             'selected_starttime': ['', null],
@@ -427,8 +427,8 @@ export class RecurringRequestComponent {
                 "due_after": this.selectedWO.dueAfter,
                 "repeat_every": this.selectedWO.every,
 
-                "selected_startdate": new Date(this.selectedWO.startDate + "T" + this.selectedWO.startTime + "Z"),
-                "selected_starttime": new Date(this.selectedWO.startDate + "T" + this.selectedWO.startTime + "Z"),
+                "selected_startdate": this.selectedWO != null && this.selectedWO.currentStatusId == WorkOrderStatuses.SCHEDULED ? new Date(this.selectedWO.startDate) : new Date(this.selectedWO.startDate + "T" + this.selectedWO.startTime + "Z"),
+                //"selected_starttime": new Date(this.selectedWO.startDate + "T" + this.selectedWO.startTime + "Z"),
                 //"selected_duedate": new Date(this.selectedWO.dueDate)
             });
 
@@ -665,8 +665,7 @@ export class RecurringRequestComponent {
             } else if (this.actionType.workflowActionId == WorkflowActions.CANCEL
                 || this.actionType.workflowActionId == WorkflowActions.PENDING
                 || this.actionType.workflowActionId == WorkflowActions.IN_PROGRESS
-                || this.actionType.workflowActionId == WorkflowActions.RETURN
-                || this.actionType.workflowActionId == WorkflowActions.CANCEL_SCHEDULE) {
+                || this.actionType.workflowActionId == WorkflowActions.RETURN) {
                 if (this.selectedWO != null && this.selectedWO.currentStatusId == WorkOrderStatuses.SCHEDULED) {
                     this.isSchedule = true;
                 }
@@ -693,6 +692,33 @@ export class RecurringRequestComponent {
                 this.selected_startdate.disable();
                 this.selected_starttime.disable();
                 this.selected_duedate.disable();
+            } else if (this.actionType.workflowActionId == WorkflowActions.CANCEL_SCHEDULE) {
+                this.isSchedule = true;
+
+                // disable all
+                this.disabled = true;
+                this.isCanEditExpenses = false;
+                //this.isCanEditFiles = false;
+
+                this.wo_number.disable();
+                this.task_name.disable();
+                this.task_desc.disable();
+                this.selected_category.disable();
+                this.selected_location.disable();
+                this.location_info.disable();
+                this.selected_status.disable();
+                this.selected_priority.disable();
+                this.selected_vendor.disable();
+                this.contact_person.disable();
+                this.contact_number.disable();
+                this.solution.disable();
+                this.selected_assignee.disable();
+                this.due_after.disable();
+                this.repeat_every.disable();
+
+                this.selected_startdate.disable();
+                //this.selected_starttime.disable();
+                //this.selected_duedate.disable();
             } else if (this.actionType.workflowActionId == WorkflowActions.COMPLETE
                 || this.actionType.workflowActionId == WorkflowActions.CLOSE_FOR_CONFIRMATION) {
                 //this.isCanEditExpenses = false;
@@ -718,6 +744,7 @@ export class RecurringRequestComponent {
             } else if (this.actionType.workflowActionId == WorkflowActions.EDIT) {
                 if (this.selectedWO != null && this.selectedWO.currentStatusId == WorkOrderStatuses.SCHEDULED) {
                     this.isSchedule = true;
+                    if (this.selectedWO.lastWoDate != null) this.selected_startdate.disable();
                 }
 
                 this.wo_number.disable();
@@ -829,8 +856,8 @@ export class RecurringRequestComponent {
             currentStatusId: this.selected_status.value == null ? null : this.selected_status.value.id,
             currentAssigneeId: this.selected_assignee.value == null ? null : this.selected_assignee.value.id,
             mainPicId: this.selected_assignee.value.id,
-            startDate: this.selected_startdate.value,
-            startTime: this.selected_startdate.value,
+            startDate: this.isSchedule == true ? moment(this.selected_startdate.value).format("YYYY-MM-DD") : this.selected_startdate.value,
+            startTime: this.isSchedule == true ? moment(this.selected_startdate.value).format("YYYY-MM-DD") : this.selected_startdate.value,
             repeatOptionId: this.selected_repeat.value == null ? null : this.selected_repeat.value.id,
             every: this.selected_repeat.value.id != 6 ? null : this.repeat_every.value,
             everyPeriodId: this.selected_repeat.value.id != 6 ? null : this.selected_every_period.value.id,
@@ -1109,7 +1136,7 @@ export class RecurringRequestComponent {
             || (this.actionType.workflowActionId == WorkflowActions.EDIT && this.isSchedule)) {
             // if selected repeat is EVERY
             if (this.selected_repeat != null && this.selected_repeat.value != null && this.selected_repeat.value.id == 6) {
-                if (input.value == null || input.value == "" || input.value.id == null || input.value.id == GlobalConfigs.DEFAULT_SELECT_OPTION) {
+                if (input.value == null || input.value == "") {
                     return { required: true };
                 } else {
                     return CustomValidators.numberOnly(input);
@@ -1157,6 +1184,33 @@ export class RecurringRequestComponent {
 
                 if (startDate > dueDate) return { crossdate: true };
             }
+        } else {
+            let editedStartDate = moment(this.selected_startdate.value).format("YYYY-MM-DD");
+            let todayDate = moment(new Date()).format("YYYY-MM-DD");
+            if (this.selectedWO != null) {
+
+                let woStartDate = moment(this.selectedWO.startDate).format("YYYY-MM-DD");
+                if (this.selected_startdate.enabled && this.selected_startdate != null && woStartDate != editedStartDate && editedStartDate < todayDate) {
+                    return { earlierdate: true };
+                }
+            } else {
+
+                if (this.selected_startdate.enabled && this.selected_startdate != null && editedStartDate < todayDate) {
+                    return { earlierdate: true };
+                }
+            }
+        }
+
+        return null;
+    }
+
+    validateSolution(input: FormControl) {
+        console.log("validateSolution", this.actionType.workflowActionId, WorkflowActions.CLOSE_FOR_CONFIRMATION, this.solution);
+        if (this.actionType.workflowActionId == WorkflowActions.CLOSE_FOR_CONFIRMATION
+            && (this.solution == null
+                || this.solution.value == null
+                || this.solution.value == "")) {
+            return { required: true };
         }
 
         return null;

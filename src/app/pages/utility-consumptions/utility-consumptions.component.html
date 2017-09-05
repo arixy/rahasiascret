@@ -18,7 +18,7 @@
         </li>
       </ul>
     </div>
-    <p-dataTable #dt [value]="lstUtilityConsumptions" [lazy]="true" (onLazyLoad)="refresh($event, dt)" [sortField]="DEFAULT_SORT_FIELD" [rows]="DEFAULT_ITEM_PER_PAGE" sortOrder="-1" [paginator]="true" [totalRecords]="totalRecords" styleClass="custom-filter-datatable">
+    <p-dataTable #dt [value]="lstUtilityConsumptions" [lazy]="true" (onLazyLoad)="refresh($event, dt)" [sortField]="DEFAULT_SORT_FIELD" [rows]="DEFAULT_ITEM_PER_PAGE" sortOrder="-1" [paginator]="true" [totalRecords]="totalRecords" styleClass="custom-filter-datatable custom-dropdown-datatable">
       <p-header>
         <div class="ui-helper-clearfix">
           <button type="button" iconPos="left" label="CSV" (click)="downloadCSV(dt)" style="float:left" class="btn-export__csv">

@@ -11,6 +11,7 @@ import { DataTable, TabViewModule } from "primeng/primeng";
 
 import { RoleService } from "../role/role.service";
 import { AccessRightsService } from "./access-rights.service";
+import { GrowlMessage, MessageLabels, MessageSeverity } from '../../popup-notification';
 
 @Component({
     selector: 'access-rights',
@@ -261,10 +262,12 @@ export class AccessRightsComponent implements OnDestroy {
 
                                 this.roleAuthorizations.push(objMenuAuth);
                             }
+                            GrowlMessage.addMessage(MessageSeverity.SUCCESS, MessageLabels.SAVE_SUCCESS);
                         } else {
                             // show error message?
                             this.errMsg = [];
                             this.errMsg = this.errMsg.concat(response.resultCode.message);
+                            GrowlMessage.addMessage(MessageSeverity.ERROR, MessageLabels.SAVE_ERROR);
                         }
                         this.isLoadingData = false;
                     });
@@ -274,6 +277,7 @@ export class AccessRightsComponent implements OnDestroy {
                 this.errMsg = [];
                 this.errMsg = this.errMsg.concat(response.resultCode.message);
                 this.isLoadingData = false;
+                GrowlMessage.addMessage(MessageSeverity.ERROR, MessageLabels.SAVE_ERROR);
             }
         });
     }

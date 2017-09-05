@@ -265,7 +265,8 @@ export const PAGES_MENU = [
                 title: 'Unit/Location',
                 pathMatch: 'prefix',
                 hidden: true
-              }
+                },
+              menuId: 'Location'
             }
           },
           {
@@ -276,6 +277,7 @@ export const PAGES_MENU = [
                 pathMatch: 'prefix',
                 hidden: true
               }
+              , menuId: 'WOCategory'
             }
           }
           

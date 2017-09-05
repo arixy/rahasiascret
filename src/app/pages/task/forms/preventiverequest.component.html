@@ -272,6 +272,12 @@
         <label for="solution" class="col-xg-2 control-label">Solution</label><br />
         <textarea [formControl]="solution" class="form-control" id="solution" [placeholder]="solution.disabled ? '' : 'Solution'" pInputTextArea></textarea>
       </div>
+      <div class="row error-row">
+        <div class="col-xg-2 line-height-zero">&nbsp;</div>
+        <div class="error-message col-xg-10" *ngIf="formGroupAdd.get('solution').hasError('required') && formGroupAdd.get('solution').touched">
+          Solution is Required
+        </div>
+      </div>
 
       <!-- Vendor -->
       <div class="form-group row" *ngIf="!isSchedule">
@@ -371,6 +377,12 @@
           <div class="col-xg-2 line-height-zero">&nbsp;</div>
           <div class="error-message col-xg-10" *ngIf="formGroupAdd.get('selected_startdate').hasError('required') && formGroupAdd.get('selected_startdate').touched">
             Start date is Required
+          </div>
+        </div>
+        <div class="row error-row">
+          <div class="col-xg-2 line-height-zero">&nbsp;</div>
+          <div class="error-message col-xg-10" *ngIf="formGroupAdd.get('selected_startdate').hasError('earlierdate') && formGroupAdd.get('selected_startdate').touched">
+            Start date must be later than today
           </div>
         </div>
       </div>

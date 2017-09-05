@@ -1,4 +1,4 @@
-<div class="widgets">
+﻿<div class="widgets">
    <div class="row">
    <div class="ui-helper-clearfix add-new-button__container">
               <div class="btn-group add-new-dropdown" style="float: right">
@@ -11,7 +11,7 @@
     </div>
     <ba-card title="" baCardClass="with-scroll">
         <spinner *ngIf="isLoadingUtilityUOM"></spinner>
-        <p-dataTable #dt [value]="utilities"  [lazy]="true" (onLazyLoad)="refresh($event, dt)" [rows]="10" [paginator]="true" [totalRecords]="totalRecords" sortField="dateUpdated" sortOrder="-1" styleClass="custom-filter-datatable">
+        <p-dataTable #dt [value]="utilities"  [lazy]="true" (onLazyLoad)="refresh($event, dt)" [rows]="DEFAULT_ITEM_PER_PAGE" [paginator]="true" [totalRecords]="totalRecords" sortField="dateUpdated" sortOrder="-1" styleClass="custom-filter-datatable custom-dropdown-datatable">
           <p-header>
             <div class="ui-helper-clearfix">
                 <button type="button" iconPos="left" label="CSV" (click)="exportUtilityUOMCSV(dt)" style="float:left" class="btn-export__csv">
@@ -43,7 +43,7 @@
                             </div>
                     </template>
             </p-column>
-           <p-column field="utilityUomId" header="Utility Type ID" [style]="{'width':'140px'}" [sortable]="true"  class="sortable-custom-icon fa fa-sort"></p-column>
+           <p-column field="utilityUomId" header="Utility UOM ID" [style]="{'width':'140px'}" [sortable]="true"  class="sortable-custom-icon fa fa-sort"></p-column>
            <p-column field="name" [style]="{'width':'280px'}" [sortable]="true"  >
                 <template pTemplate="header">
                   <span class="ui-column-title">Name </span>
@@ -68,6 +68,7 @@
       <div class="modal-body">
         <div>
             <ba-card title="" baCardClass="with-scroll custom-card">
+              <spinner *ngIf="popupLoadingState.isLoading()"></spinner>
               <form [formGroup]="form" (ngSubmit)="onSubmit(form.value)" class="form-horizontal">
                 <div class="alert alert-danger" *ngIf="errMsg.length > 0">
                     <ul style="margin-bottom: 0px;" class="lst-error">
@@ -142,6 +143,7 @@
       <div class="modal-body">
         <div>
             <ba-card title="" baCardClass="with-scroll custom-card">
+              <spinner *ngIf="popupLoadingState.isLoading()"></spinner>
               <form [formGroup]="edit_form" (ngSubmit)="onSubmitEdit(edit_form.value, $event)" class="form-horizontal">
                 <div class="alert alert-danger" *ngIf="errMsgEdit.length > 0">
                     <ul style="margin-bottom: 0px;" class="lst-error">

@@ -13,7 +13,7 @@ export class RoutingGuard implements CanActivate {
 
         let hasAccess = false;
 
-        if (routeMenuId != null) {
+        if (routeMenuId != null && route.data['type'] == null) {
             routeMenuId.forEach(item => {
                 if (authorizedSitemaps[item] != null) {
                     if (authorizedSitemaps[item].allowAccessOrView
@@ -33,6 +33,36 @@ export class RoutingGuard implements CanActivate {
                             || authorizedSitemaps['SingleWorkOrder'].allowAdd
                             || authorizedSitemaps['SingleWorkOrder'].allowUpdate
                             || authorizedSitemaps['SingleWorkOrder'].allowDelete);
+                } else if (route.params[route.data['extraParam']] === 'owner') {
+                    hasAccess = authorizedSitemaps['OwnerWorkOrder'] != null
+                        && (authorizedSitemaps['OwnerWorkOrder'].allowAccessOrView
+                        || authorizedSitemaps['OwnerWorkOrder'].allowAdd
+                        || authorizedSitemaps['OwnerWorkOrder'].allowUpdate
+                        || authorizedSitemaps['OwnerWorkOrder'].allowDelete);
+                } else if (route.params[route.data['extraParam']] === 'recurring') {
+                    hasAccess = authorizedSitemaps['RecurringWorkOrder'] != null
+                        && (authorizedSitemaps['RecurringWorkOrder'].allowAccessOrView
+                        || authorizedSitemaps['RecurringWorkOrder'].allowAdd
+                        || authorizedSitemaps['RecurringWorkOrder'].allowUpdate
+                        || authorizedSitemaps['RecurringWorkOrder'].allowDelete);
+                } else if (route.params[route.data['extraParam']] === 'preventive') {
+                    hasAccess = authorizedSitemaps['PreventiveWorkOrder'] != null
+                        && (authorizedSitemaps['PreventiveWorkOrder'].allowAccessOrView
+                        || authorizedSitemaps['PreventiveWorkOrder'].allowAdd
+                        || authorizedSitemaps['PreventiveWorkOrder'].allowUpdate
+                        || authorizedSitemaps['PreventiveWorkOrder'].allowDelete);
+                } else if (route.params[route.data['extraParam']] === 'tenant') {
+                    hasAccess = authorizedSitemaps['TenantWorkOrder'] != null
+                        && (authorizedSitemaps['TenantWorkOrder'].allowAccessOrView
+                        || authorizedSitemaps['TenantWorkOrder'].allowAdd
+                        || authorizedSitemaps['TenantWorkOrder'].allowUpdate
+                        || authorizedSitemaps['TenantWorkOrder'].allowDelete);
+                } else if (route.params[route.data['extraParam']] === 'guest') {
+                    hasAccess = authorizedSitemaps['GuestWorkOrder'] != null
+                        && (authorizedSitemaps['GuestWorkOrder'].allowAccessOrView
+                        || authorizedSitemaps['GuestWorkOrder'].allowAdd
+                        || authorizedSitemaps['GuestWorkOrder'].allowUpdate
+                        || authorizedSitemaps['GuestWorkOrder'].allowDelete);
                 }
             } else if (route.data['type'] === 'Setups') {
                 let accessurl = state.url.substring(state.url.lastIndexOf('/') + 1);
@@ -49,6 +79,32 @@ export class RoutingGuard implements CanActivate {
                         || authorizedSitemaps['WOCategory'].allowAdd
                         || authorizedSitemaps['WOCategory'].allowUpdate
                         || authorizedSitemaps['WOCategory'].allowDelete);
+                }
+            } else if (route.data['type'] === 'EntityList') {
+                if (route.params[route.data['extraParam']] == '1') {
+                    hasAccess = authorizedSitemaps['Vendor'] != null
+                        && (authorizedSitemaps['Vendor'].allowAccessOrView
+                        || authorizedSitemaps['Vendor'].allowAdd
+                        || authorizedSitemaps['Vendor'].allowUpdate
+                        || authorizedSitemaps['Vendor'].allowDelete);
+                } else if (route.params[route.data['extraParam']] == '2') {
+                    hasAccess = authorizedSitemaps['Tenant'] != null
+                        && (authorizedSitemaps['Tenant'].allowAccessOrView
+                        || authorizedSitemaps['Tenant'].allowAdd
+                        || authorizedSitemaps['Tenant'].allowUpdate
+                        || authorizedSitemaps['Tenant'].allowDelete);
+                } else if (route.params[route.data['extraParam']] == '3') {
+                    hasAccess = authorizedSitemaps['Guest'] != null
+                        && (authorizedSitemaps['Guest'].allowAccessOrView
+                        || authorizedSitemaps['Guest'].allowAdd
+                        || authorizedSitemaps['Guest'].allowUpdate
+                        || authorizedSitemaps['Guest'].allowDelete);
+                } else if (route.params[route.data['extraParam']] == '4') {
+                    hasAccess = authorizedSitemaps['Owner'] != null
+                        && (authorizedSitemaps['Owner'].allowAccessOrView
+                        || authorizedSitemaps['Owner'].allowAdd
+                        || authorizedSitemaps['Owner'].allowUpdate
+                        || authorizedSitemaps['Owner'].allowDelete);
                 }
             }
         }

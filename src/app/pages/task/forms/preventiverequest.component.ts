@@ -215,7 +215,7 @@ export class PreventiveRequestComponent {
             'selected_vendor': ['', null],
             'contact_person': ['', null],
             'contact_number': ['', Validators.compose([CustomValidators.numberOnly])],
-            'solution': ['', null],
+            'solution': ['', Validators.compose([this.validateSolution.bind(this)])],
 
             'selected_startdate': ['', Validators.compose([Validators.required, this.validateStartDueDate.bind(this)])],
             //'selected_starttime': ['', null],
@@ -439,8 +439,9 @@ export class PreventiveRequestComponent {
 
                 // due_after, every
 
-                "selected_startdate": new Date(this.selectedWO.startDate + "T" + this.selectedWO.startTime + "Z"),
-                "selected_starttime": new Date(this.selectedWO.startDate + "T" + this.selectedWO.startTime + "Z"),
+                "selected_startdate": this.selectedWO != null && this.selectedWO.currentStatusId == WorkOrderStatuses.SCHEDULED ? new Date(this.selectedWO.startDate) : new Date(this.selectedWO.startDate + "T" + this.selectedWO.startTime + "Z"),
+                //"selected_startdate": new Date(this.selectedWO.startDate + "T" + this.selectedWO.startTime + "Z"),
+                //"selected_starttime": new Date(this.selectedWO.startDate + "T" + this.selectedWO.startTime + "Z"),
             });
 
             if (response.data.workOrder.currentStatusId != WorkOrderStatuses.SCHEDULED) {
@@ -739,6 +740,7 @@ export class PreventiveRequestComponent {
                 this.contact_person.disable();
                 this.contact_number.disable();
                 this.due_after.disable();
+                this.repeat_every.disable();
                 this.solution.disable();
                 //this.selected_assignee.disable();
 
@@ -769,6 +771,7 @@ export class PreventiveRequestComponent {
             } else if (this.actionType.workflowActionId == WorkflowActions.EDIT) {
                 if (this.selectedWO != null && this.selectedWO.currentStatusId == WorkOrderStatuses.SCHEDULED) {
                     this.isSchedule = true;
+                    if (this.selectedWO.lastWoDate != null) this.selected_startdate.disable();
                 }
 
                 this.wo_number.disable();
@@ -890,8 +893,8 @@ export class PreventiveRequestComponent {
             // TODO: check later
             mainPicId: this.selected_assignee.value.id,
             // TODO: need to change to UTC+0 first
-            startDate: this.selected_startdate.value,
-            startTime: this.selected_startdate.value,
+            startDate: this.isSchedule == true ? moment(this.selected_startdate.value).format("YYYY-MM-DD") : this.selected_startdate.value,
+            startTime: this.isSchedule == true ? moment(this.selected_startdate.value).format("YYYY-MM-DD") : this.selected_startdate.value,
             repeatOptionId: this.selected_repeat.value == null ? null : this.selected_repeat.value.id,
             every: this.selected_repeat.value.id != 6 ? null : this.repeat_every.value,
             everyPeriodId: this.selected_repeat.value.id != 6 ? null : this.selected_every_period.value.id,
@@ -1166,7 +1169,7 @@ export class PreventiveRequestComponent {
             || (this.actionType.workflowActionId == WorkflowActions.EDIT && this.isSchedule)) {
             // if selected repeat is EVERY
             if (this.selected_repeat != null && this.selected_repeat.value != null && this.selected_repeat.value.id == 6) {
-                if (input.value == null || input.value == "" || input.value.id == null || input.value.id == GlobalConfigs.DEFAULT_SELECT_OPTION.id) {
+                if (input.value == null || input.value == "") {
                     return { required: true };
                 } else {
                     return CustomValidators.numberOnly(input);
@@ -1213,9 +1216,36 @@ export class PreventiveRequestComponent {
 
                 if (startDate > dueDate) return { crossdate: true };
             }
+        } else {
+            let editedStartDate = moment(this.selected_startdate.value).format("YYYY-MM-DD");
+            let todayDate = moment(new Date()).format("YYYY-MM-DD");
+            if (this.selectedWO != null) {
+
+                let woStartDate = moment(this.selectedWO.startDate).format("YYYY-MM-DD");
+                if (this.selected_startdate.enabled && this.selected_startdate != null && woStartDate != editedStartDate && editedStartDate < todayDate) {
+                    return { earlierdate: true };
+                }
+            } else {
+
+                if (this.selected_startdate.enabled && this.selected_startdate != null && editedStartDate < todayDate) {
+                    return { earlierdate: true };
+                }
+            }
         }
 
         console.log("validate start due date");
+
+        return null;
+    }
+
+    validateSolution(input: FormControl) {
+        console.log("validateSolution", this.actionType.workflowActionId, WorkflowActions.CLOSE_FOR_CONFIRMATION, this.solution);
+        if (this.actionType.workflowActionId == WorkflowActions.CLOSE_FOR_CONFIRMATION
+            && (this.solution == null
+                || this.solution.value == null
+                || this.solution.value == "")) {
+            return { required: true };
+        }
 
         return null;
     }

@@ -40,7 +40,7 @@ export class Login {
         this.response = this.authService.postLogin(values).subscribe(
           data => {
                     this.saveOAuthToken(data.data.token);
-                    localStorage.setItem('logged_user', data.data.email);
+                    localStorage.setItem('logged_user', data.data.fullname);
                     // added by Mike: authorization & sitemaps
                     localStorage.setItem('authorizedSitemaps', JSON.stringify(this.processAuthorization(data.data.authorizations)));
                     localStorage.setItem('sitemaps', JSON.stringify(this.processSitemap(data.data.sitemaps)));

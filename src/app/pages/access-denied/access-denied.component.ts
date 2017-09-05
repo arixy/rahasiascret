@@ -1,4 +1,5 @@
 import {Component, Input, ChangeDetectorRef, ViewChild, ViewEncapsulation, OnInit} from '@angular/core';
+import { Router } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import { FormControl, FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
@@ -24,7 +25,8 @@ export class AccessDenied {
     
   constructor(
     public fb: FormBuilder,
-    public cdr: ChangeDetectorRef
+    public cdr: ChangeDetectorRef,
+      private router: Router
     ) {
         
         
@@ -35,7 +37,13 @@ export class AccessDenied {
 		
 	}
 
+     showLoginPage() {
+         this.router.navigate(['login']);
+     }
 
+     showPreviousPage() {
+         history.back();
+     }
     
      
 }  

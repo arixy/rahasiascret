@@ -1,4 +1,4 @@
-import {Component, Input, ChangeDetectorRef, ViewChild, ViewEncapsulation,ViewChildren, QueryList} from '@angular/core';
+﻿import {Component, Input, ChangeDetectorRef, ViewChild, ViewEncapsulation,ViewChildren, QueryList} from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import { FormGroup, AbstractControl, FormBuilder, Validators ,FormControl} from '@angular/forms';
@@ -9,6 +9,9 @@ import { UtilityUomService } from './utility-uom.service';
 import { FilterInputComponent } from '../filter-input.component';
 import { Subscription } from 'rxjs/Subscription';
 import { saveAs } from 'file-saver';
+
+import { GlobalConfigs } from '../../global.state';
+import { GrowlMessage, MessageLabels, MessageSeverity } from '../../popup-notification';
 
 @Component({
   selector: 'utility-uom',
@@ -42,8 +45,8 @@ export class UtilityUom {
 
 	@ViewChildren('filterUtility') filterUtility: QueryList<FilterInputComponent>;
 
-	 // static
-	private readonly DEFAULT_ITEM_PER_PAGE : number = 10;
+    // static
+    private readonly DEFAULT_ITEM_PER_PAGE: number = GlobalConfigs.DEFAULT_ITEM_PER_PAGE;
 	private readonly DEFAULT_SORT_FIELD : string = "dateUpdated";
 
 	private totalRecords;
@@ -56,6 +59,13 @@ export class UtilityUom {
 	private viewEditUtilityTittle;
 	private isVisible;
 
+    // loading state
+    private popupLoadingState = {
+        isLoading: () => {
+            return this.popupLoadingState.saving;
+        },
+        saving: false
+    };
 
   	constructor(
 		public fb: FormBuilder,
@@ -149,19 +159,23 @@ export class UtilityUom {
 			return ;
 	   }
 	   
-	   this.submitLoadingUtility = true;
+       //this.submitLoadingUtility = true;
 	   if(this.form.valid){
 			 console.log('Form Values uti:', values);
-			
+
+             this.popupLoadingState.saving = true;
 			 this.utilityUomService.addUtilityUom(values).subscribe(
 				(response) => {
 					if(response.resultCode.code==0){
 						this.submitLoadingUtility = false;
-						this.utilityUomService.announceEvent("addNewModal_btnSaveOnClick_createSuccess");
+                        this.utilityUomService.announceEvent("addNewModal_btnSaveOnClick_createSuccess");
+                        GrowlMessage.addMessage(MessageSeverity.SUCCESS, MessageLabels.SAVE_SUCCESS);
 					}else{
 						this.errMsg=[];
-						this.errMsg=this.errMsg.concat(response.resultCode.message);
-					}
+                        this.errMsg = this.errMsg.concat(response.resultCode.message);
+                        GrowlMessage.addMessage(MessageSeverity.ERROR, MessageLabels.SAVE_ERROR);
+                    }
+                    this.popupLoadingState.saving = false;
 				}
 			);
 			
@@ -180,7 +194,7 @@ export class UtilityUom {
 		 if(hasError){
 			return;
 		 }
-		 this.submitLoadingUtility = true;
+		 //this.submitLoadingUtility = true;
 		if(this.edit_form.valid){
 			console.log("edit ");
 			
@@ -189,7 +203,8 @@ export class UtilityUom {
                 name: values.edit_name,
                 description: values.edit_description,
               });
-			
+
+             this.popupLoadingState.saving = true;
 			 let response = this.utilityUomService. updateUtilityUom(formatted_object).subscribe(
                 (data) => {
 					if(data.resultCode.code==0){
@@ -197,12 +212,14 @@ export class UtilityUom {
 						// this.ngOnInit();
 						// using announceEvent
 						this.submitLoadingUtility = false;
-						this.utilityUomService.announceEvent("addNewModal_btnSaveOnClick_updateSuccess");
+                        this.utilityUomService.announceEvent("addNewModal_btnSaveOnClick_updateSuccess");
+                        GrowlMessage.addMessage(MessageSeverity.SUCCESS, MessageLabels.SAVE_SUCCESS);
 					}else{
 						this.errMsgEdit=[];
 						this.errMsgEdit=this.errMsg.concat(data.data.message);
-						
-					}
+                        GrowlMessage.addMessage(MessageSeverity.ERROR, MessageLabels.SAVE_ERROR);
+                    }
+                    this.popupLoadingState.saving = false;
                 }
 		     );
 		   
