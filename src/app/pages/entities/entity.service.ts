@@ -9,7 +9,7 @@ import { GlobalConfigs } from '../../global.state';
 export class EntityService{
 	private entity_data: any;
 	redirectUrl: string;
-    private appUrl = GlobalConfigs.APP_BASE_URL + '/master/';  //'http://ec2-52-40-147-30.us-west-2.compute.amazonaws.com/api/v1/master/';
+    private appUrl = GlobalConfigs.APP_MASTER_URL + '/';
 
   constructor(private http: Http){
 

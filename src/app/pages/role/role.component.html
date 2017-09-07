@@ -56,15 +56,30 @@
           </div>
         </template>
       </p-column>
-      <p-column field="roleId" header="Role ID"  [style]="{'width':'80px'}"></p-column>
+      <p-column field="roleId" header="Role ID"  [style]="{'width':'80px'}" [sortable]="true">
+        <template pTemplate="header">
+          <span class="ui-column-title">Role ID</span>
+          <sortable-filter-input #rolefilter [dataTable]="dt" field="roleId" [disabled]="isSpinerLoading" (onFilter)="onRolefilter($event)"></sortable-filter-input>
+        </template>
+      </p-column>
       <p-column field="name" header="Name" [style]="{'width':'280px'}" sortable="true" [filter]="false">
         <template pTemplate="header">
-          <span class="ui-column-title">Name </span>
+          <span class="ui-column-title">Name</span>
           <sortable-filter-input #rolefilter [dataTable]="dt" field="name" [disabled]="isSpinerLoading" (onFilter)="onRolefilter($event)"></sortable-filter-input>
         </template>
       </p-column>
-      <p-column field="description" header="Description"></p-column>
-      <p-column field="roleTypeName" header="Role Type Name"></p-column>
+      <p-column field="description" header="Description" [sortable]="true">
+        <template pTemplate="header">
+          <span class="ui-column-title">Description</span>
+          <sortable-filter-input #rolefilter [dataTable]="dt" field="description" [disabled]="isSpinerLoading" (onFilter)="onRolefilter($event)"></sortable-filter-input>
+        </template>
+      </p-column>
+      <p-column field="roleTypeName" header="Role Type Name" [sortable]="true">
+        <template pTemplate="header">
+          <span class="ui-column-title">Role Type Name</span>
+          <sortable-filter-input #rolefilter [dataTable]="dt" field="roleTypeName" [disabled]="isSpinerLoading" (onFilter)="onRolefilter($event)"></sortable-filter-input>
+        </template>
+      </p-column>
  
     </p-dataTable>
 
@@ -112,8 +127,6 @@
                              </div>
                             
                          </div>
-                    
-                     
                      </div>
                 
 

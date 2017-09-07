@@ -66,7 +66,7 @@
         </p-column>
         <p-column field="currentStatusName" [style]="{'width':'110px'}" header="Status" [sortable]="true" [filter]="true"></p-column>
         <p-column field="assignee" [style]="{'width':'100px'}" header="Assignee" [sortable]="true" [filter]="true"></p-column>
-        <p-column [style]="{'width':'140px'}" field="dateUpdated" header="Last Updated" styleClass="top-aligned-table" [sortable]="true">
+        <p-column [style]="{'width':'140px'}" field="dateUpdated" header="Last Updated" styleClass="top-aligned-table" [sortable]="true" [filter]="true">
           <template pTemplate="body" let-update="rowData">
             {{update.dateUpdated | date: 'y-MM-dd HH:mm'}}
           </template>

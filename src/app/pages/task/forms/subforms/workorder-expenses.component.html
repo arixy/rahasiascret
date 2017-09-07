@@ -14,6 +14,7 @@
       <p-column header="Expense Type" [style]="{'width':'200px'}">
         <template let-expense="rowData" pTemplate="body">
           <ng-select class="form-control"
+                     [allowClear]="true"
                      [items]="items_expenses_types"
                      [disabled]="!isCanEdit"
                      [active]="expense.active"

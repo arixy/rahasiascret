@@ -203,12 +203,12 @@ export class ExpenseType {
         );
 	}
 	public saveDelete(){
-		console.log('test', this.deleteConfirm.expenseTypeId);	this.expenseTypeService.deleteExpenseType(this.deleteConfirm.expenseTypeId).subscribe(
+	    this.expenseTypeService.deleteExpenseType(this.deleteConfirm.expenseTypeId).subscribe(
             (data) => {
                 console.log('Return Data', data);
                 this.refresh(this.filter_master, this.expenseTypesTable);
             }
-        );
+            );
 		this.deleteModal.hide();
 	}
     public addExpenseType(){

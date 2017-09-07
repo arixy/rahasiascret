@@ -170,7 +170,7 @@ export class TaskComponent implements OnDestroy{
         this.viewModalBody.clear();
 
         // change modal title
-        this.modalTitle = "Create " + selectedType.label;
+        this.modalTitle = "Add New " + selectedType.label;
 
         if (this.selectedWoType.id == this.SINGLE_TIME_REQUEST) {
             this.currentOpenModal = this.createNewSingleRequestComponent(this.viewModalBody, SingleRequestComponent);
@@ -327,9 +327,9 @@ export class TaskComponent implements OnDestroy{
     }
 
     refresh($event, table){
-        console.log("customRefresh");
-        console.log($event);
-        console.log(table);
+        //console.log("customRefresh");
+        //console.log($event);
+        //console.log(table);
 
         this.getAllMyTasks(this.buildFilter(table));
     }

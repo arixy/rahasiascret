@@ -87,12 +87,10 @@
                     <sortable-filter-input #filterWO [dataTable]="dt" field="locationName" [disabled]="isLoadingWOData" (onFilter)="onFilterWO($event)"></sortable-filter-input>
                   </template>
                 </p-column>
-                <p-column [style]="{'width':'120px'}" header="Start" [sortable]="true" styleClass="top-aligned-table">
+                <p-column [style]="{'width':'120px'}" field="startDate" header="Start" [sortable]="true" styleClass="top-aligned-table">
                   <template pTemplate="header">
                     <span class="ui-column-title">Start</span>
-                    <span *ngIf="dt.sortField != 'start'" class="sortable-custom-icon fa fa-sort"></span>
-                    <span *ngIf="dt.sortOrder == 1 && dt.sortField == 'start'" class="sortable-custom-icon fa fa-sort-asc"></span>
-                    <span *ngIf="dt.sortOrder == -1 && dt.sortField == 'start'" class="sortable-custom-icon fa fa-sort-desc"></span>
+                    <sortable-filter-input #filterWO [dataTable]="dt" field="startDate" [disabled]="isLoadingWOData" (onFilter)="onFilterWO($event)"></sortable-filter-input>
                   </template>
                   <template pTemplate="body" let-data="rowData">
                     {{ data.startDate | date: 'y-MM-dd HH:mm' }}
@@ -121,6 +119,10 @@
                   </template>
                 </p-column>
                 <p-column [style]="{'width':'140px'}" field="dateUpdated" header="Last Updated" styleClass="top-aligned-table" [sortable]="true">
+                  <template pTemplate="header">
+                    <span class="ui-column-title">Last Updated</span>
+                    <sortable-filter-input #filterWO [dataTable]="dt" field="dateUpdated" [disabled]="isLoadingWOData" (onFilter)="onFilterWO($event)"></sortable-filter-input>
+                  </template>
                     <template pTemplate="body" let-update="rowData">
                         {{update.dateUpdated | date: 'y-MM-dd HH:mm'}}
                     </template>

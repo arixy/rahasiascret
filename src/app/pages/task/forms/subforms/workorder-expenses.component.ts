@@ -51,7 +51,7 @@ export class WorkOrderExpensesComponent {
             console.log("expenses response", response.data);
 
             var tmpLstExpenses = response.data;
-            this.items_expenses_types = [GlobalConfigs.DEFAULT_SELECT_OPTION];
+            this.items_expenses_types = [];
 
             for (var i = 0; i < tmpLstExpenses.length; i++) {
                 this.items_expenses_types.push({ id: tmpLstExpenses[i].expenseTypeId, text: tmpLstExpenses[i].name });

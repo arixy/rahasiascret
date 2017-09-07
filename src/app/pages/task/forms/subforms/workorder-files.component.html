@@ -10,8 +10,11 @@
       </p-header>
       <p-column field="name" header="Filename" [style]="{'width':'200px'}">
         <template let-file="rowData" pTemplate="body">
-          <span *ngIf="file.workOrderPhotoId == null">{{file.name}}</span>
-          <span *ngIf="file.workOrderPhotoId != null" class="link" (click)="downloadPhoto(file)">{{file.name}}</span>
+          <div style="text-align: center">
+            <img src="{{ file.blob }}" style="max-width: 100%; max-height: 96px;" alt="{{file.name}}" />
+            <!--<span *ngIf="file.workOrderPhotoId == null">{{file.name}}</span>
+            <span *ngIf="file.workOrderPhotoId != null" class="link" (click)="downloadPhoto(file)">{{file.name}}</span>-->
+          </div>
         </template>
       </p-column>
       <p-column>

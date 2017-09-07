@@ -39,7 +39,6 @@ export class OwnerRequestComponent {
 
     // const
     private _yearRange = GlobalConfigs.yearRange;
-    private _defaultSelectOption = GlobalConfigs.DEFAULT_SELECT_OPTION;
 
     // flag to disable almost all form
     public disabled = false;
@@ -232,7 +231,7 @@ export class OwnerRequestComponent {
                 console.log("vendors", response.data);
 
                 var tmpLstVendors = response.data;
-                this.items_vendors = [GlobalConfigs.DEFAULT_SELECT_OPTION.id];
+                this.items_vendors = [];
                 for (var i = 0; i < tmpLstVendors.length; i++) {
                     var currentItem = { id: tmpLstVendors[i].entityId, text: tmpLstVendors[i].name };
                     this.items_vendors.push(currentItem);
@@ -246,7 +245,7 @@ export class OwnerRequestComponent {
                 console.log("priorities", response.data);
 
                 var tmpLstPriorities = response.data;
-                this.items_priorities = [GlobalConfigs.DEFAULT_SELECT_OPTION.id];
+                this.items_priorities = [];
                 for (var i = 0; i < tmpLstPriorities.length; i++) {
                     var currentItem = { id: tmpLstPriorities[i].woPriorityId, text: tmpLstPriorities[i].name };
                     this.items_priorities.push(currentItem);
@@ -260,7 +259,7 @@ export class OwnerRequestComponent {
                 console.log("categories response", response.data);
 
                 var tmpLstCategories = response.data;
-                this.items_categories = [GlobalConfigs.DEFAULT_SELECT_OPTION.id];
+                this.items_categories = [];
                 for (var i = 0; i < tmpLstCategories.length; i++) {
                     var currentItem = { id: tmpLstCategories[i].woCategoryId, text: tmpLstCategories[i].name };
                     this.items_categories.push(currentItem);
@@ -274,7 +273,7 @@ export class OwnerRequestComponent {
                 console.log("entity:owners", response.data);
 
                 var tmpLstEntities = response.data;
-                this.items_entities = [GlobalConfigs.DEFAULT_SELECT_OPTION.id];
+                this.items_entities = [];
                 for (var i = 0; i < tmpLstEntities.length; i++) {
                     var currentItem = { id: tmpLstEntities[i].entityId, text: tmpLstEntities[i].name };
                     this.items_entities.push(currentItem);
@@ -287,7 +286,7 @@ export class OwnerRequestComponent {
             this._locationService.getLocationsLeaf().subscribe((locations) => {
                 console.log("location response", locations);
                 var lstLocations = locations.data;
-                this.items_locations = [GlobalConfigs.DEFAULT_SELECT_OPTION.id];
+                this.items_locations = [];
                 for (var i = 0; i < lstLocations.length; i++) {
                     this.items_locations.push({ text: lstLocations[i].name, id: lstLocations[i].locationId });
                 }
@@ -300,7 +299,7 @@ export class OwnerRequestComponent {
             this._assetService.getAssets().subscribe((assets) => {
                 var lstAssets = assets.data;
 
-                this.items_assets = [GlobalConfigs.DEFAULT_SELECT_OPTION.id];
+                this.items_assets = [];
                 for (var i = 0; i < lstAssets.length; i++) {
                     this.items_assets.push({ text: lstAssets[i].name, id: lstAssets[i].assetId });
                 }
@@ -313,7 +312,7 @@ export class OwnerRequestComponent {
             this._userService.getAssigneeByTypeId("User", 1).subscribe((users) => {
                 var lstUsers = users.data;
 
-                this.items_assignees = [GlobalConfigs.DEFAULT_SELECT_OPTION.id];
+                this.items_assignees = [];
                 for (var i = 0; i < lstUsers.length; i++) {
                     this.items_assignees.push({ text: lstUsers[i].fullname, id: lstUsers[i].userId });
                 }
@@ -386,7 +385,7 @@ export class OwnerRequestComponent {
                 console.log("vendors", response.data);
 
                 var tmpLstVendors = response.data;
-                this.items_vendors = [GlobalConfigs.DEFAULT_SELECT_OPTION.id];
+                this.items_vendors = [];
                 for (var i = 0; i < tmpLstVendors.length; i++) {
                     var currentItem = { id: tmpLstVendors[i].entityId, text: tmpLstVendors[i].name };
                     this.items_vendors.push(currentItem);
@@ -406,7 +405,7 @@ export class OwnerRequestComponent {
                 console.log("priorities", response.data);
 
                 var tmpLstPriorities = response.data;
-                this.items_priorities = [GlobalConfigs.DEFAULT_SELECT_OPTION.id];
+                this.items_priorities = [];
                 for (var i = 0; i < tmpLstPriorities.length; i++) {
                     var currentItem = { id: tmpLstPriorities[i].woPriorityId, text: tmpLstPriorities[i].name };
                     this.items_priorities.push(currentItem);
@@ -426,7 +425,7 @@ export class OwnerRequestComponent {
                 console.log("categories response", response.data);
 
                 var tmpLstCategories = response.data;
-                this.items_categories = [GlobalConfigs.DEFAULT_SELECT_OPTION.id];
+                this.items_categories = [];
                 for (var i = 0; i < tmpLstCategories.length; i++) {
                     var currentItem = { id: tmpLstCategories[i].woCategoryId, text: tmpLstCategories[i].name };
                     this.items_categories.push(currentItem);
@@ -445,7 +444,7 @@ export class OwnerRequestComponent {
             this._locationService.getLocationsLeaf().subscribe((locations) => {
                 console.log("location response", locations);
                 var lstLocations = locations.data;
-                this.items_locations = [GlobalConfigs.DEFAULT_SELECT_OPTION.id];
+                this.items_locations = [];
                 for (var i = 0; i < lstLocations.length; i++) {
                     var currentItem = { text: lstLocations[i].name, id: lstLocations[i].locationId };
                     this.items_locations.push(currentItem);
@@ -466,7 +465,7 @@ export class OwnerRequestComponent {
                 console.log("entity:owners", response.data);
 
                 var tmpLstEntities = response.data;
-                this.items_entities = [GlobalConfigs.DEFAULT_SELECT_OPTION.id];
+                this.items_entities = [];
                 for (var i = 0; i < tmpLstEntities.length; i++) {
                     var currentItem = { id: tmpLstEntities[i].entityId, text: tmpLstEntities[i].name };
                     this.items_entities.push(currentItem);
@@ -485,7 +484,7 @@ export class OwnerRequestComponent {
             this._assetService.getAssets().subscribe((assets) => {
                 var lstAssets = assets.data;
 
-                this.items_assets = [GlobalConfigs.DEFAULT_SELECT_OPTION.id];
+                this.items_assets = [];
                 for (var i = 0; i < lstAssets.length; i++) {
                     var currentItem = { text: lstAssets[i].name, id: lstAssets[i].assetId };
                     this.items_assets.push(currentItem);
@@ -509,7 +508,7 @@ export class OwnerRequestComponent {
                     console.log(lstUsers);
 
                     // clear assignee list
-                    this.items_assignees = [GlobalConfigs.DEFAULT_SELECT_OPTION.id];
+                    this.items_assignees = [];
                     for (var i = 0; i < lstUsers.length; i++) {
                         var currentItem = { text: lstUsers[i].fullname, id: lstUsers[i].userId };
                         this.items_assignees.push(currentItem);
@@ -529,7 +528,7 @@ export class OwnerRequestComponent {
                     console.log(lstUsers);
 
                     // clear assignee list
-                    this.items_assignees = [GlobalConfigs.DEFAULT_SELECT_OPTION.id];
+                    this.items_assignees = [];
                     for (var i = 0; i < lstUsers.length; i++) {
                         var currentItem = { text: lstUsers[i].fullname, id: lstUsers[i].userId };
                         this.items_assignees.push(currentItem);
@@ -549,7 +548,7 @@ export class OwnerRequestComponent {
                     console.log(lstUsers);
 
                     // clear assignee list
-                    this.items_assignees = [GlobalConfigs.DEFAULT_SELECT_OPTION.id];
+                    this.items_assignees = [];
                     for (var i = 0; i < lstUsers.length; i++) {
                         var currentItem = { text: lstUsers[i].fullname, id: lstUsers[i].userId };
                         this.items_assignees.push(currentItem);
@@ -860,11 +859,6 @@ export class OwnerRequestComponent {
     selectedSelectBoxValue(field, event) {
         console.log("selectedSelectBoxValue", field, event);
 
-        if (event.id == GlobalConfigs.DEFAULT_SELECT_OPTION.id) {
-            this.removeSelectBoxValue(field, event);
-            return;
-        }
-
         // handle every possible field here
         switch (field.toLowerCase()) {
             case 'selected_priority': this.selected_priority.setValue(event); break;
@@ -880,6 +874,8 @@ export class OwnerRequestComponent {
 
     touchSelectBox(field, event) {
         console.log("touchSelectBox", field, event);
+        if (!event) return;
+
         switch (field.toLowerCase()) {
             case 'selected_priority': this.selected_priority.markAsTouched(); break;
             case 'selected_category': this.selected_category.markAsTouched(); break;

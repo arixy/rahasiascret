@@ -13,6 +13,7 @@ import { saveAs } from 'file-saver';
 import { GlobalConfigs } from '../../global.state';
 import { GrowlMessage, MessageLabels, MessageSeverity } from '../../popup-notification';
 
+import { DialogsService } from './../../services/dialog.service';
 @Component({
   selector: 'utility-uom',
   templateUrl: './utility-uom.component.html',
@@ -70,7 +71,8 @@ export class UtilityUom {
   	constructor(
 		public fb: FormBuilder,
 		public cdr: ChangeDetectorRef,
-		public utilityUomService: UtilityUomService
+        public utilityUomService: UtilityUomService,
+        private _dialogService: DialogsService
 		) {
 			
 			this.subscription=this.utilityUomService.eventEmitted$.subscribe(event=>{
@@ -116,7 +118,14 @@ export class UtilityUom {
     public deleteUtilityUom(event){
 		this.deleteConfirm= event;
 		this.delete_name= event.name;
-		this.deleteModal.show();
+		//this.deleteModal.show();
+        this._dialogService.confirmDelete(event.name, '').subscribe(
+            (response) => {
+                if (response == true) {
+                    this.saveDelete();
+                }
+            }
+        );
 	}
 	public saveDelete(){
 		this.submitLoadingUtility=true;
@@ -131,6 +140,7 @@ export class UtilityUom {
 	}
 
     public addUtilityUom(){
+        this.clearFormInput(this.form);
         this.addNewModal.show();
     }
     

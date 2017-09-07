@@ -19,10 +19,9 @@ import { GlobalState, GlobalConfigs, WorkOrderStatuses, WorkflowActions } from '
 @Component({
     selector: 'print-wo',
     templateUrl: './print-wo.component.html',
-    encapsulation: ViewEncapsulation.Native
 })
 export class PrintWOComponent implements OnDestroy {
-    private dataModel;
+    private dataModel: any = {};
 
     @Input("workOrderId")
     public workOrderIdParam;

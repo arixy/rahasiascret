@@ -43,14 +43,24 @@
                             </div>
                     </template>
             </p-column>
-           <p-column field="utilityUomId" header="Utility UOM ID" [style]="{'width':'140px'}" [sortable]="true"  class="sortable-custom-icon fa fa-sort"></p-column>
+           <p-column field="utilityUomId" header="Utility UOM ID" [style]="{'width':'140px'}" [sortable]="true"  class="sortable-custom-icon fa fa-sort">
+             <template pTemplate="header">
+               <span class="ui-column-title">Utility UOM ID</span>
+               <sortable-filter-input #filterUtility [dataTable]="dt" field="utilityUomId" [disabled]="isLoadingUtilityUOM" (onFilter)="onFilterUtility($event)"></sortable-filter-input>
+             </template>
+           </p-column>
            <p-column field="name" [style]="{'width':'280px'}" [sortable]="true"  >
                 <template pTemplate="header">
                   <span class="ui-column-title">Name </span>
                   <sortable-filter-input #filterUtility [dataTable]="dt" field="name" [disabled]="isLoadingUtilityUOM" (onFilter)="onFilterUtility($event)"></sortable-filter-input>                  
                 </template>
            </p-column>
-           <p-column field="description" header="Description" ></p-column>
+           <p-column field="description" header="Description" [sortable]="true">
+             <template pTemplate="header">
+               <span class="ui-column-title">Description</span>
+               <sortable-filter-input #filterUtility [dataTable]="dt" field="description" [disabled]="isLoadingUtilityUOM" (onFilter)="onFilterUtility($event)"></sortable-filter-input>
+             </template>
+           </p-column>
         </p-dataTable>
     </ba-card>
     </div>
@@ -63,7 +73,7 @@
           <span aria-hidden="true">&times;</span>
         </button>
         <h4 class="modal-title">Add New Utility UOM</h4>
-		  <hr/>
+		  <!--<hr/>-->
       </div>
       <div class="modal-body">
         <div>
@@ -138,7 +148,7 @@
           <span aria-hidden="true">&times;</span>
         </button>
 		  <h4 class="modal-title">{{viewEditUtilityTittle}}</h4>
-		  <hr/>
+		  <!--<hr/>-->
       </div>
       <div class="modal-body">
         <div>

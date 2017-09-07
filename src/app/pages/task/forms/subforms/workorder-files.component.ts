@@ -1,4 +1,4 @@
-﻿import { Component, Input, Output, ChangeDetectorRef, ViewChild, ViewEncapsulation, EventEmitter } from '@angular/core';
+﻿import { Component, Input, Output, ChangeDetectorRef, ViewChild, ViewEncapsulation, EventEmitter, SimpleChanges } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import { FormGroup, AbstractControl, FormBuilder, Validators, ValidatorFn } from '@angular/forms';
@@ -24,7 +24,7 @@ import { WorkflowActions, WorkOrderStatuses } from '../../../../global.state';
 export class WorkOrderFilesComponent {
     @Input('existingFiles')
     @Output('existingFiles')
-    private existingFiles;
+    private existingFiles = [];
 
     @Input('existingPhotos')
     @Output('existingPhotos')
@@ -59,6 +59,27 @@ export class WorkOrderFilesComponent {
         if (this.existingPhotos == null) this.existingPhotos = [];
     }
 
+    ngOnChanges(changes: SimpleChanges) {
+        
+        if (changes['existingPhotos'] != null) {
+            if (this.existingPhotos.length > 0) {
+                console.log("existingPhotos");
+                this.existingPhotos.forEach(file => {
+                    console.log("existingPhotos", file);
+                    this._taskService.getImageById(file.workOrderPhotoId).subscribe((response) => {
+                        let blobData: Blob = new Blob([response.blob()], { type: response.headers.get('Content-Type') });
+                        var reader = new FileReader();
+                        reader.onload = function (e) {
+                            //window.open(reader.result);
+                            file.blob = reader.result;
+                        }
+                        reader.readAsDataURL(blobData);
+                    });
+                });
+            }
+        }
+    }
+
     filterActiveFiles(file) {
         return file.isActive;
     }
@@ -83,7 +104,7 @@ export class WorkOrderFilesComponent {
     }
 
     onSelectPhoto(event) {
-        console.log(event);
+        console.log("selected photo", event);
         for (var i = 0; i < event.files.length; i++) {
             var file = event.files[i];
             var tmpPhoto = {
@@ -92,8 +113,19 @@ export class WorkOrderFilesComponent {
                 path: "", // image blob url is stored in 'file.objectURL.changingThisBreaksApplicationSecurity'
                 notes: "",
                 isActive: true,
-                actualFile: file
+                actualFile: file,
+                blob: null
             };
+
+            //let blobData: Blob = new Blob([file.objectURL.changingThisBreaksApplicationSecurity], { type: file.type });
+            //console.log("blobdata", blobData);
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                //console.log("img blob", reader.result);
+                tmpPhoto.blob = reader.result;
+            }
+            reader.readAsDataURL(file);
+
             this.existingPhotos.unshift(tmpPhoto);
         }
     }
@@ -143,15 +175,48 @@ export class WorkOrderFilesComponent {
     //    }
     //}
 
-    downloadPhoto(file) {
-        this._taskService.getImageById(file.workOrderPhotoId).subscribe((response) => {
-            let blobData: Blob = new Blob([response.blob()], { type: response.headers.get('Content-Type') });
-            var reader = new FileReader();
-            reader.onload = function (e) {
-                window.open(reader.result);
+    base64toBlob(base64Data, contentType) {
+        contentType = contentType || '';
+        var sliceSize = 1024;
+        var byteCharacters = atob(base64Data);
+        var bytesLength = byteCharacters.length;
+        var slicesCount = Math.ceil(bytesLength / sliceSize);
+        var byteArrays = new Array(slicesCount);
+
+        for (var sliceIndex = 0; sliceIndex < slicesCount; ++sliceIndex) {
+            var begin = sliceIndex * sliceSize;
+            var end = Math.min(begin + sliceSize, bytesLength);
+
+            var bytes = new Array(end - begin);
+            for (var offset = begin, i = 0; offset < end; ++i, ++offset) {
+                bytes[i] = byteCharacters[offset].charCodeAt(0);
             }
-            reader.readAsDataURL(blobData);
-        });
+            byteArrays[sliceIndex] = new Uint8Array(bytes);
+        }
+        return new Blob(byteArrays, { type: contentType });
+    }
+
+    downloadPhoto(file) {
+        //this._taskService.getImageById(file.workOrderPhotoId).subscribe((response) => {
+        //    let blobData: Blob = new Blob([response.blob()], { type: response.headers.get('Content-Type') });
+        //    var reader = new FileReader();
+        //    reader.onload = function (e) {
+        //        window.open(reader.result);
+        //        file.blob = reader.result;
+        //    }
+        //    reader.readAsDataURL(blobData);
+        //});
+
+        //window.open(file.blob);
+        let blobInfo = (<string>file.blob).substring(0, (<string>file.blob).indexOf(','));
+        let blobData = (<string>file.blob).substring((<string>file.blob).indexOf(',') + 1);
+        let blob: Blob = this.base64toBlob(blobData, blobInfo.substring(blobInfo.indexOf(':') + 1, blobInfo.indexOf(';')));
+        saveAs(blob, file.name);
+
+        //let win: any = window.open('', '_blank');
+        //win.document.open();
+        //win.document.write(file.blob);
+        //win.document.close();
     }
 
     downloadFile(file) {

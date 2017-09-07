@@ -13,7 +13,7 @@
     </div>
     <ba-card title="" baCardClass="with-scroll">
        <spinner *ngIf="dataLoading"></spinner>
-        <p-dataTable #dt [value]="expenses" [lazy]="true" (onLazyLoad)="refresh(filter_master, dt)" [rows]="10" [paginator]="true" [totalRecords]="totalRecords" sortField="dateUpdated" sortOrder="-1" styleClass="custom-filter-datatable">
+        <p-dataTable #dt [value]="expenses" [lazy]="true" (onLazyLoad)="refresh(filter_master, dt)" [rows]="10" [paginator]="true" [totalRecords]="totalRecords" sortField="dateUpdated" sortOrder="-1" styleClass="custom-filter-datatable custom-dropdown-datatable">
           <p-header>
             <div class="ui-helper-clearfix">
                 <button type="button" iconPos="left" label="CSV" (click)="dt.exportCSV()" style="float:left" class="btn-export__csv">

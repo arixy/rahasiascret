@@ -26,7 +26,7 @@
                      [disabled]="lsbUtilityType.disabled"
                      (removed)="removeSelectBoxValue('lsbUtilityType', $event)"
                      (selected)="selectedSelectBoxValue('lsbUtilityType', $event)"
-                     (mousedown)="touchSelectBox('lsbUtilityType', $event)"
+                     (opened)="touchSelectBox('lsbUtilityType', $event)"
                      placeholder="No Type selected">
           </ng-select>
         </div>
@@ -49,7 +49,7 @@
                      [disabled]="lsbUOM.disabled"
                      (removed)="removeSelectBoxValue('lsbUOM', $event)"
                      (selected)="selectedSelectBoxValue('lsbUOM', $event)"
-                     (mousedown)="touchSelectBox('lsbUOM', $event)"
+                     (opened)="touchSelectBox('lsbUOM', $event)"
                      placeholder="No UOM selected">
           </ng-select>
         </div>

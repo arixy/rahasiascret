@@ -40,7 +40,6 @@ export class PreventiveRequestComponent {
 
     // const
     private _yearRange = GlobalConfigs.yearRange;
-    private _defaultSelectOption = GlobalConfigs.DEFAULT_SELECT_OPTION;
 
     // flag to disable almost all form
     public disabled = false;
@@ -275,7 +274,7 @@ export class PreventiveRequestComponent {
                 console.log("repeat options response", response.data);
 
                 var tmpLstRepeats = response.data;
-                this.items_repeats = [GlobalConfigs.DEFAULT_SELECT_OPTION];
+                this.items_repeats = [];
                 for (var i = 0; i < tmpLstRepeats.length; i++) {
                     var currentItem = { id: tmpLstRepeats[i].repeatOptionId, text: tmpLstRepeats[i].name };
                     this.items_repeats.push(currentItem);
@@ -289,7 +288,7 @@ export class PreventiveRequestComponent {
                 console.log("period durations response", response.data);
 
                 var tmpLstDurations = response.data;
-                this.items_period_duration = [GlobalConfigs.DEFAULT_SELECT_OPTION];
+                this.items_period_duration = [];
                 for (var i = 0; i < tmpLstDurations.length; i++) {
                     var currentItem = { id: tmpLstDurations[i].periodDurationId, text: tmpLstDurations[i].name };
                     this.items_period_duration.push(currentItem);
@@ -303,7 +302,7 @@ export class PreventiveRequestComponent {
                 console.log("priorities", response.data);
 
                 var tmpLstPriorities = response.data;
-                this.items_priorities = [GlobalConfigs.DEFAULT_SELECT_OPTION];
+                this.items_priorities = [];
                 for (var i = 0; i < tmpLstPriorities.length; i++) {
                     var currentItem = { id: tmpLstPriorities[i].woPriorityId, text: tmpLstPriorities[i].name };
                     this.items_priorities.push(currentItem);
@@ -317,7 +316,7 @@ export class PreventiveRequestComponent {
                 console.log("categories response", response.data);
 
                 var tmpLstCategories = response.data;
-                this.items_categories = [GlobalConfigs.DEFAULT_SELECT_OPTION];
+                this.items_categories = [];
                 for (var i = 0; i < tmpLstCategories.length; i++) {
                     var currentItem = { id: tmpLstCategories[i].woCategoryId, text: tmpLstCategories[i].name };
                     this.items_categories.push(currentItem);
@@ -330,7 +329,7 @@ export class PreventiveRequestComponent {
             this._locationService.getLocationsLeaf().subscribe((locations) => {
                 console.log("location response", locations);
                 var lstLocations = locations.data;
-                this.items_locations = [GlobalConfigs.DEFAULT_SELECT_OPTION];
+                this.items_locations = [];
                 for (var i = 0; i < lstLocations.length; i++) {
                     this.items_locations.push({ text: lstLocations[i].name, id: lstLocations[i].locationId });
                 }
@@ -343,7 +342,7 @@ export class PreventiveRequestComponent {
             this._assetService.getAssets().subscribe((assets) => {
                 var lstAssets = assets.data;
 
-                this.items_assets = [GlobalConfigs.DEFAULT_SELECT_OPTION];
+                this.items_assets = [];
                 for (var i = 0; i < lstAssets.length; i++) {
                     this.items_assets.push({ text: lstAssets[i].name, id: lstAssets[i].assetId });
                 }
@@ -465,7 +464,7 @@ export class PreventiveRequestComponent {
                     console.log("repeat options response", response.data);
 
                     var tmpLstRepeats = response.data;
-                    this.items_repeats = [GlobalConfigs.DEFAULT_SELECT_OPTION];
+                    this.items_repeats = [];
                     for (var i = 0; i < tmpLstRepeats.length; i++) {
                         var currentItem = { id: tmpLstRepeats[i].repeatOptionId, text: tmpLstRepeats[i].name };
                         this.items_repeats.push(currentItem);
@@ -484,7 +483,7 @@ export class PreventiveRequestComponent {
                     console.log("period durations response", response.data);
 
                     var tmpLstDurations = response.data;
-                    this.items_period_duration = [GlobalConfigs.DEFAULT_SELECT_OPTION];
+                    this.items_period_duration = [];
                     for (var i = 0; i < tmpLstDurations.length; i++) {
                         var currentItem = { id: tmpLstDurations[i].periodDurationId, text: tmpLstDurations[i].name };
                         this.items_period_duration.push(currentItem);
@@ -519,7 +518,7 @@ export class PreventiveRequestComponent {
                 console.log("priorities", response.data);
 
                 var tmpLstPriorities = response.data;
-                this.items_priorities = [GlobalConfigs.DEFAULT_SELECT_OPTION];
+                this.items_priorities = [];
                 for (var i = 0; i < tmpLstPriorities.length; i++) {
                     var currentItem = { id: tmpLstPriorities[i].woPriorityId, text: tmpLstPriorities[i].name };
                     this.items_priorities.push(currentItem);
@@ -538,7 +537,7 @@ export class PreventiveRequestComponent {
                 console.log("categories response", response.data);
 
                 var tmpLstCategories = response.data;
-                this.items_categories = [GlobalConfigs.DEFAULT_SELECT_OPTION];
+                this.items_categories = [];
                 for (var i = 0; i < tmpLstCategories.length; i++) {
                     var currentItem = { id: tmpLstCategories[i].woCategoryId, text: tmpLstCategories[i].name };
                     this.items_categories.push(currentItem);
@@ -556,7 +555,7 @@ export class PreventiveRequestComponent {
             this._locationService.getLocationsLeaf().subscribe((locations) => {
                 console.log("location response", locations);
                 var lstLocations = locations.data;
-                this.items_locations = [GlobalConfigs.DEFAULT_SELECT_OPTION];
+                this.items_locations = [];
                 for (var i = 0; i < lstLocations.length; i++) {
                     var currentItem = { text: lstLocations[i].name, id: lstLocations[i].locationId };
                     this.items_locations.push(currentItem);
@@ -575,7 +574,7 @@ export class PreventiveRequestComponent {
             this._assetService.getAssets().subscribe((assets) => {
                 var lstAssets = assets.data;
 
-                this.items_assets = [GlobalConfigs.DEFAULT_SELECT_OPTION];
+                this.items_assets = [];
                 for (var i = 0; i < lstAssets.length; i++) {
                     var currentItem = { text: lstAssets[i].name, id: lstAssets[i].assetId };
                     this.items_assets.push(currentItem);
@@ -598,7 +597,7 @@ export class PreventiveRequestComponent {
                     console.log(lstUsers);
 
                     // clear assignee list
-                    this.items_assignees = [GlobalConfigs.DEFAULT_SELECT_OPTION];
+                    this.items_assignees = [];
                     for (var i = 0; i < lstUsers.length; i++) {
                         var currentItem = { text: lstUsers[i].fullname, id: lstUsers[i].userId };
                         this.items_assignees.push(currentItem);
@@ -618,7 +617,7 @@ export class PreventiveRequestComponent {
                     console.log(lstUsers);
 
                     // clear assignee list
-                    this.items_assignees = [GlobalConfigs.DEFAULT_SELECT_OPTION];
+                    this.items_assignees = [];
                     for (var i = 0; i < lstUsers.length; i++) {
                         var currentItem = { text: lstUsers[i].fullname, id: lstUsers[i].userId };
                         this.items_assignees.push(currentItem);
@@ -638,7 +637,7 @@ export class PreventiveRequestComponent {
                     console.log(lstUsers);
 
                     // clear assignee list
-                    this.items_assignees = [GlobalConfigs.DEFAULT_SELECT_OPTION];
+                    this.items_assignees = [];
                     for (var i = 0; i < lstUsers.length; i++) {
                         var currentItem = { text: lstUsers[i].fullname, id: lstUsers[i].userId };
                         this.items_assignees.push(currentItem);
@@ -1011,11 +1010,6 @@ export class PreventiveRequestComponent {
     selectedSelectBoxValue(field, event) {
         console.log("selectedSelectBoxValue", field, event);
 
-        if (event.id == GlobalConfigs.DEFAULT_SELECT_OPTION.id) {
-            this.removeSelectBoxValue(field, event);
-            return;
-        }
-
         // handle every possible field here
         switch (field.toLowerCase()) {
             case 'selected_priority': this.selected_priority.setValue(event); break;
@@ -1038,6 +1032,8 @@ export class PreventiveRequestComponent {
 
     touchSelectBox(field, event) {
         console.log("touchSelectBox", field, event);
+        if (!event) return;
+
         switch (field.toLowerCase()) {
             case 'selected_repeat': {
                 this.selected_repeat.markAsTouched();
@@ -1156,7 +1152,7 @@ export class PreventiveRequestComponent {
         console.log("validateRepeat", input);
         if (this.actionType.workflowActionId == WorkflowActions.CREATE
             || (this.actionType.workflowActionId == WorkflowActions.EDIT && this.isSchedule)) {
-            if (input.value == null || input.value == "" || input.value.id == null || input.value.id == GlobalConfigs.DEFAULT_SELECT_OPTION.id) {
+            if (input.value == null || input.value == "") {
                 return { required: true };
             }
         }
@@ -1185,7 +1181,7 @@ export class PreventiveRequestComponent {
             || (this.actionType.workflowActionId == WorkflowActions.EDIT && this.isSchedule)) {
             // if selected repeat is EVERY
             if (this.selected_repeat != null && this.selected_repeat.value != null && this.selected_repeat.value.id == 6) {
-                if (input.value == null || input.value == "" || input.value.id == null || input.value.id == GlobalConfigs.DEFAULT_SELECT_OPTION.id) {
+                if (input.value == null || input.value == "") {
                     return { required: true };
                 }
             }
@@ -1197,7 +1193,7 @@ export class PreventiveRequestComponent {
     validateDuePeriod(input: FormControl) {
         if (this.actionType.workflowActionId == WorkflowActions.CREATE
             || (this.actionType.workflowActionId == WorkflowActions.EDIT && this.isSchedule)) {
-            if (input.value == null || input.value == "" || input.value.id == null || input.value.id == GlobalConfigs.DEFAULT_SELECT_OPTION.id) {
+            if (input.value == null || input.value == "") {
                 return { required: true };
             }
         }

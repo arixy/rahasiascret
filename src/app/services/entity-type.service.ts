@@ -5,13 +5,14 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/observable/of';
 
+import { GlobalConfigs } from '../global.state';
 @Injectable()
 export class EntityTypeService{
   private location_data: any;
 
   redirectUrl: string;
     
-    private appUrl = 'http://ec2-52-40-147-30.us-west-2.compute.amazonaws.com/api/v1/lookup/';
+  private appUrl = GlobalConfigs.APP_BASE_URL + '/lookup/';
 
   constructor(private http: Http){
 

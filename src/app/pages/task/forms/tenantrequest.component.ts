@@ -880,6 +880,9 @@ export class TenantRequestComponent {
 
     touchSelectBox(field, event) {
         console.log("touchSelectBox", field, event);
+
+        if (!event) return;
+
         switch (field.toLowerCase()) {
             case 'selected_priority': this.selected_priority.markAsTouched(); break;
             case 'selected_category': this.selected_category.markAsTouched(); break;

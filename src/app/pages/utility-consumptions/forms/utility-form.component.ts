@@ -200,6 +200,7 @@ export class UtilityFormComponent {
 
     touchSelectBox(field, event) {
         console.log("touchSelectBox", field, event);
+        if (!event) return;
         switch (field) {
             case 'lsbUtilityType': this.lsbUtilityType.markAsTouched(); break;
             case 'lsbUOM': this.lsbUOM.markAsTouched(); break;

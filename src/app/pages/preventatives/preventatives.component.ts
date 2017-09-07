@@ -401,7 +401,7 @@ export class Preventatives {
         
         
         // change modal title
-        this.modalTitle = "Create " + selectedType.label;
+        this.modalTitle = "Add New " + selectedType.label;
 
         if (this.selectedWoType.id == this.SINGLE_TIME_REQUEST) {
             this.currentOpenModal = this.createNewSingleRequestComponent(this.viewModalBody, SingleRequestComponent);

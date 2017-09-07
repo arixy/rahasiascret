@@ -158,11 +158,12 @@ export class RoleComponent {
 	}
 
     public addRole(){
+        this.clearFormInput(this.form);
         this.addNewModal.show();
     }
 
     public refreshRole($event, table){
-        console.log();
+        this.errMsg = [];
 		this.getAllRole(this.builderFilterRole(table,this.roleFilterMaster));
     }
 

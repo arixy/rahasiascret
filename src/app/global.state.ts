@@ -43,10 +43,20 @@ export class GlobalState {
 }
 
 export class GlobalConfigs {
-    public static readonly APP_BASE_URL = "http://ec2-52-40-147-30.us-west-2.compute.amazonaws.com/api/v1";
-    public static readonly APP_MASTER_URL = "http://ec2-52-40-147-30.us-west-2.compute.amazonaws.com/api/v1/master";
-    public static readonly APP_AUTH_URL = "http://ec2-52-40-147-30.us-west-2.compute.amazonaws.com/api/v1/auth";
+    // DEMO port
+    private static readonly APP_PORT = "59687"; //"59687";
+    // DEMO server
+    //public static readonly APP_BASE_URL = "http://ec2-52-40-147-30.us-west-2.compute.amazonaws.com:" + GlobalConfigs.APP_PORT + "/api/v1";
+    //public static readonly APP_MASTER_URL = "http://ec2-52-40-147-30.us-west-2.compute.amazonaws.com:" + GlobalConfigs.APP_PORT + "/api/v1/master";
+    //public static readonly APP_AUTH_URL = "http://ec2-52-40-147-30.us-west-2.compute.amazonaws.com:" + GlobalConfigs.APP_PORT + "/api/v1/auth";
 
+    // Dev
+    public static readonly APP_BASE_URL = "http://45.32.120.89:" + GlobalConfigs.APP_PORT + "/api/v1";
+    public static readonly APP_MASTER_URL = "http://45.32.120.89:" + GlobalConfigs.APP_PORT + "/api/v1/master";
+    public static readonly APP_AUTH_URL = "http://45.32.120.89:" + GlobalConfigs.APP_PORT + "/api/v1/auth";
+    //public static readonly APP_BASE_URL = "http://127.0.0.1/api/v1";
+    //public static readonly APP_MASTER_URL = "http://127.0.0.1/api/v1/master";
+    //public static readonly APP_AUTH_URL = "http://127.0.0.1/api/v1/auth";
     // used for ng-prime date picker year range
     public static readonly yearRange = '1970:2100';
     public static readonly DEFAULT_ITEM_PER_PAGE = 10;

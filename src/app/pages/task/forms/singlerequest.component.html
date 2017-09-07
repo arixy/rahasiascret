@@ -77,11 +77,12 @@
 
         <div class="col-xg-10">
           <ng-select #addCategorySelectBox
+                      [allowClear]="true"
                       [items]="items_categories"
                       [disabled]="disabled || selected_category.disabled"
                       (removed)="removeSelectBoxValue('selected_category', $event)"
                       (selected)="selectedSelectBoxValue('selected_category', $event)"
-                      (mousedown)="touchSelectBox('selected_category', $event)"
+                      (opened)="touchSelectBox('selected_category', $event)"
                       placeholder="No Category selected">
           </ng-select>
         </div>
@@ -100,11 +101,12 @@
 
         <div class="col-xg-10">
           <ng-select #addPrioritySelectBox
+                     [allowClear]="true"
                       [items]="items_priorities"
                       [disabled]="disabled || selected_priority.disabled"
                       (removed)="removeSelectBoxValue('selected_priority', $event)"
                       (selected)="selectedSelectBoxValue('selected_priority', $event)"
-                      (mousedown)="touchSelectBox('selected_priority', $event)"
+                      (opened)="touchSelectBox('selected_priority', $event)"
                       placeholder="No Priority selected">
           </ng-select>
         </div>
@@ -123,11 +125,12 @@
 
         <div class="col-xg-10">
           <ng-select #addLocationSelectBox
+                     [allowClear]="true"
                       [items]="items_locations"
                       [disabled]="disabled || selected_location.disabled"
                       (removed)="removeSelectBoxValue('selected_location', $event)"
                       (selected)="selectedSelectBoxValue('selected_location', $event)"
-                      (mousedown)="touchSelectBox('selected_location', $event)"
+                      (opened)="touchSelectBox('selected_location', $event)"
                       placeholder="No Location selected">
           </ng-select>
         </div>
@@ -190,6 +193,7 @@
 
         <div class="col-xg-10">
           <ng-select #addAssetSelectBox
+                     [allowClear]="true"
                       [items]="items_assets"
                       [disabled]="disabled || selected_asset.disabled"
                       (removed)="removeSelectBoxValue('selected_asset', $event)"
@@ -211,6 +215,7 @@
 
         <div class="col-xg-10">
           <ng-select #addAssigneeSelectBox
+                     [allowClear]="true"
                       [items]="items_assignees"
                       [disabled]="selected_assignee.disabled"
                       (removed)="removeSelectBoxValue('selected_assignee', $event)"
@@ -296,6 +301,7 @@
         <label for="selected_priority" class="col-xg-2 control-label">Vendor</label>
         <div class="col-xg-10">
           <ng-select #addVendorSelectBox
+                     [allowClear]="true"
                       [items]="items_vendors"
                       [disabled]="disabled || selected_vendor.disabled"
                       (removed)="removeSelectBoxValue('selected_vendor', $event)"
