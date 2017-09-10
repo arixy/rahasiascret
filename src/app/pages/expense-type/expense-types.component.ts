@@ -7,6 +7,7 @@ import * as moment from 'moment';
 import { ExpenseTypeService } from './expense-type.service';
 import { DataTable } from 'primeng/primeng';
 import { DialogsService } from './../../services/dialog.service';
+import { GrowlMessage, MessageSeverity, MessageLabels } from '../../popup-notification';
 
 @Component({
   selector: 'expense-types',
@@ -31,10 +32,11 @@ export class ExpenseType {
 	deleteConfirm;
 	delete_name;
     
-    error_from_server = null;
+    error_from_server = [];
 
     add_form_submitted = false;
     edit_form_submitted = false;
+    disabled = false;
 
     // Filtering
     filter_name_fc = new FormControl();
@@ -53,6 +55,7 @@ export class ExpenseType {
 
     // Loading State
     dataLoading = false;
+    submitLoading = false;
 
     @ViewChild('addNewModal') addNewModal: ModalDirective;
     @ViewChild('editModal') editModal: ModalDirective;
@@ -206,7 +209,19 @@ export class ExpenseType {
 	    this.expenseTypeService.deleteExpenseType(this.deleteConfirm.expenseTypeId).subscribe(
             (data) => {
                 console.log('Return Data', data);
-                this.refresh(this.filter_master, this.expenseTypesTable);
+                if(data.resultCode.code == 0){
+                    // Growl Message Success
+                    GrowlMessage.addMessage(MessageSeverity.SUCCESS, MessageLabels.DELETE_SUCCESS);
+                    this.refresh(this.filter_master, this.expenseTypesTable);    
+                } else {
+                    // Error
+                    let error_delete = [];
+                    error_delete = error_delete.concat(data.resultCode.message);
+                    GrowlMessage.addMessage(MessageSeverity.ERROR, MessageLabels.DELETE_ERROR + '. ' + error_delete[0]);
+                    
+                }
+
+                
             }
             );
 		this.deleteModal.hide();
@@ -219,6 +234,9 @@ export class ExpenseType {
 	}
     public editExpenseType(event){
         console.log('editing', event);
+        
+        this.disabled = false;
+        this.edit_form.enable();
         
 		this.expense_edit = event.expenseTypeId;
 		// Inject Initial Value to the Edit Form
@@ -234,30 +252,69 @@ export class ExpenseType {
          this.editModal.show();
     }
 
+    public viewExpenseType(event){
+        console.log('Viewing', event);
+        
+		this.expense_edit = event.expenseTypeId;
+		// Inject Initial Value to the Edit Form
+        this.edit_form.patchValue(
+			{ 
+				edit_name: event.name,
+				edit_description: event.description
+			
+			}
+		);
+		// Disable Form
+        this.edit_form.disable();
+        this.disabled = true;
+        // Display Form Modal
+         this.editModal.show();
+    }
+
 	public onSubmit(values){
 		this.submitted = true;
         this.add_form_submitted = true;
         
 	   	console.log('create component');
 			if (this.form.valid) {
-				console.log(values);
-				// your code goes here
+                
+                this.submitLoading = true;
 				this.expenseTypeService.addExpenseType(values).subscribe(
 				(data) => {
 					console.log('Return Data test', data);
+					this.submitLoading = false;
+                    if(data.resultCode.code == 0){
+                        // Clear all input in the form
+                        this.clearFormInputs(this.form);
+                        
+                        this.addNewModal.hide();
+                        
+                        // Success Message
+                        GrowlMessage.addMessage(MessageSeverity.SUCCESS, MessageLabels.SAVE_SUCCESS);
+                        
+                        this.refresh(this.filter_master, this.expenseTypesTable);
+                        
+                        
+                    } else {
+                        
+                        // Error
+                        this.error_from_server = [];
+                        this.error_from_server = this.error_from_server.concat(data.resultCode.message);
+                    }
 					
-					this.refresh(this.filter_master, this.expenseTypesTable);
 				}
 			);
 
-			this.addNewModal.hide();
+			
 
 		}
     }
   	public onSubmitEdit(values,event){
 		console.log('edit form',values);
         this.edit_form_submitted = true;
+        
 		if(this.edit_form.valid){
+            this.submitLoading = true;
 			 var formatted_object = Object.assign({}, {
                id: this.expense_edit,
                 name: values.edit_name,
@@ -266,6 +323,7 @@ export class ExpenseType {
 			
 			 let response = this.expenseTypeService. updateExpenseType(formatted_object).subscribe(
                 (data) => {
+                    this.submitLoading = false;
                     console.log('Response Data', data);
                     this.editModal.hide();
 

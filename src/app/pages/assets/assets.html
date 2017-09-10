@@ -82,7 +82,7 @@
                        Date Updated
                    </template>
                     <template let-node="rowData" pTemplate="body">
-                        {{node.data.dateUpdated | date: 'shortDate'}}
+                        {{node.data.dateUpdated | date: 'y-MM-dd HH:mm'}}
                     </template>
                 </p-column>
                 <p-column [style]="{'width':'180px'}" styleClass="col-button">
@@ -200,7 +200,7 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <button class="close" aria-label="Close" (click)="hideModal()">
+        <button class="close" aria-label="Close" (click)="cancel()">
           <span aria-hidden="true">&times;</span>
         </button>
         <h4 class="modal-title">Add New Asset</h4>
@@ -216,6 +216,7 @@
       <div class="modal-body">
         <div>
             <ba-card title="" baCardClass="with-scroll custom-card">
+             <spinner *ngIf="submitLoading"></spinner>
               <form [formGroup]="form" (ngSubmit)="onSubmit(form.value)" class="form-horizontal">
               <p-tabView>
                   <p-tabPanel #addGeneralTab header="General">
@@ -328,6 +329,7 @@
                                          [allowClear]="true"
                                           [items]="items_asset"
                                           [disabled]="disabled"
+                                          (removed)="removedParentAsset($event)"
                                           (selected)="selectedAsset($event)"
                                           placeholder="No Location selected">
                               </ng-select>
@@ -393,6 +395,7 @@
       <div class="modal-body">
         <div>
             <ba-card title="" baCardClass="with-scroll custom-card">
+             <spinner *ngIf="submitLoading"></spinner>
               <form [formGroup]="editForm" (ngSubmit)="onSubmitEdit(editForm.value, $event)" class="form-horizontal">
                     <p-tabView>
                        <p-tabPanel #editGeneralTab header="General">

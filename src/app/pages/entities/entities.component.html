@@ -75,7 +75,7 @@
         <button class="close" aria-label="Close" (click)="cancel()">
           <span aria-hidden="true">&times;</span>
         </button>
-        <h4 class="modal-title">ADD NEW {{current_entity_type_name}}</h4>
+        <h4 class="modal-title">Add New {{current_entity_type_name}}</h4>
           <div *ngIf="error_from_server" class="error-from-server">
               <i class="fa fa-exclamation-circle"></i> {{error_from_server}}
           </div>
@@ -83,6 +83,7 @@
       <div class="modal-body">
         <div>
             <ba-card title="" baCardClass="with-scroll custom-card">
+             <spinner *ngIf="submitLoading"></spinner>
               <form [formGroup]="form" (ngSubmit)="onSubmit(form.value)" class="form-horizontal">
               <div class="modal-form-container">
               <div class="form-group row" [ngClass]="{'has-error': (!name.valid && name.touched), 'has-success': (name.valid && name.touched)}">
@@ -117,7 +118,7 @@
               <div class="form-group row">
                 <div class="col-sm-12">
                  <label for="inputPassword3">Address 1</label>
-                  <input [formControl]="address1" type="text" class="form-control" id="inputPassword3" placeholder="address 1">
+                  <input [formControl]="address1" type="text" class="form-control" id="inputPassword3" placeholder="Address 1">
                 </div>
               </div>
               <div class="row error-row">
@@ -127,24 +128,23 @@
                       Address is required
                     </div>
               </div>
+              <div class="form-group row">
+                <div class="col-sm-12">
+                 <label for="inputPassword3">Address 2</label>
+                  <input [formControl]="address2" type="text" class="form-control" id="inputPassword3" placeholder="Address 2">
+                </div>
+              </div>
 			 <div class="form-group row">
 
                 <div class="col-sm-12">
-                 <label for="inputPassword3">Contact</label>
-                  <input [formControl]="contact_person" type="text" class="form-control" id="inputPassword3" placeholder="contact person">
+                 <label for="inputPassword3">Contact Person</label>
+                  <input [formControl]="contact_person" type="text" class="form-control" id="inputPassword3" placeholder="Contact Person">
                 </div>
-              </div>
-              <div class="row error-row">
-                    <div
-                      class="error-message col-sm-12"
-                      *ngIf="form.get('contact_person').hasError('required') && add_form_submitted">
-                      Contact Person is required
-                    </div>
               </div>	
 			 <div class="form-group row">
                 <div class="col-sm-12">
-                 <label>Phone</label>
-                  <input [formControl]="phone1" type="text" class="form-control" id="inputPassword3" placeholder="phone">
+                 <label>Phone 1</label>
+                  <input [formControl]="phone1" type="text" class="form-control" id="inputPassword3" placeholder="Phone 1">
                 </div>
               </div>
               <div class="row error-row">
@@ -153,6 +153,18 @@
                       *ngIf="form.get('phone1').hasError('required') && add_form_submitted">
                       Phone is required
                     </div>
+              </div>
+              <div class="form-group row">
+                <div class="col-sm-12">
+                 <label>Phone 2</label>
+                  <input [formControl]="phone2" type="text" class="form-control" id="inputPassword3" placeholder="Phone 2">
+                </div>
+              </div>
+              <div class="form-group row">
+                <div class="col-sm-12">
+                 <label>Phone 3</label>
+                  <input [formControl]="phone3" type="text" class="form-control" id="inputPassword3" placeholder="Phone 3">
+                </div>
               </div>
               <!-- <div *ngIf="items_entity_type" class="form-group row select-container">
                  <label for="selectlocation" class="col-sm-2 control-label">Entity Type</label>
@@ -207,6 +219,7 @@
       <div class="modal-body">
         <div>
             <ba-card title="" baCardClass="with-scroll custom-card">
+             <spinner *ngIf="submitLoading"></spinner>
               <form [formGroup]="edit_form" (ngSubmit)="onSubmitEdit(edit_form.value, $event)" class="form-horizontal">
               <div class="modal-form-container">
               <div class="form-group row">
@@ -238,7 +251,7 @@
               <div class="form-group row">
                 <div class="col-sm-12">
                  <label for="inputPassword3">Address 1</label>
-                  <input [formControl]="edit_address1" type="text" class="form-control" id="inputPassword3" placeholder="address 1">
+                  <input [formControl]="edit_address1" type="text" class="form-control" id="inputPassword3" placeholder="Address 1">
                 </div>
               </div>
               
@@ -251,21 +264,14 @@
               </div>
 			 <div class="form-group row">
                 <div class="col-sm-12">
-                 <label for="inputPassword3">Contact</label>
-                  <input [formControl]="edit_contact_person" type="text" class="form-control" id="inputPassword3" placeholder="contact person">
+                 <label for="inputPassword3">Contact Person</label>
+                  <input [formControl]="edit_contact_person" type="text" class="form-control" id="inputPassword3" placeholder="contact Person">
                 </div>
-              </div>
-             <div class="row error-row">
-                    <div
-                      class="error-message col-sm-12"
-                      *ngIf="edit_form.get('edit_contact_person').hasError('required') && edit_form_submitted">
-                      Contact is required
-                    </div>
               </div>	
 			 <div class="form-group row">
                 <div class="col-sm-12">
-                  <label for="inputPassword3">Phone</label>
-                  <input [formControl]="edit_phone1" type="text" class="form-control" id="inputPassword3" placeholder="phone">
+                  <label for="inputPassword3">Phone 1</label>
+                  <input [formControl]="edit_phone1" type="text" class="form-control" id="inputPassword3" placeholder="Phone 1">
                 </div>
               </div>
               

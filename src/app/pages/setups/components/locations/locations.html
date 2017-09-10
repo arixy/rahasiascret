@@ -16,7 +16,7 @@
            </div>
       <ba-card title="" baCardClass="with-scroll">
           <spinner *ngIf="dataLoading"></spinner>
-           <p-treeTable class="ui-datatable" [value]="treeLocationsWithData">
+           <p-treeTable class="ui-datatable custom-dropdown-datatable" [value]="treeLocationsWithData">
                <p-header>
             <div class="ui-helper-clearfix">
                 <button type="button" iconPos="left" label="CSV" (click)="exportCSV()" style="float:left" class="btn-export__csv">
@@ -35,7 +35,7 @@
                 <p-column field="name" [filter]="true">
                    <template pTemplate="header">
                        Location Name
-                       <input class="ui-column-filter" type="text"  />
+                       <input [formControl]="filterLocationName" class="ui-column-filter" type="text"  />
                    </template>
                     <template let-node="rowData" pTemplate="body">
                         {{node.data.name}}
@@ -44,7 +44,7 @@
                 <p-column [sortable]="true" field="description">
                    <template pTemplate="header">
                        Description
-                       <input class="ui-column-filter" type="text"  />
+                       <input [formControl]="filterLocationDescription" class="ui-column-filter" type="text"  />
                    </template>
                     <template let-node="rowData" pTemplate="body">
                         {{node.data.description}}
@@ -59,15 +59,15 @@
                         {{node.data.locationId}}
                     </template>
                 </p-column> -->
-                <p-column [style]="{'width':'200px'}" styleClass="top-aligned-table" field="name" [filter]="true">
+                <p-column styleClass="top-aligned-table" field="name" [filter]="true">
                    <template pTemplate="header">
                        Date Updated
                    </template>
                     <template let-node="rowData" pTemplate="body">
-                        {{node.data.dateUpdated | date: 'yyyy-MM-dd'}}
+                        {{node.data.dateUpdated | date: 'y-MM-dd HH:mm'}}
                     </template>
                 </p-column>
-                <p-column styleClass="col-button">
+                <p-column [style]="{'width':'200px'}" styleClass="col-button">
                    <template pTemplate="header">
                         Action
                     </template>
@@ -98,10 +98,19 @@
           <span aria-hidden="true">&times;</span>
         </button>
         <h4 class="modal-title">Add New Location</h4>
+        <div *ngIf="error_from_server.length > 0" class="error-from-server">
+              <i class="fa fa-exclamation-circle"></i>
+              <ul style="margin-bottom: 0px;" class="lst-error">
+                  <li *ngFor="let err of error_from_server">
+                    {{err}}
+                  </li>
+                </ul>
+          </div>
       </div>
       <div class="modal-body">
         <div>
             <ba-card title="" baCardClass="with-scroll custom-card">
+             <spinner *ngIf="submitLoading"></spinner>
               <form [formGroup]="form" (ngSubmit)="onSubmit(form.value)" class="form-horizontal">
                   <div class="modal-form-container">
               <div class="form-group row" [ngClass]="{'has-error': (!name.valid && name.touched), 'has-success': (name.valid && name.touched)}">
@@ -118,13 +127,14 @@
                 </div>
               </div>
               <div class="form-group row select-container">
-                 <div class="col-sm-10">
+                 <div class="col-sm-12">
                      <label>Parent Location</label>
                       <ng-select #addSelectBox
                                  [allowClear]="true"
                                   [items]="items_location"
                                   [disabled]="disabled"
                                   (data)="refreshValue($event)"
+                                  (removed)="removedParentLocation($event)"
                                   (selected)="selectedLocation($event)"
                                   (typed)="typed($event)"
                                   placeholder="No Location selected">
@@ -164,14 +174,21 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <button class="close" aria-label="Close" (click)="hideChildModal()">
+        <button class="close" aria-label="Close" (click)="cancel()">
           <span aria-hidden="true">&times;</span>
         </button>
-        <h4 class="modal-title">Edit Location</h4>
+        <span *ngIf="!disabled">
+            <h4 class="modal-title">Edit Location</h4>
+        </span>
+        
+        <span *ngIf="disabled">
+            <h4 class="modal-title">View Location</h4>
+        </span>
       </div>
       <div class="modal-body">
         <div>
             <ba-card title="" baCardClass="with-scroll custom-card">
+             <spinner *ngIf="submitLoading"></spinner>
               <form [formGroup]="editForm" (ngSubmit)="onSubmitEdit(editForm.value, $event)" class="form-horizontal">
               <div class="modal-form-container">
               <div class="form-group row" [ngClass]="{'has-error': (!name.valid && name.touched), 'has-success': name.valid}">
@@ -217,7 +234,7 @@
                         </span>
                    </div>
                   <div class="col-sm-3 btn-with-icon">
-                    <button type="submit" class="btn btn-default btn-save">
+                    <button *ngIf="!disabled" type="submit" class="btn btn-default btn-save">
                     <i class="icon ion-checkmark"></i>
                         Save
                     </button>
@@ -234,20 +251,20 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-     
+         <div class="content_confirm">
+             <img src="assets/img/lnr-warning.svg">
+            <h3>Delete {{delete_name}}?</h3>    
+		  </div>
       </div>
       <div class="modal-body">
-		  <div class="content_confirm">
-				<h3>Delete {{delete_name}}?</h3>
-                <i class="icon ion-ios-minus-outline"></i>
-		  </div>
+		  
 		  <!-- <p>Please be aware deleted items might not be Recoverable</p> -->
 		  <div class="delete-btn_confirm">
-			  <button (click)="saveDelete()" class="btn-yes">
-				  Yes
-			  </button>
 			  <button (click)="deleteClose()" class="btn-no">
 				  No
+			  </button>
+             <button (click)="saveDelete()" class="btn-yes">
+				  Yes
 			  </button>
           </div>
       </div>

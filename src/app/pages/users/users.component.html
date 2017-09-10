@@ -14,7 +14,7 @@
     </div>
     <ba-card title="" baCardClass="with-scroll">
        <spinner *ngIf="dataLoading"></spinner>
-        <p-dataTable #dt [value]="users" [lazy]="true" (onLazyLoad)="refresh(filter_master, dt)" [rows]="10" [paginator]="true" [totalRecords]="totalRecords" sortField="dateUpdated" sortOrder="-1" styleClass="custom-filter-datatable">
+        <p-dataTable #dt [value]="users" [lazy]="true" (onLazyLoad)="refresh(filter_master, dt)" [rows]="10" [paginator]="true" [totalRecords]="totalRecords" sortField="dateUpdated" sortOrder="-1" styleClass="custom-filter-datatable custom-dropdown-datatable">
           <p-header>
             <div class="ui-helper-clearfix">
                 <button type="button" iconPos="left" label="CSV" (click)="exportCSV()" style="float:left" class="btn-export__csv">
@@ -41,6 +41,7 @@
                                 Action <span class="caret"></span>
                               </button>
                               <ul dropdownMenu role="menu" aria-labelledby="single-button">
+                                <li role="menuitem"><a  class="dropdown-item" (click)="viewUsers(users)">View</a></li>
                                 <li role="menuitem"><a  class="dropdown-item" (click)="editUsers(users)">Edit</a></li>
                                 <li role="menuitem"><a class="dropdown-item" (click)="deleteUsers(users)">Delete</a></li>
                                 <!-- <li role="menuitem"><a class="dropdown-item" (click)="roles(users)">Roles</a></li> -->
@@ -103,15 +104,20 @@
         <button class="close" aria-label="Close" (click)="hideChildModal()">
           <span aria-hidden="true">&times;</span>
         </button>
-        	<h4 class="modal-title">ADD NEW USER</h4>
-        	<hr/>
-        	<div *ngIf="error_from_server" class="error-from-server">
-              <i class="fa fa-exclamation-circle"></i> {{error_from_server}}
+        	<h4 class="modal-title">Add New User</h4>
+        	<div *ngIf="error_from_server.length > 0" class="error-from-server">
+              <i class="fa fa-exclamation-circle"></i>
+              <ul style="margin-bottom: 0px;" class="lst-error">
+                  <li *ngFor="let err of error_from_server">
+                    {{err}}
+                  </li>
+                </ul>
           </div>
       </div>
       <div class="modal-body">
         <div>
             <ba-card title="" baCardClass="with-scroll custom-card">
+             <spinner *ngIf="submitLoading"></spinner>
               <form [formGroup]="form" (ngSubmit)="onSubmit(form.value)" class="form-horizontal">
                   <div class="modal-form-container">
                       <div class="form-group row" [ngClass]="{'has-error': (!username.valid && username.touched), 'has-success': (username.valid && username.touched)}">
@@ -129,14 +135,14 @@
               </div>
 			  <div class="form-group row" [ngClass]="{'has-error': (!fullname.valid && fullname.touched), 'has-success': (fullname.valid && fullname.touched)}">
                 <div class="col-sm-12">
-					<label>Fullname</label>
-					<input [formControl]="fullname" type="text" class="form-control" id="inputEmail3" placeholder="fullname">
+					<label>Full Name</label>
+					<input [formControl]="fullname" type="text" class="form-control" id="inputEmail3" placeholder="Full Name">
                 </div>
               </div>
               <div class="row error-row">
                    <div class="col-sm-12">
                         <div class="error-message col-xg-10" *ngIf="form.get('fullname').hasError('required') && add_form_submitted">
-                              Fullname is required
+                              Full Name is required
                         </div>
                     </div>
               </div>
@@ -179,7 +185,7 @@
                         </div>
                     </div>
               </div>
-              <ba-card title="Users Role" baCardClass="with-scroll role-card">
+              <ba-card title="User's Role" baCardClass="with-scroll role-card">
                  <div class="row error-row">
                    <div class="col-sm-12">
                         <div class="error-message col-xg-10" *ngIf="hasValueError(add_roles).required && add_form_submitted">
@@ -237,12 +243,18 @@
         <button class="close" aria-label="Close" (click)="hideChildModal()">
           <span aria-hidden="true">&times;</span>
         </button>
-        <h4 class="modal-title">Edit Users</h4>
-		  <hr/>
+        <span *ngIf="!disabled">
+            <h4 class="modal-title">Edit Users</h4>
+        </span>
+        
+        <span *ngIf="disabled">
+            <h4 class="modal-title">View Users</h4>
+        </span>
       </div>
       <div class="modal-body">
         <div>
             <ba-card title="" baCardClass="with-scroll custom-card">
+            <spinner *ngIf="submitLoading"></spinner>
              <form [formGroup]="edit_form" (ngSubmit)="onSubmitEdit(edit_form.value , $event)" class="form-horizontal">
              <div class="modal-form-container">
               <div class="form-group row" [ngClass]="{'has-error': (!edit_username.valid && edit_username.touched), 'has-success': (edit_username.valid && edit_username.touched)}">
@@ -260,14 +272,14 @@
               </div>
 				<div class="form-group row">
 				  <div class="col-sm-12">
-					 <label>Fullname</label>
-					  <input [formControl]="edit_fullname" type="text" class="form-control" id="inputPassword3" placeholder="Fullname">
+					 <label>Full Name</label>
+					  <input [formControl]="edit_fullname" type="text" class="form-control" id="inputPassword3" placeholder="Full Name">
                 </div>
               </div>
               <div class="row error-row">
                    <div class="col-sm-12">
                         <div class="error-message col-xg-10" *ngIf="edit_form.get('edit_fullname').hasError('required') && edit_form_submitted">
-                              Fullname is required
+                              Full Name is required
                         </div>
                     </div>
               </div>
@@ -297,7 +309,7 @@
                 </div>
               </div>
 -->
-            <ba-card title="Users Role" baCardClass="with-scroll role-card">
+            <ba-card title="User's Role" baCardClass="with-scroll role-card">
                   <div *ngFor="let role of loaded_roles">
                         <div class="form-group">
                           <div class="checkbox">
@@ -326,7 +338,7 @@
                         </span>
                    </div>
                   <div class="col-sm-3 btn-with-icon">
-                    <button type="submit" class="btn btn-default btn-save">
+                    <button *ngIf="!disabled" type="submit" class="btn btn-default btn-save">
                     <i class="icon ion-checkmark"></i>
                         Save
                     </button>

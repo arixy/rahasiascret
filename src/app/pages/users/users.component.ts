@@ -10,6 +10,8 @@ import { UsersRolesService } from './../users-role/users-roles.service';
 import { RoleService } from './../role/role.service';
 import { DataTable } from 'primeng/primeng';
 import { saveAs } from 'file-saver';
+import { DialogsService } from './../../services/dialog.service';
+import { GrowlMessage, MessageSeverity, MessageLabels } from '../../popup-notification';
 
 @Component({
   selector: 'users',
@@ -47,6 +49,7 @@ export class UsersComponent {
 
     public add_form_submitted = false;
     public edit_form_submitted = false;
+    public disabled = false;
 
 	new_users;
 	deleteConfirm;
@@ -63,6 +66,7 @@ export class UsersComponent {
 
     // Loading States
     dataLoading = false;
+    submitLoading = false;
 
     filter_master = {
         "username": {
@@ -83,7 +87,7 @@ export class UsersComponent {
         }
   };
 
-    private error_from_server;
+    public error_from_server = [];
     @ViewChild('addNewModal') addNewModal: ModalDirective;
     @ViewChild('editModal') editModal: ModalDirective;
     @ViewChild('rolesModal') rolesModal: ModalDirective;
@@ -95,7 +99,8 @@ export class UsersComponent {
     public cdr: ChangeDetectorRef,
     public usersService: UsersService,
     public usersRolesService: UsersRolesService,
-    public roleService: RoleService
+    public roleService: RoleService,
+    public dialogsService: DialogsService
     ) {
         // Add New Form
        this.form = fb.group({
@@ -264,7 +269,14 @@ export class UsersComponent {
     public deleteUsers(event){
 		this.deleteConfirm= event;
 		this.delete_name= event.fullname;
-		this.deleteModal.show();
+		
+        this.dialogsService.confirmDelete(this.delete_name, 'Test').subscribe(
+            (response) => {
+                if(response == true){
+                    this.saveDelete();
+                }
+            }
+        );
 		console.log('delete', event);
 		console.log('delete', event.fullname);
 	}
@@ -272,7 +284,17 @@ export class UsersComponent {
 		console.log('test', this.deleteConfirm.userId);	this.usersService.deleteUsers(this.deleteConfirm.userId).subscribe(
             (data) => {
                 console.log('Return Data', data);
-                this.ngOnInit();
+                if(data.resultCode.code == 0){
+                    // Growl Message Success
+                    GrowlMessage.addMessage(MessageSeverity.SUCCESS, MessageLabels.DELETE_SUCCESS);
+                    this.refresh(this.filter_master, this.usersTable);    
+                } else {
+                    // Error
+                    let error_delete = [];
+                    error_delete = error_delete.concat(data.resultCode.message);
+                    GrowlMessage.addMessage(MessageSeverity.ERROR, MessageLabels.DELETE_ERROR + '. ' + error_delete[0]);
+                    
+                }
             }
         );
 		this.deleteModal.hide();
@@ -292,6 +314,8 @@ export class UsersComponent {
     
     public editUsers(event){
         console.log('editing', event);
+        this.disabled = false;
+        this.edit_form.enable();
         
 		this.user_edit = event.userId;
         
@@ -375,6 +399,78 @@ export class UsersComponent {
         // Display Form Modal
         this.editModal.show();
     }
+
+    public viewUsers(event){
+        console.log('Viewing', event);
+        
+		this.user_edit = event.userId;
+        
+        // Actually Call the Get Individual User
+        this.usersService.get(this.user_edit).subscribe(
+            (response) => {
+                let user_data = response.data.user;
+                let user_roles = response.data.roles;
+                
+                console.log('User data from Get', response);
+                
+                // Inject Initial Value to the Edit Form
+                this.edit_form.patchValue(
+                    {
+                        edit_username: user_data.username,
+                        edit_fullname: user_data.fullname,
+                        edit_email: user_data.email,
+                        edit_mobilePhoneNumber: user_data.mobilePhoneNumber,
+                        edit_password: user_data.password
+                    }
+                );
+                
+                this.roleService.getRole().subscribe(
+                    (role_data) => {
+                        this.loaded_roles = role_data.data;
+                        this.loaded_roles = this.loaded_roles.map(
+                            (edit_role) => {
+                                let user_role_found = user_roles.find(
+                                    (role_of_user) => {
+                                        return role_of_user.roleId == edit_role.roleId;
+                                    }
+                                );
+                                
+                                if(user_role_found != undefined){
+                                    edit_role.is_selected = true;
+                                } else {
+                                    edit_role.is_selected = false;
+                                }
+                                
+                                return edit_role;
+                            }
+                        );
+                        
+                        // Make an Integer Representation of loaded roles
+                        this.loaded_roles.forEach(
+                            (loaded_role) => {
+                                if(loaded_role.is_selected == true){
+                                    this.edit_roles.push(loaded_role.roleId);
+                                }
+                            }
+                        );
+                        console.log('Loaded Roles after filteringt', this.loaded_roles);
+                    }
+                );
+            }
+        );
+        
+		
+		
+        // Prepare Roles Checkbox
+        // TODO: Doesn't this need to use processed_roles instead?
+        this.selected_user = event;
+        
+        // Display Form Modal
+        this.disabled = true;
+        this.edit_form.disable();
+        this.editModal.show();
+    }
+
     public onSubmit(values){
 		console.log('event', event);
        this.submitted = true;
@@ -382,6 +478,7 @@ export class UsersComponent {
         this.add_form_submitted = true;
         
 		if(this.form.valid){
+            this.submitLoading = true;
 			 console.log('Form Values uti:', values.id);
 			 console.log('Form Values uti:', values.leaderId);
 			 var formatted_object = Object.assign({}, {
@@ -397,16 +494,23 @@ export class UsersComponent {
 			 this.usersService.addUser(formatted_object).subscribe(
 				(data) => {
 					console.log('Return Data test', data);
+                    this.submitLoading = false;
 					if(data.resultCode.code == 0){
+                        
                         console.log('Success!');
+                        this.clearFormInputs(this.form);
+                        
+                        // Success Message
+                        GrowlMessage.addMessage(MessageSeverity.SUCCESS, MessageLabels.SAVE_SUCCESS);
+                        
                         this.addNewModal.hide();
                         // Refresh Data
-                        this.ngOnInit();
+                        this.refresh(this.filter_master, this.usersTable);
                         
                     } else {
-                        // Fail
-                        this.error_from_server = data.resultCode.message;
-                        // No Need to Close the Modal or Refresh Data
+                        // Error
+                        this.error_from_server = [];
+                        this.error_from_server = this.error_from_server.concat(data.resultCode.message);
                     }
 				}
 			);	

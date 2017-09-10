@@ -486,6 +486,11 @@ export class Assets {
         this.location_fc.setValue(null);
     }
 
+    public removedParentAsset(value: any){
+        this.selected_parent_asset = null;
+           
+    }
+
     
     public removed(value: any){
         console.log('Removed value is:', value);
@@ -649,7 +654,7 @@ export class Assets {
                     // Error
                     let error_delete = [];
                     error_delete = error_delete.concat(data.resultCode.message);
-                    GrowlMessage.addMessage(MessageSeverity.ERROR, MessageLabels.DELETE_ERROR + error_delete[0]);
+                    GrowlMessage.addMessage(MessageSeverity.ERROR, MessageLabels.DELETE_ERROR + '. ' + error_delete[0]);
                 }
                 this.ngOnInit();
             }
@@ -786,7 +791,7 @@ export class Assets {
             }
         );
         
-        // Disable Stuff in Here
+        // Disable Form in Here
         this.editForm.disable();
         this.disabled = true;
         this.editChildModal.show();

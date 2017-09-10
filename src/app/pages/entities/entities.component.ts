@@ -28,8 +28,11 @@ export class Entities {
     public name;
     public description;
     public address1;
+    public address2;
     public contact_person;
     public phone1;
+    public phone2;
+    public phone3;
 	public entity_edit;
     
     public items_entity_type = null;
@@ -40,14 +43,18 @@ export class Entities {
 	public edit_name;
     public edit_description;
     public edit_address1;
+    public edit_address2;
     public edit_contact_person;
     public edit_phone1;
+    public edit_phone2;
+    public edit_phone3;
 	public edit_entities;
 	deleteConfirm;
 	delete_name;
 
     add_form_submitted = false;
     edit_form_submitted = false;
+    disabled = false;
 
     // Filtering Form Conrol
     filter_name_fc = new FormControl();
@@ -96,6 +103,7 @@ export class Entities {
     current_entity_type_name = null;
 
     dataLoading = false;
+    submitLoading = false;
     totalRecords;
 	
     @ViewChild('addNewModal') addNewModal: ModalDirective;
@@ -116,22 +124,28 @@ export class Entities {
           'name': ['', Validators.compose([Validators.required])],
           'description': ['', Validators.compose([Validators.required])],
 			'address1': ['', Validators.compose([Validators.required])],
-			'contact_person': ['', Validators.compose([Validators.required])],
+            'address2': [''],
+			'contact_person': [''],
 			'phone1': ['', Validators.compose([Validators.required])],
-          
+            'phone2': [''],
+            'phone3': [''],
         });
         this.name = this.form.controls['name'];
         this.description = this.form.controls['description'];
         this.address1 = this.form.controls['address1'];
-        this.contact_person= this.form.controls['contact_person'];
-        this.phone1= this.form.controls['phone1'];
-		
+        this.address2 = this.form.controls['address2'];
+        this.contact_person = this.form.controls['contact_person'];
+        this.phone1 = this.form.controls['phone1'];
+        this.phone2 = this.form.controls['phone2'];
+		this.phone3 = this.form.controls['phone3'];
+      
+      
 		//edit
 		 this.edit_form = fb.group({
           'edit_name': ['', Validators.compose([Validators.required])],
           'edit_description': ['', Validators.compose([Validators.required])],
 			'edit_address1': ['', Validators.compose([Validators.required])],
-			'edit_contact_person': ['', Validators.compose([Validators.required])],
+			'edit_contact_person': [''],
 			'edit_phone1': ['', Validators.compose([Validators.required])],
           
         });
@@ -310,10 +324,13 @@ export class Entities {
 	   	console.log('create component', values);
         values.entity_type_id = this.selected_entity_type;
 			if (this.form.valid) {
+                this.submitLoading = true;
 				console.log(values);
 				// your code goes here
 				this.entityService.addEntity(values).subscribe(
 				(data) => {
+                    this.submitLoading = false;
+                    
                     if(data.resultCode.code == 0){
                         console.log('Success!');
                         this.addNewModal.hide();
@@ -362,6 +379,9 @@ export class Entities {
         //event.preventDefault();
             this.edit_form_submitted = true;
 		if(this.edit_form.valid){
+            
+            this.submitLoading = true;
+            
 			 var formatted_object = Object.assign({}, {
                	id: this.entity_edit,
                 name: values.edit_name,
@@ -374,6 +394,8 @@ export class Entities {
 			
 			 let response = this.entityService. updateEntity(formatted_object).subscribe(
                 (data) => {
+                    this.submitLoading = false;
+                    
                     console.log('Response Data', data);
                     this.editModal.hide();
 

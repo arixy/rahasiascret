@@ -41,6 +41,7 @@
                                 Action <span class="caret"></span>
                               </button>
                               <ul dropdownMenu role="menu" aria-labelledby="single-button">
+                                <li role="menuitem"><a  class="dropdown-item" (click)="viewPriority(priority)">View</a></li>
                                 <li role="menuitem"><a  class="dropdown-item" (click)="editPriority(priority)">Edit</a></li>
                                 <li role="menuitem"><a class="dropdown-item" (click)="deletePriority(priority)">Delete</a></li>
                               </ul>
@@ -86,13 +87,19 @@
           <span aria-hidden="true">&times;</span>
         </button>
         <h4 class="modal-title">Add New Priority</h4>
-       <div *ngIf="error_from_server" class="error-from-server">
-              <i class="fa fa-exclamation-circle"></i> {{error_from_server}}
+       <div *ngIf="error_from_server.length > 0" class="error-from-server">
+              <i class="fa fa-exclamation-circle"></i>
+              <ul style="margin-bottom: 0px;" class="lst-error">
+                  <li *ngFor="let err of error_from_server">
+                    {{err}}
+                  </li>
+                </ul>
           </div>
       </div>
       <div class="modal-body">
         <div>
             <ba-card title="" baCardClass="with-scroll custom-card">
+             <spinner *ngIf="submitLoading"></spinner>
               <form [formGroup]="form" (ngSubmit)="onSubmit(form.value)" class="form-horizontal">
               <div class="modal-form-container">
                   
@@ -171,11 +178,18 @@
         <button class="close" aria-label="Close" (click)="cancel()">
           <span aria-hidden="true">&times;</span>
         </button>
-        <h4 class="modal-title">Edit Priority</h4>
+        <span *ngIf="!disabled">
+            <h4 class="modal-title">Edit Priority</h4>
+        </span>
+        
+        <span *ngIf="disabled">
+            <h4 class="modal-title">View Priority</h4>
+        </span>
       </div>
       <div class="modal-body">
         <div>
             <ba-card title="" baCardClass="with-scroll custom-card">
+             <spinner *ngIf="submitLoading"></spinner>
               <form [formGroup]="edit_form" (ngSubmit)="onSubmitEdit(edit_form.value, $event)" class="form-horizontal">
               <div class="modal-form-container">
               <div class="form-group row">

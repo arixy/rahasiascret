@@ -3,10 +3,11 @@ import { NgUploaderOptions } from 'ngx-uploader';
 import { LocationService } from '../../../../services/location.service';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
-import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
+import { FormControl, FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { TreeComponent } from 'angular2-tree-component';
 import { ModalDirective } from 'ng2-bootstrap';
 import { SelectComponent } from 'ng2-select';
+import { GrowlMessage, MessageSeverity, MessageLabels } from '../../../../popup-notification';
 
 function convertToTree(flat_data){
         console.log('Flat Data:', flat_data);
@@ -131,17 +132,19 @@ export class Locations {
   add_form_submitted = false;
   edit_form_submitted = false;
 
+  disabled = false;
+
+  error_from_server = [];
+
   // Loading State
   public dataLoading = false;
   public submitLoading = false;
 
-  public location_edit = null /*{
-    id: null,
-    name: '',
-    description: '',
-    parent_location_id: null,
-    selected_location: null
-  };*/
+  public location_edit = null
+  
+  // Form Control
+  public filterLocationName = new FormControl();
+  public filterLocationDescription = new FormControl();
 
   public filter_master = {
       "name": {
@@ -230,6 +233,28 @@ export class Locations {
               );
         }
       );*/
+      // Filter Form Control
+        this.filterLocationName.valueChanges.debounceTime(800).subscribe(
+            (filter_text) => {
+                console.log('Filter Text', filter_text);
+                this.filter_master.name = {
+                    matchMode: undefined,
+                    value: filter_text
+                }
+                this.refresh(this.filter_master);
+            }
+        );
+      
+        this.filterLocationDescription.valueChanges.debounceTime(800).subscribe(
+            (filter_text) => {
+                console.log('Filter Text', filter_text);
+                this.filter_master.description = {
+                    matchMode: undefined,
+                    value: filter_text
+                }
+                this.refresh(this.filter_master);
+            }
+        );
   }
 
     public initialRefresh(filter_master){
@@ -336,13 +361,17 @@ export class Locations {
     public removed(value: any){
         console.log('Removed value is:', value);
     }
+    
+    public removedParentLocation(value: any){
+        this.selected_location = null;
+    }
 
     public onSubmitEdit(values,event) {
         //event.preventDefault();
         console.log('EditForm:', values);
         console.log('Location Edit', this.location_edit);
         if(this.editForm.valid){
-            
+            this.submitLoading = true;
             var formatted_object = Object.assign({}, {
                id: this.location_edit.data.locationId,
                 name: values.edit_name,
@@ -355,6 +384,7 @@ export class Locations {
             
             this.locationService.updateLocation(formatted_object).subscribe(
                 (data) => {
+                    this.submitLoading = false;
                     console.log('Response Update Data', data);
                     this.ngOnInit();
                 }
@@ -370,6 +400,7 @@ export class Locations {
         this.submitted = true;
         
         if (this.form.valid) {
+            this.submitLoading = true;
             console.log(values);
           // your code goes here
             var formatted_object = Object.assign({}, {
@@ -391,24 +422,37 @@ export class Locations {
             
             this.locationService.addLocation(formatted_object).subscribe(
                 (data) => {
-                    
+                    this.submitLoading = false;
                     console.log('Response Data', data);
                     
-                    //this.appRef.tick();
-                    //var temp_locations = JSON.parse(JSON.stringify(this.locations));
-                    //this.treeLocations = [].concat(convertToTree(temp_locations));
-                    //this.locations_tree.treeModel.update();
+                    if(data.resultCode.code == 0){
+                        // Clear all input in the form
+                        this.clearFormInputs(this.form);
+                        // Specific clearing for add select boxes
+                        this.selected_location = null;
+
+                        this.addSelectBox.active = [];
+                        this.addSelectBox.ngOnInit();
+
+                        console.log('Tree Model:', this.locations_tree);
+                        console.log('The Locations Tree:', this.treeLocations);
+                        console.log('The Locations:', this.locations);
+                        
+                        this.childModal.hide();
+                        
+                        GrowlMessage.addMessage(MessageSeverity.SUCCESS, MessageLabels.SAVE_SUCCESS);
+                        
+                        this.ngOnInit(); 
+                        
+                    } else {
+                        // Error
+                        this.error_from_server = [];
+                        this.error_from_server = this.error_from_server.concat(data.resultCode.message);
+                    }
                     
-                    console.log('Tree Model:', this.locations_tree);
-                    console.log('The Locations Tree:', this.treeLocations);
-                    console.log('The Locations:', this.locations);
-                    // Perhaps ngOnInit works better?
-                    this.ngOnInit();
                 }
             );
             
-            
-            this.childModal.hide();
         }
     }
 
@@ -417,8 +461,8 @@ export class Locations {
         
         
         var selected_location = {
-            id: event.id,
-            text: event.name
+            id: event.data.locationId,
+            text: event.data.name
         }
         this.selected_location = selected_location;
         // Only Done because bug in ng2-select
@@ -434,6 +478,8 @@ export class Locations {
     public editLocation(event){
         console.log('Tree Edit Node Click', event);
         this.location_edit = event;
+        this.disabled = false;
+        this.editForm.enable();
         
         // Inject Initial Value to the Edit Form
         this.editForm.patchValue({ edit_name: event.data.name });
@@ -464,9 +510,49 @@ export class Locations {
         console.log('Location Edit Initial Select:', this.location_edit.selected_location);
         this.editChildModal.show();
     }
+
+    public viewLocation(event){
+        console.log('View Location', event);
+        this.location_edit = event;
+        
+        this.editForm.patchValue(
+            {
+                edit_name: event.data.name,
+                edit_description: event.data.description,
+            }
+        );
+        
+        if(event.data.parentLocationId){
+            if (this.editSelectBox) {
+                
+              let locations_data = this.locations;    
+              let location_found = locations_data.filter(
+                (locations_object) => {
+                    return locations_object.locationId == event.data.parentLocationId;
+                }
+              );
+              console.log('Location Found', location_found);
+                
+              this.location_edit.selected_location = {
+                    id: event.data.parentLocationId,
+                    text: location_found[0].name
+              };
+                
+              // Only Done because bug in ng2-select
+              this.editSelectBox.active = [this.location_edit.selected_location];
+              this.editSelectBox.ngOnInit();
+            }
+        }
+        
+        // Disable Form in Here
+        this.editForm.disable();
+        this.disabled = true;
+        this.editChildModal.show();
+        
+    }
     public deleteLocation(event){
         this.deleteConfirm = event;
-        this.delete_name = event.name;
+        this.delete_name = event.data.name;
         
         this.deleteModal.show();
         console.log('Deleting Node', event);
@@ -482,7 +568,17 @@ export class Locations {
         // Should call the Confirmation Modal first
         this.locationService.deleteLocation(this.deleteConfirm.data.locationId).subscribe(
             (data) => {
+                
                 console.log('Return Data', data);
+                if(data.resultCode.code == 0){
+                    // Growl Message Success
+                    GrowlMessage.addMessage(MessageSeverity.SUCCESS, MessageLabels.DELETE_SUCCESS);
+                } else {
+                    // Error
+                    let error_delete = [];
+                    error_delete = error_delete.concat(data.resultCode.message);
+                    GrowlMessage.addMessage(MessageSeverity.ERROR, MessageLabels.DELETE_ERROR + '. ' + error_delete[0]);
+                }
                 // Refresh
                 this.ngOnInit();
             }
@@ -504,9 +600,23 @@ export class Locations {
                     
         
     }
+    
     public clearFormInputs(form){
         form.reset();
     }
+
+    public resetFilters(table){
+        
+        // Clear all filter in filter master. Might be Redundant
+        this.filter_master.name.value = "";
+        this.filter_master.description.value = "";
+        
+        // Actually changing the value on the input field. Auto Refresh
+        this.filterLocationName.setValue("");
+        this.filterLocationDescription.setValue("");
+        
+    }
+
     public hideChildModal(){
         this.childModal.hide();
         this.editChildModal.hide();

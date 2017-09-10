@@ -7,6 +7,7 @@ import { ModalDirective } from 'ng2-bootstrap';
 import { DataTable } from 'primeng/primeng';
 import * as moment from 'moment';
 import { DialogsService } from './../../services/dialog.service';
+import { GrowlMessage, MessageSeverity, MessageLabels } from '../../popup-notification';
 
 @Component({
   selector: 'priorities',
@@ -33,7 +34,7 @@ export class Priorities {
 	deleteConfirm;
 	delete_name;
     
-    error_from_server = null;
+    error_from_server = [];
 
     add_form_submitted = false;
     edit_form_submitted = false;
@@ -55,6 +56,9 @@ export class Priorities {
 
     // Loading State
     dataLoading = false;
+    public submitLoading = false;
+
+    disabled = false;
     
     @ViewChild('addNewModal') addNewModal: ModalDirective;
 	@ViewChild('editModal') editModal: ModalDirective;
@@ -240,6 +244,8 @@ export class Priorities {
     
     public editPriority(priority){
         console.log('editing', priority);
+        this.disabled = false;
+        this.edit_form.enable();
         
 		this.priority_edit = priority.woPriorityId;
 		// Inject Initial Value to the Edit Form
@@ -256,23 +262,60 @@ export class Priorities {
          this.editModal.show();   
     }
 
+    public viewPriority(priority){
+        console.log('Viewing', priority);
+        this.priority_edit = priority.woPriorityId;
+		// Inject Initial Value to the Edit Form
+        this.edit_form.patchValue(
+			{ 
+				edit_name: priority.name,
+				edit_description: priority.description,
+				edit_escalationPeriodInDays: priority.escalationPeriodInDays
+			
+			}
+		);
+		
+        this.disabled = true;
+        this.edit_form.disable();
+		
+        // Display Form Modal
+         this.editModal.show();   
+    }
+
 	public onSubmit(values:Object):void {
 		this.submitted = true;
         this.add_form_submitted = true;
+        
 		 console.log('create component');
 		if (this.form.valid) {
-			console.log(values);
-		  // your code goes here
+			
+            this.submitLoading = true;
+
 			this.priorityService.addPriority(values).subscribe(
 				(data) => {
+                    this.submitLoading = false;
 					console.log('Return Data', data);
+                            
+                    if(data.resultCode.code == 0){
+                        
+                        this.addNewModal.hide();
+                        
+                        // Growl Message Success
+                        GrowlMessage.addMessage(MessageSeverity.SUCCESS, MessageLabels.SAVE_SUCCESS);
+                        
+                        // Refresh Data
+                        this.refresh(this.filter_master, this.prioritiesTable);
+                        
+                    } else {
+                        // Error
+                        this.error_from_server = [];
+                        this.error_from_server = this.error_from_server.concat(data.resultCode.message);
+                    }
                     
-                    // Refresh Data
-                    this.refresh(this.filter_master, this.prioritiesTable);
 				}
 			);
 
-			this.addNewModal.hide();
+			
 
 			
 		}
@@ -281,7 +324,10 @@ export class Priorities {
 	public onSubmitEdit(values,event){
     	console.log('edit form',values);
         this.edit_form_submitted = true;
+        
 		if(this.edit_form.valid){
+            this.submitLoading = true;
+            
 			 var formatted_object = Object.assign({}, {
                	id: this.priority_edit,
                 name: values.edit_name,
@@ -291,6 +337,7 @@ export class Priorities {
 			
 			 let response = this.priorityService. updatePriority(formatted_object).subscribe(
                 (data) => {
+                    this.submitLoading = false;
                     console.log('Response Data', data);
                     this.editModal.hide();
 

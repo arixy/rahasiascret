@@ -8,6 +8,7 @@ import { UtilityTypesService } from './utility-types.service';
 import { LocalDataSource } from 'ng2-smart-table';
 import { DataTable } from 'primeng/primeng';
 import { DialogsService } from './../../services/dialog.service';
+import { GrowlMessage, MessageSeverity, MessageLabels } from '../../popup-notification';
 
 @Component({
   selector: 'utility-types',
@@ -36,6 +37,7 @@ export class UtilityTypes {
     
     add_form_submitted = false;
     edit_form_submitted = false;
+    disabled = false;
 
     // Filtering
     filter_name_fc = new FormControl();
@@ -54,6 +56,7 @@ export class UtilityTypes {
 
     // Loading State
     dataLoading = false;
+    submitLoading = false;
 
 	@ViewChild('addNewModal') addNewModal: ModalDirective;
     @ViewChild('editModal') editModal: ModalDirective;
@@ -209,7 +212,19 @@ export class UtilityTypes {
 			this.utilityTypesService.deleteUtilityType(this.deleteConfirm.utilityTypeId).subscribe(
             (data) => {
                 console.log('Return Data', data);
-                this.refresh(this.filter_master, this.utilityTypesTable);
+                
+                if(data.resultCode.code == 0){
+                    // Growl Message Success
+                    GrowlMessage.addMessage(MessageSeverity.SUCCESS, MessageLabels.DELETE_SUCCESS);
+                    this.refresh(this.filter_master, this.utilityTypesTable);    
+                } else {
+                    // Error
+                    let error_delete = [];
+                    error_delete = error_delete.concat(data.resultCode.message);
+                    GrowlMessage.addMessage(MessageSeverity.ERROR, MessageLabels.DELETE_ERROR + '. ' + error_delete[0]);
+                    
+                }
+                
             }
         );
 		//this.deleteModal.hide();
@@ -222,6 +237,8 @@ export class UtilityTypes {
     
     public editUtilityType(event){
         console.log('editing', event);
+        this.disabled = false;
+        this.edit_form.enable();
         
 		this.utility_edit = event.utilityTypeId;
 		console.log('this.utility_edit', this.utility_edit);
@@ -236,6 +253,26 @@ export class UtilityTypes {
          this.editModal.show();
     }
 
+    public viewUtilityType(event){
+        console.log('editing', event);
+        
+		this.utility_edit = event.utilityTypeId;
+		console.log('this.utility_edit', this.utility_edit);
+		// Inject Initial Value to the Edit Form
+        this.edit_form.patchValue(
+			{ 
+				edit_name: event.name,
+				edit_description: event.description
+			}
+		);
+        
+        this.disabled = true;
+        this.edit_form.disable();
+        
+        // Display Form Modal
+         this.editModal.show();
+    }
+
 	public onSubmit(values:Object):void {
 		this.submitted = true;
         this.add_form_submitted = true;
@@ -243,23 +280,35 @@ export class UtilityTypes {
 		 console.log('create component');
 		 console.log('create component', values);
 		if (this.form.valid) {
-			console.log(values);
-		  // your code goes here
+            
+            this.submitLoading = true;
 			this.utilityTypesService.addUtilityType(values).subscribe(
 				(data) => {
-					console.log('Return Data', data);
+                    this.submitLoading = false;
                     
-                    // Refresh Data 
-                    this.refresh(this.filter_master, this.utilityTypesTable);
+					console.log('Return Data', data);
+                    if(data.resultCode.code == 0){
+                        // Refresh Data 
+                        
+                        this.clearFormInputs(this.form);
+                        this.addNewModal.hide();
+                        
+                        // Success Message
+                        GrowlMessage.addMessage(MessageSeverity.SUCCESS, MessageLabels.SAVE_SUCCESS);
+                        
+                        this.refresh(this.filter_master, this.utilityTypesTable);
+                        
+                    } else {
+                        
+                        // Error
+                        this.error_from_server = [];
+                        this.error_from_server = this.error_from_server.concat(data.resultCode.message);
+                    }
+                    
 				}
 			);
-			this.form.patchValue(
-            	{   
-                	name:'',
-                	description: '',
-				}
-        	);
-			this.addNewModal.hide();
+			
+			
 		}
 
 	  }

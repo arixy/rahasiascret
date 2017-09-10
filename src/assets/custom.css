@@ -701,6 +701,14 @@ body .ui-paginator .ui-paginator-first, body .ui-paginator .ui-paginator-prev, b
   background: linear-gradient(to right, #f31a79, #f15f79);
 }
 
+.ui-treetable .col-button {
+    text-align: center;
+}
+.ui-datatable .col-button {
+    text-align: center;
+}
+
+button:focus {outline:0 !important;}
 /* Added by Mike */
 .ui-fileupload-buttonbar button:not(.ui-fileupload-choose) {
   display: none !important;
